@@ -1,7 +1,7 @@
 {
-    "name": "Wastechain",
+    "name": "wastechain-contract",
     "version": "0.0.1",
-    "description": "My Smart Contract",
+    "description": "Wastechain Contract",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "engines": {
