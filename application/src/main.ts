@@ -1,23 +1,19 @@
 import { FileSystemWallet, Gateway, GatewayOptions } from "fabric-network";
 import * as fs from "fs";
-const yaml = require('js-yaml');
-
-console.log(__dirname)
+import * as yaml from "js-yaml";
 
 async function main() {
     const gateway = new Gateway();
     const wallet = new FileSystemWallet('/Users/julian/Documents/wallets/identity/user/balaji/wallet');
-    //const wallet = new FileSystemWallet('identity/user/balaji/wallet');
 
     try {
-        console.log("Connecting")
         const userName = 'Admin@org1.example.com';
 
         // Load connection profile; will be used to locate a gateway
         let connectionProfile = yaml.safeLoad(fs.readFileSync('networkConnection.yaml', 'utf8'));
 
         // Set connection options; identity and wallet
-        let connectionOptions = {
+        let connectionOptions: GatewayOptions = {
             identity: userName,
             wallet: wallet,
             discovery: { enabled: false, asLocalhost: true }
