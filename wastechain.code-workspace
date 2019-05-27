@@ -1,10 +1,12 @@
 {
 	"folders": [
 		{
-			"path": "/Users/julian/Documents/Programming/Wastechain/Wastechain/contract"
+			"name": "contract",
+			"path": "contract"
 		},
 		{
-			"path": "/Users/julian/Documents/Programming/Wastechain/Wastechain/application"
+			"name": "application",
+			"path": "application"
 		}
 	],
 	"settings": {}

@@ -5,7 +5,7 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import { Order } from './order';
 
-@Info({title: 'OrderContract', description: 'My Smart Contract' })
+@Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
 
     @Transaction(false)
@@ -24,6 +24,7 @@ export class OrderContract extends Contract {
         const order = new Order();
         order.value = value;
         const buffer = Buffer.from(JSON.stringify(order));
+        ctx.stub.setEvent("CREATE_ORDER", buffer);
         await ctx.stub.putState(orderId, buffer);
     }
 
