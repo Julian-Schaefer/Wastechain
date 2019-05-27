@@ -35,7 +35,16 @@ async function main() {
 
         const contract = await network.getContract('papercontract', 'org.papernet.commercialpaper');
         console.log(network.getChannel().getName());
-        //contract.addContractListener()
+        contract.addContractListener('CREATE_ORDER', 'CREATE_ORDER', (error: Error, event: { [key: string]: any }, blockNumber: string, transactionId: string, status: string) => {
+            return new Promise((resolve, reject) => {
+                console.log('Order Created');
+                if (error) {
+                    reject(error)
+                } else {
+                    resolve(event);
+                }
+            });
+        });
     } catch (e) {
         console.log(e);
     } finally {
