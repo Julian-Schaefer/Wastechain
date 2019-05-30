@@ -24,8 +24,8 @@ export class OrderContract extends Contract {
         const order = new Order();
         order.value = value;
         const buffer = Buffer.from(JSON.stringify(order));
-        ctx.stub.setEvent("CREATE_ORDER", buffer);
         await ctx.stub.putState(orderId, buffer);
+        ctx.stub.setEvent("CREATE_ORDER", Buffer.from(orderId));
     }
 
     @Transaction(false)
