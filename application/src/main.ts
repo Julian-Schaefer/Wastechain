@@ -34,11 +34,11 @@ async function main() {
         console.log('Use org.papernet.commercialpaper smart contract.');
 
         const contract = await network.getContract('Wastechain', 'OrderContract');
-        const tx = await contract.submitTransaction('createOrder', 'tdsesddt2s2', 'Testvalue');
+        const tx = await contract.submitTransaction('createOrder', 'test', 'Testvalue');
 
         contract.addContractListener('CREATE_ORDER', 'CREATE_ORDER', (error: Error, event: { [key: string]: any }, blockNumber: string, transactionId: string, status: string) => {
             return new Promise((resolve, reject) => {
-                console.log('Order Created: ' + JSON.stringify(event.payload));
+                console.log('Order Created: ' + event.payload.toString('utf-8'));
                 if (error) {
                     reject(error)
                 } else {
