@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
 import { Settings, SettingsSchema } from '../model/Settings';
-import { Validator, ValidationError } from 'express-json-validator-middleware';
+import { Validator } from 'express-json-validator-middleware';
 import * as fs from 'fs';
 
 export class SettingsController {
