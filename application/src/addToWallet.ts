@@ -9,7 +9,7 @@ const fs = require('fs');
 const { FileSystemWallet, X509WalletMixin } = require('fabric-network');
 const path = require('path');
 
-const fixtures = path.resolve(__dirname, '/Users/julian/Documents/Programming/hyperledger/fabric-samples/basic-network');
+const fixtures = path.resolve(__dirname, '../../network');
 
 // A wallet stores a collection of identities
 const wallet = new FileSystemWallet('../identity/user/balaji/wallet');
