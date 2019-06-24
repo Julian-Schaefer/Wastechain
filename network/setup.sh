@@ -80,8 +80,5 @@ sudo apt-get install -y nodejs
 sudo mkdir -p /var/hyperledger
 sudo chown -R vagrant:vagrant /var/hyperledger
 
-# Ensure permissions are set for GOPATH
-sudo chown -R vagrant:vagrant $GOPATH
-
 # finally, remove our warning so the user knows this was successful
 rm /etc/motd
