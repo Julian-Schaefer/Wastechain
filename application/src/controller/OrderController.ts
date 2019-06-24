@@ -10,7 +10,7 @@ export class OrderController {
     constructor(app: Express, fabricConnection: FabricConnection) {
         this.fabricConnection = fabricConnection;
 
-        app.get('/events', this.getEvents.bind(this));
+        app.get('/order', this.getOrders.bind(this));
         app.post('/order/:orderId', this.createOrder.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
@@ -24,7 +24,7 @@ export class OrderController {
         });
     }
 
-    private getEvents = (request: Request, response: Response) => {
+    private getOrders = (request: Request, response: Response) => {
         // SSE Setup
         response.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -47,13 +47,12 @@ export class OrderController {
         let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
         try {
             await contract.submitTransaction('createOrder', orderId, 'Testvalue');
+            console.log('Submitted Contract with ID: ' + orderId);
+            response.send('Submitted Contract with ID: ' + request.params.orderId);
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
             response.send('Error submitting Transaction: ' + error);
-
         }
-        console.log('Submitted Contract with ID: ' + orderId);
-        response.send('Submitted Contract with ID: ' + request.params.orderId);
     }
 
 
