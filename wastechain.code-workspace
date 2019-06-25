@@ -9,7 +9,12 @@
 			"path": "application"
 		},
 		{
+			"name": "network",
 			"path": "network"
+		},
+		{
+			"name": "frontend",
+			"path": "frontend"
 		}
 	],
 	"settings": {}
