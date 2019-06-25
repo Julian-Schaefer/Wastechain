@@ -79,6 +79,3 @@ sudo apt-get install -y nodejs
 # Create directory for the DB
 sudo mkdir -p /var/hyperledger
 sudo chown -R vagrant:vagrant /var/hyperledger
-
-# finally, remove our warning so the user knows this was successful
-rm /etc/motd
