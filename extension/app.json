@@ -1,0 +1,31 @@
+{
+  "id": "60d4c66d-a6a4-4ace-99cd-162c5cf440dc",
+  "name": "Wastechain",
+  "publisher": "Julian Schäfer",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "appId": "05f7e1ef-ed7c-42bc-8a09-6d146ed92f6f",
+      "name": "RC365 Core",
+      "version": "1.0.0.0",
+      "publisher": "tegos Group"
+    }
+  ],
+  "screenshots": [],
+  "platform": "13.0.0.0",
+  "application": "13.0.0.0",
+  "idRange": 
+    {
+      "from": 50100,
+      "to": 50149
+    },
+  "showMyCode": false,
+  "runtime": "2.4"
+}
