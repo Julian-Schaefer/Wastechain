@@ -1,10 +1,5 @@
 pageextension 50100 "Waste Mgt. Order Ext WC" extends "Waste Mgt. Order"
 {
-    layout
-    {
-        // Add changes to page layout here
-    }
-
     actions
     {
         addlast(Create)
@@ -17,12 +12,9 @@ pageextension 50100 "Waste Mgt. Order Ext WC" extends "Waste Mgt. Order"
                 var
                     WastechainMgt: Codeunit "Wastechain Management";
                 begin
-                    WastechainMgt.CreateWasteOrderOnBlockchain();
+                    WastechainMgt.CreateWasteOrderOnBlockchain(Rec);
                 end;
             }
         }
     }
-
-    var
-        myInt: Integer;
 }
