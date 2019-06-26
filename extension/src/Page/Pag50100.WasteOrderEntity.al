@@ -9,6 +9,8 @@ page 50100 "Waste Order Entity WC"
     EntitySetName = 'wasteOrders';
     SourceTable = "Waste Order WC";
     DelayedInsert = true;
+    ModifyAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -40,5 +42,7 @@ page 50100 "Waste Order Entity WC"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         Insert(true);
+
+        exit(false);
     end;
 }
