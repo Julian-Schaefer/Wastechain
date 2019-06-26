@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as bodyparser from 'body-parser';
-import { ValidationError } from 'express-json-validator-middleware';
+import { ValidationError } from '@hapi/joi';
 import { OrderController } from './controller/OrderController';
 import { FabricConnection } from './fabric';
 import { SettingsController } from './controller/SettingsController';
@@ -18,7 +18,7 @@ export class WastechainServer {
         new SettingsController(this.app);
 
         this.app.use(function (error: Error, _: any, response: any, next: any) {
-            if (error instanceof ValidationError) {
+            if ((error as ValidationError).isJoi) {
                 response.status(400).send('Invalid Format of the Request Body.');
                 next();
             }

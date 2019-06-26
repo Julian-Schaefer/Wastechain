@@ -1,16 +1,14 @@
 import { Express, Request, Response } from 'express';
 import { Settings, SettingsSchema } from '../model/Settings';
-import { Validator } from 'express-json-validator-middleware';
+import * as Joi from '@hapi/joi';
 import * as fs from 'fs';
 
 export class SettingsController {
     private FILE_NAME = 'wastechain.json';
-    private validator = new Validator({ allErrors: true });
 
     constructor(app: Express) {
-        let validator = this.validator.validate({ body: SettingsSchema });
         app.get('/settings', this.getSettings.bind(this));
-        app.post('/settings', validator, this.postSettings.bind(this));
+        app.post('/settings', this.postSettings.bind(this));
     }
 
     private getSettings(_: Request, response: Response) {
@@ -26,8 +24,12 @@ export class SettingsController {
         });
     }
 
-    private async postSettings(request: Request, response: Response) {
+    private postSettings(request: Request, response: Response) {
         let settings = request.body as Settings;
+        const validationResult = Joi.validate(settings, SettingsSchema);
+        if(validationResult.error !== null) {
+            throw validationResult.error;
+        }
 
         fs.writeFile(this.FILE_NAME, JSON.stringify(settings), 'utf8', (error) => {
             if (error) {
