@@ -18,20 +18,20 @@
 
 # This is the mount point for the sync_folders of the source
 SRCMOUNT = "/hyperledger"
-LOCALDEV = "/local-dev"
+NETWORKMOUNT = "/network"
 
 $script = <<SCRIPT
 set -x
 
 echo "127.0.0.1 couchdb" | tee -a /etc/hosts
 
-/vagrant/setup.sh
+#{NETWORKMOUNT}/setup.sh
 
 SCRIPT
 
 Vagrant.require_version ">= 1.7.4"
 Vagrant.configure('2') do |config|
-  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.box = "generic/ubuntu1604"
 
   config.vm.network :forwarded_port, guest: 7050, host: 7050, id: "orderer", host_ip: "localhost", auto_correct: true # fabric orderer service
   config.vm.network :forwarded_port, guest: 7051, host: 7051, id: "peer", host_ip: "localhost", auto_correct: true # fabric peer service
@@ -39,6 +39,7 @@ Vagrant.configure('2') do |config|
   config.vm.network :forwarded_port, guest: 7054, host: 7054, id: "ca", host_ip: "localhost", auto_correct: true # fabric-ca service
   config.vm.network :forwarded_port, guest: 5984, host: 15984, id: "couchdb", host_ip: "localhost", auto_correct: true # CouchDB service
   config.vm.synced_folder "..", "#{SRCMOUNT}"
+  config.vm.synced_folder ".", "#{NETWORKMOUNT}"
   config.vm.provider :hyperv do |vb|
     vb.vmname = "hyperledger"
     vb.cpus = 2
