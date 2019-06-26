@@ -1,6 +1,8 @@
 import { Express, Request, Response } from 'express';
-import { FabricConnection } from '../fabric';
+import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
+import { FabricConnection } from '../fabric';
+import { WasteOrderSchema } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -16,7 +18,9 @@ export class OrderController {
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
                 console.log('Order Created: ' + status);
-                this.sendEvent(JSON.stringify(event));
+                //this.sendEvent(JSON.stringify(event));
+                this.sendEvent(JSON.stringify(event.payload.toString('utf-8')));
+            
                 resolve({});
             });
         }, (error: Error) => {
@@ -44,9 +48,17 @@ export class OrderController {
 
     private async createOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
-        let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+        let wasteOrder = request.body;
+
         try {
-            await contract.submitTransaction('createOrder', orderId, 'Testvalue');
+            const validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
+            if(validationResult.error !== null) {
+                throw validationResult.error;
+            }
+
+            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
+
             console.log('Submitted Contract with ID: ' + orderId);
             response.send('Submitted Contract with ID: ' + request.params.orderId);
         } catch (error) {
@@ -54,8 +66,6 @@ export class OrderController {
             response.send('Error submitting Transaction: ' + error);
         }
     }
-
-
 
     private sendEvent(data: any) {
         this.responses.forEach((response: Response) => {
