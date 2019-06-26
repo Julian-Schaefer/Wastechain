@@ -3,8 +3,9 @@
  */
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
+import * as Joi from '@hapi/joi';
 import { Order } from './order';
-import { WasteOrder } from './model/WasteOrder';
+import { WasteOrder, WasteOrderSchema } from './model/WasteOrder';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -19,6 +20,11 @@ export class OrderContract extends Contract {
     @Transaction()
     public async createOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
+        
+        let validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
+        if(validationResult.error !== null) {
+            throw "Invalid Waste Order Schema!";
+        }
 
         orderId = ctx.clientIdentity.getMSPID() + '-' + orderId;
         const exists = await this.orderExists(ctx, orderId);
