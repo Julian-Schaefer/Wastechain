@@ -4,7 +4,7 @@ page 50100 "Waste Order Entity WC"
     Caption = 'wasteOrder';
     APIPublisher = 'JulianSchaefer';
     APIGroup = 'wastechain';
-    APIVersion = 'v1.0';
+    APIVersion = 'beta';
     EntityName = 'wasteOrder';
     EntitySetName = 'wasteOrders';
     SourceTable = "Waste Order WC";
