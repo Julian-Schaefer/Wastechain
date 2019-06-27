@@ -5,7 +5,6 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
 import { WasteOrder, WasteOrderSchema, WasteOrderUpdateSchema } from './model/WasteOrder';
-import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -40,13 +39,28 @@ export class OrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getHistory(ctx: Context, key: string): Promise<Iterators.KeyModification[]> {
+    public async getHistory(ctx: Context, key: string): Promise<{key: string, timestamp: string, value: string}[]> {
         let iterator = await ctx.stub.getHistoryForKey(key);
-        let allResults: Iterators.KeyModification[] = [];
+        let allResults: {key: string, timestamp: string, value: string}[] = [];
 
         while (true) {
             let result = await iterator.next();
-            allResults.push(result.value);
+            if (result.value === undefined) {
+                throw 'No History for Key: ' + key;
+            }
+
+            let transactionContent = String.fromCharCode.apply(null, new Uint16Array(result.value.value.buffer)) as string;
+            let start = transactionContent.indexOf('{');
+            let wasteOrderValue = transactionContent.substr(start, transactionContent.lastIndexOf('}') - start + 1) + '?!---END---!?';
+
+            var date = new Date(0);
+            date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
+
+            allResults.push({
+                key: result.value.tx_id,
+                timestamp: date.toString(),
+                value: wasteOrderValue
+            });
 
             if (result.done) {
                 await iterator.close();
@@ -77,22 +91,22 @@ export class OrderContract extends Contract {
         }
 
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
-        
+
         let validationResult = Joi.validate(wasteOrder, WasteOrderUpdateSchema);
         if (validationResult.error !== null) {
             throw "Invalid Waste Order Update Schema!";
         }
 
         let oldWasteOrder = await this.readOrder(ctx, orderId);
-        if(wasteOrder.quantity !== undefined) {
+        if (wasteOrder.quantity !== undefined) {
             oldWasteOrder.quantity = wasteOrder.quantity;
         }
 
-        if(wasteOrder.unitPrice !== undefined) {
+        if (wasteOrder.unitPrice !== undefined) {
             oldWasteOrder.unitPrice = wasteOrder.unitPrice;
         }
 
-        if(wasteOrder.contractorMSPID !== undefined) {
+        if (wasteOrder.contractorMSPID !== undefined) {
             oldWasteOrder.contractorMSPID = wasteOrder.contractorMSPID;
         }
 
