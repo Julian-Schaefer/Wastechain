@@ -26,4 +26,4 @@ export const WasteOrderUpdateSchema = Joi.object().keys({
     quantity: Joi.number(),
     unitPrice: Joi.number(),
     contractorMSPID: Joi.string()
-});
+}).min(1);
