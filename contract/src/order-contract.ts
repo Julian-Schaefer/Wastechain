@@ -4,8 +4,8 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { Order } from './order';
-import { WasteOrder, WasteOrderSchema } from './model/WasteOrder';
+import { WasteOrder, WasteOrderSchema, WasteOrderUpdateSchema } from './model/WasteOrder';
+import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -20,9 +20,9 @@ export class OrderContract extends Contract {
     @Transaction()
     public async createOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
-        
+
         let validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
-        if(validationResult.error !== null) {
+        if (validationResult.error !== null) {
             throw "Invalid Waste Order Schema!";
         }
 
@@ -40,27 +40,65 @@ export class OrderContract extends Contract {
     }
 
     @Transaction(false)
+    public async getHistory(ctx: Context, key: string): Promise<Iterators.KeyModification[]> {
+        let iterator = await ctx.stub.getHistoryForKey(key);
+        let allResults: Iterators.KeyModification[] = [];
+
+        while (true) {
+            let result = await iterator.next();
+            allResults.push(result.value);
+
+            if (result.done) {
+                await iterator.close();
+                break;
+            }
+        }
+
+        return allResults;
+    }
+
+    @Transaction(false)
     @Returns('Order')
-    public async readOrder(ctx: Context, orderId: string): Promise<Order> {
+    public async readOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const exists = await this.orderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
         const buffer = await ctx.stub.getState(orderId);
-        const order = JSON.parse(buffer.toString()) as Order;
-        return order;
+        const wasteOrder = JSON.parse(buffer.toString()) as WasteOrder;
+        return wasteOrder;
     }
 
     @Transaction()
-    public async updateOrder(ctx: Context, orderId: string, newValue: string): Promise<void> {
+    public async updateOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
         const exists = await this.orderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
-        const order = new Order();
-        order.value = newValue;
-        const buffer = Buffer.from(JSON.stringify(order));
+
+        let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
+        
+        let validationResult = Joi.validate(wasteOrder, WasteOrderUpdateSchema);
+        if (validationResult.error !== null) {
+            throw "Invalid Waste Order Update Schema!";
+        }
+
+        let oldWasteOrder = await this.readOrder(ctx, orderId);
+        if(wasteOrder.quantity !== undefined) {
+            oldWasteOrder.quantity = wasteOrder.quantity;
+        }
+
+        if(wasteOrder.unitPrice !== undefined) {
+            oldWasteOrder.unitPrice = wasteOrder.unitPrice;
+        }
+
+        if(wasteOrder.contractorMSPID !== undefined) {
+            oldWasteOrder.contractorMSPID = wasteOrder.contractorMSPID;
+        }
+
+        const buffer = Buffer.from(JSON.stringify(oldWasteOrder));
         await ctx.stub.putState(orderId, buffer);
+        //ctx.stub.setEvent("CREATE_ORDER", buffer);
     }
 
     @Transaction()

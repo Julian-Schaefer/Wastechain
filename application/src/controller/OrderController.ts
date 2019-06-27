@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
-import { WasteOrderSchema } from '../model/WasteOrder';
+import { WasteOrderSchema, WasteOrderUpdateSchema } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -13,14 +13,16 @@ export class OrderController {
         this.fabricConnection = fabricConnection;
 
         app.get('/order', this.getOrders.bind(this));
+        app.get('/order/:orderId/history', this.getOrderHistory.bind(this));
         app.post('/order/:orderId', this.createOrder.bind(this));
+        app.put('/order/:orderId', this.updateOrder.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
                 console.log('Order Created: ' + status);
                 //this.sendEvent(JSON.stringify(event));
                 this.sendEvent(JSON.stringify(event.payload.toString('utf-8')));
-            
+
                 resolve({});
             });
         }, (error: Error) => {
@@ -45,6 +47,17 @@ export class OrderController {
         });
     };
 
+    private async getOrderHistory(request: Request, response: Response) {
+        const orderId = request.params.orderId;
+        try {
+            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            let result = await contract.evaluateTransaction('getHistory', orderId);
+            response.send(result.toString('utf-8'));
+        } catch (error) {
+            console.log('Error submitting Transaction: ' + error);
+            response.send('Error submitting Transaction: ' + error);
+        }
+    }
 
     private async createOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
@@ -52,7 +65,7 @@ export class OrderController {
 
         try {
             const validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
-            if(validationResult.error !== null) {
+            if (validationResult.error !== null) {
                 throw validationResult.error;
             }
 
@@ -61,6 +74,28 @@ export class OrderController {
 
             console.log('Submitted Contract with ID: ' + orderId);
             response.send('Submitted Contract with ID: ' + request.params.orderId);
+        } catch (error) {
+            console.log('Error submitting Transaction: ' + error);
+            response.send('Error submitting Transaction: ' + error);
+        }
+    }
+
+    private async updateOrder(request: Request, response: Response) {
+        const orderId = request.params.orderId;  
+        let wasteOrderUpdate = request.body;
+
+        
+        try {
+            const validationResult = Joi.validate(wasteOrderUpdate, WasteOrderUpdateSchema);
+            if (validationResult.error !== null) {
+                throw validationResult.error;
+            }
+
+            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            await contract.submitTransaction('updateOrder', orderId, JSON.stringify(wasteOrderUpdate));
+
+            console.log('Updated Contract with ID: ' + orderId);
+            response.send('Updated Contract with ID: ' + request.params.orderId);
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
             response.send('Error submitting Transaction: ' + error);
