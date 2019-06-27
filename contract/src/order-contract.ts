@@ -39,9 +39,54 @@ export class OrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getHistory(ctx: Context, key: string): Promise<{key: string, timestamp: string, value: string}[]> {
+    public async getHistory2(ctx: Context, key: string): Promise<any> {
+
         let iterator = await ctx.stub.getHistoryForKey(key);
-        let allResults: {key: string, timestamp: string, value: string}[] = [];
+        let isHistory = true;
+
+        let allResults = [];
+        while (true) {
+            let res = await iterator.next();
+
+            if (res.value && res.value.value.toString()) {
+                let jsonRes: any = {};
+                console.log(res.value.value.toString('utf8'));
+
+                if (isHistory && isHistory === true) {
+                    jsonRes.TxId = res.value.tx_id;
+                    jsonRes.Timestamp = res.value.timestamp;
+                    jsonRes.IsDelete = res.value.is_delete.toString();
+                    try {
+                        jsonRes.Value = JSON.parse(res.value.value.toString('utf8'));
+                    } catch (err) {
+                        console.log(err);
+                        jsonRes.Value = res.value.value.toString('utf8');
+                    }
+                } else {
+                    // jsonRes.Key = res.value.key;
+                    // try {
+                    //     jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
+                    // } catch (err) {
+                    //     console.log(err);
+                    //     jsonRes.Record = res.value.value.toString('utf8');
+                    // }
+                }
+                allResults.push(jsonRes);
+            }
+            if (res.done) {
+                console.log('end of data');
+                await iterator.close();
+                console.info(allResults);
+                break;
+            }
+        }
+
+        return JSON.stringify(allResults);
+    }
+    @Transaction(false)
+    public async getHistory(ctx: Context, key: string): Promise<{ key: string, timestamp: string, value: string }[]> {
+        let iterator = await ctx.stub.getHistoryForKey(key);
+        let allResults: { key: string, timestamp: string, value: string }[] = [];
 
         while (true) {
             let result = await iterator.next();

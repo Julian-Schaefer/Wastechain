@@ -51,7 +51,7 @@ export class OrderController {
         const orderId = request.params.orderId;
         try {
             let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            let result = await contract.evaluateTransaction('getHistory', orderId);
+            let result = await contract.evaluateTransaction('getHistory2', orderId);
 
             // let resultArray: WasteOrder[] = JSON.parse(result.toString('utf-8'));
             // resultArray.forEach((wasteOrder: WasteOrder) => {
@@ -60,16 +60,17 @@ export class OrderController {
             //         throw validationResult.error;
             //     }
             // });
-            console.log('GANZER INPUT ' + result.toString('utf-8') + '\n\n');
+            // console.log('GANZER INPUT ' + result.toString('utf-8') + '\n\n');
 
 
-            let jsonobject: any[] = JSON.parse(result.toString('utf-8'));
-            let response2 = '';
-            for (let i = 0; i < jsonobject.length; i++) {
-                jsonobject[i].value = this.convert(jsonobject[i].value);
-                response2 += JSON.stringify(jsonobject[i]) + "\n\n?????";
-            }
-            response.send(response2);
+            // let jsonobject: any[] = JSON.parse(result.toString('utf-8'));
+            // let response2 = '';
+            // for (let i = 0; i < jsonobject.length; i++) {
+            //     jsonobject[i].value = this.convert(jsonobject[i].value);
+            //     response2 += JSON.stringify(jsonobject[i]) + "\n\n?????";
+            // }
+
+            response.send(result.toString());
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
             response.send('Error submitting Transaction: ' + error);
