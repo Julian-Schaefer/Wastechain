@@ -4,7 +4,7 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { WasteOrder, WasteOrderSchema, WasteOrderUpdateSchema } from './model/WasteOrder';
+import { WasteOrder, WasteOrderSchema, WasteOrderUpdateSchema, WasteOrderStatus } from './model/WasteOrder';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -31,6 +31,7 @@ export class OrderContract extends Contract {
             throw new Error(`The order ${orderId} already exists`);
         }
 
+        wasteOrder.status = WasteOrderStatus.COMMISSIONED;
         wasteOrder.originatorMSPID = ctx.clientIdentity.getMSPID();
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
