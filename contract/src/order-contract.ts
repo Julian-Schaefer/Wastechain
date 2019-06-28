@@ -39,76 +39,40 @@ export class OrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getHistory2(ctx: Context, key: string): Promise<any> {
-
+    public async getHistory(ctx: Context, key: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
         let iterator = await ctx.stub.getHistoryForKey(key);
-        let isHistory = true;
-
-        let allResults = [];
-        while (true) {
-            let res = await iterator.next();
-
-            if (res.value && res.value.value.toString()) {
-                let jsonRes: any = {};
-                console.log(res.value.value.toString('utf8'));
-
-                if (isHistory && isHistory === true) {
-                    jsonRes.TxId = res.value.tx_id;
-                    jsonRes.Timestamp = res.value.timestamp;
-                    jsonRes.IsDelete = res.value.is_delete.toString();
-                    try {
-                        jsonRes.Value = JSON.parse(res.value.value.toString('utf8'));
-                    } catch (err) {
-                        console.log(err);
-                        jsonRes.Value = res.value.value.toString('utf8');
-                    }
-                } else {
-                    // jsonRes.Key = res.value.key;
-                    // try {
-                    //     jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
-                    // } catch (err) {
-                    //     console.log(err);
-                    //     jsonRes.Record = res.value.value.toString('utf8');
-                    // }
-                }
-                allResults.push(jsonRes);
-            }
-            if (res.done) {
-                console.log('end of data');
-                await iterator.close();
-                console.info(allResults);
-                break;
-            }
-        }
-
-        return JSON.stringify(allResults);
-    }
-    @Transaction(false)
-    public async getHistory(ctx: Context, key: string): Promise<{ key: string, timestamp: string, value: string }[]> {
-        let iterator = await ctx.stub.getHistoryForKey(key);
-        let allResults: { key: string, timestamp: string, value: string }[] = [];
+        let allResults: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
 
         while (true) {
             let result = await iterator.next();
-            if (result.value === undefined) {
-                throw 'No History for Key: ' + key;
+
+            if (result.value && result.value.value.toString()) {
+                console.log(result.value.value.toString('utf8'));
+
+                let value: string;
+                try {
+                    value = JSON.parse(result.value.value.toString('utf8'));
+                } catch (err) {
+                    console.log(err);
+                    value = result.value.value.toString('utf8');
+                }
+
+                let date = new Date(0);
+                date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
+
+                let reponse: { txId: string, timestamp: string, isDelete: string, value: string } = {
+                    txId: result.value.tx_id,
+                    timestamp: date.toString(),
+                    isDelete: result.value.is_delete.toString(),
+                    value
+                };
+
+                allResults.push(reponse);
             }
-
-            let transactionContent = String.fromCharCode.apply(null, new Uint16Array(result.value.value.buffer)) as string;
-            let start = transactionContent.indexOf('{');
-            let wasteOrderValue = transactionContent.substr(start, transactionContent.lastIndexOf('}') - start + 1) + '?!---END---!?';
-
-            var date = new Date(0);
-            date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
-
-            allResults.push({
-                key: result.value.tx_id,
-                timestamp: date.toString(),
-                value: wasteOrderValue
-            });
 
             if (result.done) {
                 await iterator.close();
+                console.info(allResults);
                 break;
             }
         }
