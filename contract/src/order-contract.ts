@@ -41,7 +41,7 @@ export class OrderContract extends Contract {
     @Transaction(false)
     public async getHistory(ctx: Context, key: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
         let iterator = await ctx.stub.getHistoryForKey(key);
-        let allResults: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
+        let transactionHistory: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
 
         while (true) {
             let result = await iterator.next();
@@ -60,24 +60,24 @@ export class OrderContract extends Contract {
                 let date = new Date(0);
                 date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
 
-                let reponse: { txId: string, timestamp: string, isDelete: string, value: string } = {
+                let transaction: { txId: string, timestamp: string, isDelete: string, value: string } = {
                     txId: result.value.tx_id,
                     timestamp: date.toString(),
                     isDelete: result.value.is_delete.toString(),
                     value
                 };
 
-                allResults.push(reponse);
+                transactionHistory.push(transaction);
             }
 
             if (result.done) {
                 await iterator.close();
-                console.info(allResults);
+                console.info(transactionHistory);
                 break;
             }
         }
 
-        return allResults;
+        return transactionHistory;
     }
 
     @Transaction(false)

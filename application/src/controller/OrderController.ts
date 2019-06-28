@@ -51,63 +51,14 @@ export class OrderController {
         const orderId = request.params.orderId;
         try {
             let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            let result = await contract.evaluateTransaction('getHistory2', orderId);
+            let result = await contract.evaluateTransaction('getHistory', orderId);
 
-            // let resultArray: WasteOrder[] = JSON.parse(result.toString('utf-8'));
-            // resultArray.forEach((wasteOrder: WasteOrder) => {
-            //     const validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
-            //     if (validationResult.error !== null) {
-            //         throw validationResult.error;
-            //     }
-            // });
-            // console.log('GANZER INPUT ' + result.toString('utf-8') + '\n\n');
-
-
-            // let jsonobject: any[] = JSON.parse(result.toString('utf-8'));
-            // let response2 = '';
-            // for (let i = 0; i < jsonobject.length; i++) {
-            //     jsonobject[i].value = this.convert(jsonobject[i].value);
-            //     response2 += JSON.stringify(jsonobject[i]) + "\n\n?????";
-            // }
-
-            response.send(result.toString());
+            let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = JSON.parse(result.toString('utf-8'));
+            response.send(JSON.stringify(history));
         } catch (error) {
-            console.log('Error submitting Transaction: ' + error);
-            response.send('Error submitting Transaction: ' + error);
+            console.log('Error getting Transaction History: ' + error);
+            response.send('Error getting Transaction History: ' + error);
         }
-    }
-
-    private convert(input: string): string {
-        let string = '';
-
-        console.log('INPUT: ' + input + '\n\n'); 
-        let start = -1;
-        let open = 0;
-        for (let i = 0; i < input.length; i++) {
-            let char = input.charAt(i);
-            console.log(char);
-            if (char === '{') {
-                if (start === -1) {
-                    start = i;
-                } else {
-                    open++;
-                }
-            } else if (char === '}') {
-                if (start !== -1) {
-                    if (open !== 0) {
-                        open--;
-                    } else {
-                        //console.log(i + ', ' + start);
-                        let sub = input.substring(start, i - start + 1);
-                        //console.log(sub);
-                        string += sub + '---;---';
-                        start = -1;
-                    }
-                }
-            }
-        }
-
-        return string;
     }
 
     private async createOrder(request: Request, response: Response) {
