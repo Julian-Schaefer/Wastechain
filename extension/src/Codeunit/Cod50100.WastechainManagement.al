@@ -1,27 +1,27 @@
 codeunit 50100 "Wastechain Management"
 {
-    procedure CreateWasteOrderOnBlockchain(WasteHeader: Record "Waste Management Header")
+    procedure PostWasteOrder(WasteLine: Record "Waste Management Line")
     var
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
         Content: HttpContent;
+        ContentHeaders: HttpHeaders;
         ResponseText: Text;
-        WasteOrder: Record "Waste Order WC";
-        asd: Text;
+        WasteOrderJSON: JsonObject;
+        WasteOrderJSONText: Text;
     begin
-        WasteOrder.Init();
-        WasteOrder.Id := 'test001';
-        WasteOrder.Description := 'Test-Description';
-        WasteOrder.Address := 'Address 1';
-        WasteOrder.Insert();
-
-        WasteOrder.ConvertToJSON().WriteTo(asd);
-        Message(asd);
-
         InitClient(Client);
+
+
         //if Client.SetBaseAddress('http://localhost:3000/') then begin
-        Message(Client.GetBaseAddress());
-        Client.Post('/order/new', Content, ResponseMessage);
+
+        WasteOrderJSON := GenerateWasteOrderJSON(WasteLine);
+        WasteOrderJSON.WriteTo(WasteOrderJSONText);
+        Content.WriteFrom(WasteOrderJSONText);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
+        Client.Post('http://localhost:3000/order/' + WasteLine."Document No." + '-' + Format(WasteLine."Line No."), Content, ResponseMessage);
         ResponseMessage.Content.ReadAs(ResponseText);
         Message(ResponseText);
         // end else
@@ -30,11 +30,9 @@ codeunit 50100 "Wastechain Management"
         //    Error('Could not set URI');
     end;
 
-    local procedure InitClient(var Client: HttpClient)
+    procedure InitClient(var Client: HttpClient)
     begin
-        Client.DefaultRequestHeaders.Remove('Content-Type');
-        Client.DefaultRequestHeaders().Add('Content-Type', 'application/json;charset=utf-8');
-        Client.SetBaseAddress('http://localhost:3000');
+        //Client.SetBaseAddress('http://localhost:3000/');
     end;
 
     procedure GenerateWasteOrderJSON(WasteLine: Record "Waste Management Line"): JsonObject
@@ -46,7 +44,6 @@ codeunit 50100 "Wastechain Management"
         TaskSiteJSON: JsonObject;
         ServiceJSON: JsonObject;
     begin
-
         with WasteLine do begin
             WasteOrderJSON.Add('description', Description);
             WasteOrderJSON.Add('quantity', Quantity);
@@ -55,7 +52,7 @@ codeunit 50100 "Wastechain Management"
             BusinessPartner.Get("Business-with No.");
             WasteOrderJSON.Add('contractorMSPID', BusinessPartner."Wastechain MSP ID");
 
-            BusinessPartnerSite.Get("Task-at Code");
+            BusinessPartnerSite.Get("Post-with No.", "Task-at Code");
             TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
             TaskSiteJSON.Add('address2', BusinessPartnerSite."Address 2");
             TaskSiteJSON.Add('postCode', BusinessPartnerSite."Post Code");
@@ -71,5 +68,7 @@ codeunit 50100 "Wastechain Management"
 
             WasteOrderJSON.Add('service', ServiceJSON);
         end;
+
+        exit(WasteOrderJSON);
     end;
 }

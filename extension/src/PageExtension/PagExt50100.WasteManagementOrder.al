@@ -12,7 +12,7 @@ pageextension 50100 "Waste Mgt. Order Ext WC" extends "Waste Mgt. Order"
                 var
                     WastechainMgt: Codeunit "Wastechain Management";
                 begin
-                    WastechainMgt.CreateWasteOrderOnBlockchain(Rec);
+                    //WastechainMgt.PostWasteOrder(Rec);
                 end;
             }
         }

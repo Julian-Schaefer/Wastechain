@@ -14,6 +14,12 @@ export class WastechainServer {
         this.app.listen(3000, function () {
             console.log('Wastechain-Server listening on port 3000!');
         });
+
+        this.app.use((req, res, next) => {
+            console.log('Logger:' + req.body);
+            next();
+        })
+
         this._orderController = new OrderController(this.app, fabricConnection);
         new SettingsController(this.app);
 
