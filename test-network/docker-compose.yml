@@ -5,6 +5,9 @@
 #
 version: '2'
 
+networks:
+  test_basic:
+
 services:
 
   ## Certificate Authorities
@@ -24,6 +27,8 @@ services:
     volumes:
       - ./crypto-config/peerOrganizations/ordering-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.ordering-organisation.org
+    networks:
+      - test_basic
 
   ca.subcontractor-organisation.org:
     image: hyperledger/fabric-ca
@@ -36,11 +41,13 @@ services:
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.subcontractor-organisation.org-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4c2bd0189f0f65dd5ddc8b2905dee6b1e76e4e8c6f060202717386518454c7a3_sk
     ports:
-      - "7054:7054"
+      - "7055:7054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/subcontractor-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.subcontractor-organisation.org
+    networks:
+      - test_basic
 
   ca.third-party-organisation.org:
     image: hyperledger/fabric-ca
@@ -53,15 +60,17 @@ services:
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.third-party-organisation.org-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/dcaa6d5768b7c6669eefa37e0876e824866675239998a990e42872e342e4d90f_sk
     ports:
-      - "7054:7054"
+      - "7056:7054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/third-party-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.third-party-organisation.org
+    networks:
+      - test_basic
 
   ## Wastechain-Orderer  
-  orderer.example.com:
-    container_name: orderer.example.com
+  orderer.wastechainorderer.org:
+    container_name: orderer.wastechainorderer.org
     image: hyperledger/fabric-orderer
     environment:
       - FABRIC_LOGGING_SPEC=debug
@@ -84,207 +93,136 @@ services:
         - ./crypto-config/peerOrganizations/ordering-organisation.org/peers/peer0.ordering-organisation.org/:/etc/hyperledger/crypto/peerOrderingOrg
         - ./crypto-config/peerOrganizations/subcontractor-organisation.org/peers/peer0.subcontractor-organisation.org/:/etc/hyperledger/crypto/peerSubcontractorOrg
         - ./crypto-config/peerOrganizations/third-party-organisation.org/peers/peer0.third-party-organisation.org/:/etc/hyperledger/crypto/thirdPartyOrg
-
-  ## TODO: Peers
-  peer0.org1.example.com:
-    container_name: peer0.org1.example.com
-    extends:
-      file:   base.yaml
-      service: peer-base
-    environment:
-      - CORE_PEER_ID=peer0.org1.example.com
-      - CORE_PEER_LOCALMSPID=Org1MSP
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051      
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
-    ports:
-      - 7051:7051
-      - 7053:7053
-    volumes:
-        - ./channel/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/:/etc/hyperledger/crypto/peer
-    depends_on:
-      - orderer.example.com
-
-  peer1.org1.example.com:
-    container_name: peer1.org1.example.com
-    extends:
-      file:   base.yaml
-      service: peer-base
-    environment:
-      - CORE_PEER_ID=peer1.org1.example.com
-      - CORE_PEER_LOCALMSPID=Org1MSP
-      - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051      
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
-    ports:
-      - 7056:7051
-      - 7058:7053
-    volumes:
-        - ./channel/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/:/etc/hyperledger/crypto/peer
-    depends_on:
-      - orderer.example.com
-
-  peer0.org2.example.com:
-    container_name: peer0.org2.example.com
-    extends:
-      file:   base.yaml
-      service: peer-base
-    environment:
-      - CORE_PEER_ID=peer0.org2.example.com
-      - CORE_PEER_LOCALMSPID=Org2MSP
-      - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.example.com:7051      
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.example.com:7051
-    ports:
-      - 8051:7051
-      - 8053:7053
-    volumes:
-        - ./channel/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/:/etc/hyperledger/crypto/peer
-    depends_on:
-      - orderer.example.com
-
-  peer1.org2.example.com:
-    container_name: peer1.org2.example.com
-    extends:
-      file:   base.yaml
-      service: peer-base
-    environment:
-      - CORE_PEER_ID=peer1.org2.example.com
-      - CORE_PEER_LOCALMSPID=Org2MSP
-      - CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:7051      
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.example.com:7051
-    ports:
-      - 8056:7051
-      - 8058:7053
-    volumes:
-        - ./channel/crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/:/etc/hyperledger/crypto/peer
-    depends_on:
-      - orderer.example.com
-
-
-#########
-#
-# Copyright IBM Corp All Rights Reserved
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-version: '2'
-
-networks:
-  basic:
-
-services:
-  ca.example.com:
-    image: hyperledger/fabric-ca
-    environment:
-      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca.example.com
-      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4239aa0dcd76daeeb8ba0cda701851d14504d31aad1b2ddddbac6a57365e497c_sk
-    ports:
-      - "7054:7054"
-    command: sh -c 'fabric-ca-server start -b admin:adminpw'
-    volumes:
-      - ./crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca.example.com
     networks:
-      - basic
+      - test_basic
 
-  orderer.example.com:
-    container_name: orderer.example.com
-    image: hyperledger/fabric-orderer
-    environment:
-      - FABRIC_LOGGING_SPEC=info
-      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-      - ORDERER_GENERAL_GENESISMETHOD=file
-      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
-      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
-      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
-    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
-    command: orderer
-    ports:
-      - 7050:7050
-    volumes:
-        - ./config/:/etc/hyperledger/configtx
-        - ./crypto-config/ordererOrganizations/wastechainorderer.org/orderers/orderer.wastechainorderer.org/:/etc/hyperledger/msp/orderer
-    networks:
-      - basic
-
-  peer0.org1.example.com:
-    container_name: peer0.org1.example.com
+  ## Peers
+  peer0.ordering-organisation.org:
+    container_name: peer0.ordering-organisation.org
     image: hyperledger/fabric-peer
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_PEER_ID=peer0.org1.example.com
+      - CORE_PEER_ID=peer0.ordering-organisation.org
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      # # the following setting starts chaincode containers on the same
-      # # bridge network as the peers
-      # # https://docs.docker.com/compose/networking/
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
+      - CORE_PEER_ADDRESS=peer0.ordering-organisation.org:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_default
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb:5984
-      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
-      # provide the credentials for ledger to connect to CouchDB.  The username and password must
-      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.ordering-organisation.org:5984
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
-    # command: peer node start --peer-chaincodedev=true
     ports:
       - 7051:7051
       - 7053:7053
     volumes:
         - /var/run/:/host/var/run/
-        - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/msp/peer
-        - ./crypto-config/peerOrganizations/org1.example.com/users:/etc/hyperledger/msp/users
+        - ./crypto-config/peerOrganizations/ordering-organisation.org/peers/peer0.ordering-organisation.org/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/ordering-organisation.org/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
     depends_on:
-      - orderer.example.com
-      - couchdb
+      - orderer.wastechainorderer.org
+      - couchdb.ordering-organisation.org
     networks:
-      - basic
+      - test_basic
 
-  couchdb:
-    container_name: couchdb
+  peer0.subcontractor-organisation.org:
+    container_name: peer0.subcontractor-organisation.org
+    image: hyperledger/fabric-peer
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer0.subcontractor-organisation.org
+      - FABRIC_LOGGING_SPEC=info
+      - CORE_CHAINCODE_LOGGING_LEVEL=info
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer0.subcontractor-organisation.org:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_default
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.subcontractor-organisation.org:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 8051:7051
+      - 8053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/subcontractor-organisation.org/peers/peer0.subcontractor-organisation.org/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/subcontractor-organisation.org/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.wastechainorderer.org
+      - couchdb.subcontractor-organisation.org
+    networks:
+      - test_basic
+
+  peer0.third-party-organisation.org:
+    container_name: peer0.third-party-organisation.org
+    image: hyperledger/fabric-peer
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer0.third-party-organisation.org
+      - FABRIC_LOGGING_SPEC=info
+      - CORE_CHAINCODE_LOGGING_LEVEL=info
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer0.third-party-organisation.org:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_default
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.third-party-organisation.org:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 9051:7051
+      - 9053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/third-party-organisation.org/peers/peer0.third-party-organisation.org/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/third-party-organisation.org/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.wastechainorderer.org
+      - couchdb.third-party-organisation.org
+    networks:
+      - test_basic
+
+  # Databases
+  couchdb.ordering-organisation.org:
+    container_name: couchdb.ordering-organisation.org
     image: hyperledger/fabric-couchdb
-    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
-    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
     environment:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
     ports:
       - 5984:5984
     networks:
-      - basic
+      - test_basic
 
-  # cli:
-  #   container_name: cli
-  #   image: hyperledger/fabric-tools
-  #   tty: true
-  #   environment:
-  #     - GOPATH=/opt/gopath
-  #     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-  #     - FABRIC_LOGGING_SPEC=info
-  #     - CORE_PEER_ID=cli
-  #     - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-  #     - CORE_PEER_LOCALMSPID=Org1MSP
-  #     - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-  #     - CORE_CHAINCODE_KEEPALIVE=10
-  #   working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-  #   command: /bin/bash
-  #   volumes:
-  #       - /var/run/:/host/var/run/
-  #       - ./../chaincode/:/opt/gopath/src/github.com/
-  #       - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
-  #   networks:
-  #       - basic
-    #depends_on:
-    #  - orderer.example.com
-    #  - peer0.org1.example.com
-    #  - couchdb
+  couchdb.subcontractor-organisation.org:
+    container_name: couchdb.subcontractor-organisation.org
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 6984:5984
+    networks:
+      - test_basic
+
+  couchdb.third-party-organisation.org:
+    container_name: couchdb.third-party-organisation.org
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 7984:5984
+    networks:
+      - test_basic
