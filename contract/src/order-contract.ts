@@ -4,7 +4,7 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { WasteOrder, WasteOrderSchema, WasteOrderUpdateSchema, WasteOrderStatus } from './model/WasteOrder';
+import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus } from './model/WasteOrder';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -17,16 +17,16 @@ export class OrderContract extends Contract {
     }
 
     @Transaction()
-    public async createOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
+    public async createOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
 
-        let validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
+        let validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
         if (validationResult.error !== null) {
             throw "Invalid Waste Order Schema!";
         }
 
-        orderId = ctx.clientIdentity.getMSPID() + '-' + orderId;
-        const exists = await this.orderExists(ctx, orderId);
+        wasteOrder.key = ctx.clientIdentity.getMSPID() + '-' + orderId;
+        const exists = await this.orderExists(ctx, wasteOrder.key);
         if (exists) {
             throw new Error(`The order ${orderId} already exists`);
         }
@@ -37,6 +37,7 @@ export class OrderContract extends Contract {
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
         await ctx.stub.putState(orderId, buffer);
         ctx.stub.setEvent("CREATE_ORDER", buffer);
+        return wasteOrder;
     }
 
     @Transaction(false)
