@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
-import { WasteOrderSchema, WasteOrderUpdateSchema, WasteOrder } from '../model/WasteOrder';
+import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderSchema } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -66,16 +66,17 @@ export class OrderController {
         let wasteOrder = request.body;
 
         try {
-            const validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
+            const validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
             if (validationResult.error !== null) {
                 throw validationResult.error;
             }
 
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
+            const contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            const submittedWasteOrderBuffer = await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
+            const submittedWasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
 
-            console.log('Submitted Contract with ID: ' + orderId);
-            response.send('Submitted Contract with ID: ' + request.params.orderId);
+            console.log('Submitted Contract with ID: ' + submittedWasteOrder.orderId);
+            response.send(JSON.stringify(submittedWasteOrder));
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
             response.send('Error submitting Transaction: ' + error);
