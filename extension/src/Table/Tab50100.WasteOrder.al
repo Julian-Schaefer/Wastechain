@@ -4,49 +4,32 @@ table 50100 "Waste Order WC"
 
     fields
     {
-        field(1; Id; Guid)
+        field(1; "Transaction ID"; Text[250])
         {
-
+            Caption = 'Transaction ID';
         }
 
-        field(2; Description; Text[250])
+        field(2; "Transaction Timestamp"; Text[250])
         {
-
+            Caption = 'Transaction Timestamp';
         }
 
-        field(3; Address; Text[250])
+        field(3; Quantity; Decimal)
         {
+            Caption = 'Quantity';
+        }
 
+        field(4; "Unit Price"; Decimal)
+        {
+            Caption = 'Unit Price';
         }
     }
 
     keys
     {
-        key(PK; Id)
+        key(PK; "Transaction ID")
         {
             Clustered = true;
         }
     }
-
-    trigger OnInsert()
-    begin
-        Id := CreateGuid();
-    end;
-
-    procedure ConvertToJSON(): JsonObject
-    var
-        RecRef: RecordRef;
-        Field: Record Field;
-        JSON: JsonObject;
-    begin
-        RecRef.GetTable(Rec);
-
-        Field.SetRange(TableNo, Database::"Waste Order WC");
-        if Field.FindSet(false, false) then
-            repeat
-                JSON.Add(Field.FieldName, Format(RecRef.Field(Field."No.").Value));
-            until Field.Next() = 0;
-
-        exit(JSON);
-    end;
 }
