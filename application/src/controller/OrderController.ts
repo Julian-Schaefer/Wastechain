@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
-import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderSchema } from '../model/WasteOrder';
+import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderSchema, WasteOrder } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -73,9 +73,9 @@ export class OrderController {
 
             const contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
             const submittedWasteOrderBuffer = await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
-            const submittedWasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
+            const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
 
-            console.log('Submitted Contract with ID: ' + submittedWasteOrder.orderId);
+            console.log('Submitted Contract with ID: ' + submittedWasteOrder.key);
             response.send(JSON.stringify(submittedWasteOrder));
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
