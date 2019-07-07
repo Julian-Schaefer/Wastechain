@@ -79,7 +79,7 @@ export class OrderController {
             response.send(JSON.stringify(submittedWasteOrder));
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
-            response.send('Error submitting Transaction: ' + error);
+            response.status(500).send('Error submitting Transaction: ' + error);
         }
     }
 
