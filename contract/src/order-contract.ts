@@ -28,14 +28,14 @@ export class OrderContract extends Contract {
         wasteOrder.key = ctx.clientIdentity.getMSPID() + '-' + orderId;
         const exists = await this.orderExists(ctx, wasteOrder.key);
         if (exists) {
-            throw new Error(`The order ${orderId} already exists`);
+            throw new Error(`The order ${wasteOrder.key} already exists`);
         }
 
         wasteOrder.status = WasteOrderStatus.COMMISSIONED;
         wasteOrder.originatorMSPID = ctx.clientIdentity.getMSPID();
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
-        await ctx.stub.putState(orderId, buffer);
+        await ctx.stub.putState(wasteOrder.key, buffer);
         ctx.stub.setEvent("CREATE_ORDER", buffer);
         return wasteOrder;
     }
