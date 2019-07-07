@@ -101,7 +101,7 @@ export class OrderController {
             response.send('Updated Contract with ID: ' + request.params.orderId);
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
-            response.send('Error submitting Transaction: ' + error);
+            response.status(500).send('Error submitting Transaction: ' + error);
         }
     }
 

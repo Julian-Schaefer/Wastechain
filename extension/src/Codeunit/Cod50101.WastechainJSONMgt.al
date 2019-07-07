@@ -37,6 +37,25 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(WasteOrderJSON);
     end;
 
+    procedure GenerateUpdateWasteOrderJSON(OldWasteLine: Record "Waste Management Line"; NewWasteLine: Record "Waste Management Line"): JsonObject
+    var
+        Service: Record Service;
+        WasteOrderJSON: JsonObject;
+    begin
+        if OldWasteLine.Quantity <> NewWasteLine.Quantity then
+            WasteOrderJSON.Add('quantity', NewWasteLine.Quantity);
+
+        if OldWasteLine."Unit Price" <> NewWasteLine."Unit Price" then
+            WasteOrderJSON.Add('unitPrice', NewWasteLine."Unit Price");
+
+        exit(WasteOrderJSON);
+    end;
+
+    procedure GetWasteOrderKey(WasteLine: Record "Waste Management Line"): Text
+    begin
+        exit(WasteLine."Document No." + '-' + Format(WasteLine."Line No."));
+    end;
+
     procedure GetWasteOrderKeyFromJSONText(JSONText: Text): Text
     var
         JSON: JsonObject;

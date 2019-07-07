@@ -15,8 +15,8 @@ export class WastechainServer {
             console.log('Wastechain-Server listening on port 3000!');
         });
 
-        this.app.use((req, res, next) => {
-            console.log('Logger:' + req.body);
+        this.app.use((req, _, next) => {
+            console.log('Logger:' + JSON.stringify(req.body));
             next();
         })
 

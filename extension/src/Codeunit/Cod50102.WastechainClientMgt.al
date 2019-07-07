@@ -7,24 +7,49 @@ codeunit 50102 "Wastechain Client Mgt. WC"
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
         ResponseText: Text;
-        WasteOrderJSON: JsonObject;
-        WasteOrderJSONText: Text;
+        CreateWasteOrderJSON: JsonObject;
+        CreateWasteOrderJSONText: Text;
     begin
         InitClient(Client);
 
-        WasteOrderJSON := WastechainJSONMgt.GenerateCreateWasteOrderJSON(WasteLine);
-        WasteOrderJSON.WriteTo(WasteOrderJSONText);
-        Content.WriteFrom(WasteOrderJSONText);
+        CreateWasteOrderJSON := WastechainJSONMgt.GenerateCreateWasteOrderJSON(WasteLine);
+        CreateWasteOrderJSON.WriteTo(CreateWasteOrderJSONText);
+        Content.WriteFrom(CreateWasteOrderJSONText);
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
-        Client.Post('http://localhost:3000/order/' + WasteLine."Document No." + '-' + Format(WasteLine."Line No."), Content, Response);
+        Client.Post('http://localhost:3000/order/' + WastechainJSONMgt.GetWasteOrderKey(WasteLine), Content, Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then begin
             WasteLine."Wastechain Key" := WastechainJSONMgt.GetWasteOrderKeyFromJSONText(ResponseText);
             WasteLine.Modify();
-            Message('Successfully commissioned Order to Wastechain.');
+            Message('Successfully commissioned Waste Order to Wastechain.');
+        end else
+            Error(ResponseText);
+    end;
+
+    procedure UpdateWasteOrder(WasteOrderKey: Text; UpdateWasteOrderJSON: JSONObject)
+    var
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        ResponseText: Text;
+        UpdateWasteOrderJSONText: Text;
+    begin
+        InitClient(Client);
+
+        UpdateWasteOrderJSON.WriteTo(UpdateWasteOrderJSONText);
+        Content.WriteFrom(UpdateWasteOrderJSONText);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
+        Client.Put('http://localhost:3000/order/' + WasteOrderKey, Content, Response);
+
+        Response.Content.ReadAs(ResponseText);
+        if Response.IsSuccessStatusCode then begin
+            Message('Successfully updated the Waste Order on the Wastechain.');
         end else
             Error(ResponseText);
     end;
