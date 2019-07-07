@@ -1,3 +1,28 @@
+enum 50100 "Waste Order Status WC"
+{
+    Extensible = true;
+
+    value(0; Commissioned)
+    {
+        Caption = 'Commissioned';
+    }
+
+    value(1; Accepted)
+    {
+        Caption = 'Accepted';
+    }
+
+    value(2; Rejected)
+    {
+        Caption = 'Rejected';
+    }
+
+    value(3; Cancelled)
+    {
+        Caption = 'Cancelled';
+    }
+}
+
 table 50100 "Waste Order WC"
 {
     DataClassification = CustomerContent;
@@ -14,12 +39,17 @@ table 50100 "Waste Order WC"
             Caption = 'Transaction Timestamp';
         }
 
-        field(3; Quantity; Decimal)
+        field(3; Status; enum "Waste Order Status WC")
+        {
+            Caption = 'Status';
+        }
+
+        field(4; Quantity; Decimal)
         {
             Caption = 'Quantity';
         }
 
-        field(4; "Unit Price"; Decimal)
+        field(5; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
         }

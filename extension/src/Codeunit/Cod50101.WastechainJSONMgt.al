@@ -48,17 +48,39 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(Token.AsValue().AsText());
     end;
 
-    procedure GetWasteOrderHistoryFromText(HistoryText: Text; var WasteOrder: Record "Waste Order WC" temporary)
+    procedure GetWasteOrderTransactionHistoryFromText(TransactionHistoryText: Text; var WasteOrder: Record "Waste Order WC" temporary)
     var
-        HistoryJSON: JsonArray;
-        HistoryJSONToken: JsonToken;
+        TransactionHistoryJSONArray: JsonArray;
+        TransactionJSONToken: JsonToken;
+        ValueJSONToken: JsonToken;
+        WasteOrderJSONToken: JsonToken;
+        WasteOrderJSONObject: JsonObject;
     begin
-        HistoryJSON.ReadFrom(HistoryText);
-        foreach HistoryJSONToken in HistoryJSON do begin
-            WasteOrder.Init();
-            WasteOrder."Transaction ID" := HistoryJSONToken.Path;
-            WasteOrder.Quantity := 12;
-            WasteOrder.Insert();
+        TransactionHistoryJSONArray.ReadFrom(TransactionHistoryText);
+        foreach TransactionJSONToken in TransactionHistoryJSONArray do begin
+            with WasteOrder do begin
+                Init();
+                TransactionJSONToken.AsObject().Get('txId', ValueJSONToken);
+                "Transaction ID" := ValueJSONToken.AsValue().AsText();
+
+                TransactionJSONToken.AsObject().Get('timestamp', ValueJSONToken);
+                "Transaction Timestamp" := ValueJSONToken.AsValue().AsText();
+
+                // Waste Order
+                TransactionJSONToken.AsObject().Get('value', WasteOrderJSONToken);
+                WasteOrderJSONObject := WasteOrderJSONToken.AsObject();
+
+                WasteOrderJSONObject.Get('status', ValueJSONToken);
+                Status := ValueJSONToken.AsValue().AsOption();
+
+                WasteOrderJSONObject.Get('quantity', ValueJSONToken);
+                Quantity := ValueJSONToken.AsValue().AsDecimal();
+
+                WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
+                "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
+
+                Insert();
+            end;
         end;
     end;
 }

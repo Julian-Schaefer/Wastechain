@@ -1,5 +1,6 @@
 page 50102 "Waste Order History WC"
 {
+    Caption = 'Wastechain: Waste Order History';
     PageType = List;
     SourceTable = "Waste Order WC";
     SourceTableTemporary = true;
@@ -21,6 +22,11 @@ page 50102 "Waste Order History WC"
                     ApplicationArea = All;
                 }
 
+                field(Status; Status)
+                {
+                    ApplicationArea = All;
+                }
+
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
@@ -37,14 +43,13 @@ page 50102 "Waste Order History WC"
     trigger OnOpenPage()
     var
         WasteOrderHistoryPage: Page "Waste Order History WC";
-        HistoryText: Text;
+        TransactionHistoryText: Text;
     begin
         if WasteLine."Wastechain Key" = '' then
             Error('This line has not been commissioned.');
 
-        HistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WasteLine."Wastechain Key");
-        Message(HistoryText);
-        WastechainJSONMgt.GetWasteOrderHistoryFromText(HistoryText, Rec);
+        TransactionHistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WasteLine."Wastechain Key");
+        WastechainJSONMgt.GetWasteOrderTransactionHistoryFromText(TransactionHistoryText, Rec);
     end;
 
     var

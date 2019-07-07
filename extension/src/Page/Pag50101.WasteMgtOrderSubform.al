@@ -9,7 +9,6 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                 action("Commission Order")
                 {
                     Caption = 'Commission Order';
-                    Enabled = ActionEnabled;
 
                     trigger OnAction()
                     var
@@ -34,15 +33,4 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
             }
         }
     }
-
-    var
-        ActionEnabled: Boolean;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        if Description <> '' then
-            ActionEnabled := true
-        else
-            ActionEnabled := false;
-    end;
 }
