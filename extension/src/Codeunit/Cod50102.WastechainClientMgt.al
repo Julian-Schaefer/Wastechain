@@ -74,6 +74,23 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
+    procedure GetIncomingWasteOrders(): Text
+    var
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+        ResponseText: Text;
+    begin
+        InitClient(Client);
+
+        Client.Get('http://localhost:3000/order/commissioned', Response);
+
+        Response.Content.ReadAs(ResponseText);
+        if Response.IsSuccessStatusCode then
+            exit(ResponseText)
+        else
+            Error(ResponseText);
+    end;
+
     procedure InitClient(var Client: HttpClient)
     begin
         //Client.SetBaseAddress('http://localhost:3000/');

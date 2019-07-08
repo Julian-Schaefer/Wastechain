@@ -44,20 +44,20 @@ page 50102 "Waste Order Tx History WC"
     var
         TransactionHistoryText: Text;
     begin
-        if WasteLine."Wastechain Key" = '' then
-            Error('This line has not been commissioned.');
+        if WastechainKey = '' then
+            Error('Please specify a Wastechain Key.');
 
-        TransactionHistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WasteLine."Wastechain Key");
+        TransactionHistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WastechainKey);
         WastechainJSONMgt.GetWasteOrderTransactionHistoryFromText(TransactionHistoryText, Rec);
     end;
 
     var
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
         WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
-        WasteLine: Record "Waste Management Line";
+        WastechainKey: Text[250];
 
-    procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
+    procedure SetWastechainKey(WastechainKey2: Text)
     begin
-        WasteLine := WasteLine2;
+        WastechainKey := WastechainKey2;
     end;
 }

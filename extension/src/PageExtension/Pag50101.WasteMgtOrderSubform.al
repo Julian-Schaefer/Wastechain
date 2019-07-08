@@ -6,7 +6,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
         {
             group(Wastechain)
             {
-                action("Commission Order")
+                action("Commission Order WC")
                 {
                     Caption = 'Commission Order';
 
@@ -18,7 +18,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                     end;
                 }
 
-                action("Show History")
+                action("Show History WC")
                 {
                     Caption = 'Show History';
 
@@ -26,7 +26,10 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                     var
                         WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                     begin
-                        WasteOrderHistoryPage.SetWasteLine(Rec);
+                        if "Wastechain Key" = '' then
+                            Error('This line has not been commissioned.');
+
+                        WasteOrderHistoryPage.SetWastechainKey("Wastechain Key");
                         WasteOrderHistoryPage.RunModal();
                     end;
                 }

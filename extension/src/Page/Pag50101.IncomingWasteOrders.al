@@ -91,4 +91,41 @@ page 50101 "Incoming Waste Orders WC"
             }
         }
     }
+
+    actions
+    {
+        area(Processing)
+        {
+            action("Show History WC")
+            {
+                Caption = 'Show History';
+
+                trigger OnAction()
+                var
+                    WasteOrderHistoryPage: Page "Waste Order Tx History WC";
+                begin
+                    WasteOrderHistoryPage.SetWastechainKey("Key");
+                    WasteOrderHistoryPage.RunModal();
+                end;
+            }
+        }
+    }
+
+    trigger OnOpenPage()
+    var
+        IncomingWasteOrdersText: Text;
+    begin
+        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrders();
+        WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, Rec);
+    end;
+
+    var
+        WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
+        WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
+        WasteLine: Record "Waste Management Line";
+
+    procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
+    begin
+        WasteLine := WasteLine2;
+    end;
 }
