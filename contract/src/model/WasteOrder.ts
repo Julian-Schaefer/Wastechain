@@ -2,22 +2,14 @@ import { Service, ServiceSchema } from "./Service";
 import { TaskSite, TaskSiteSchema } from "./TaskSite";
 import * as Joi from '@hapi/joi';
 
-export enum WasteOrderStatus {
-    COMMISSIONED,
-    ACCEPTED,
-    REJECTED,
-    CANCELLED
-}
-
 export interface WasteOrder {
     key: string;
-    status: WasteOrderStatus;
     service: Service;
     taskSite: TaskSite;
     description: string;
     quantity: number;
     unitPrice: number;
-    originatorMSPID?: string;
+    originatorMSPID: string;
     contractorMSPID: string;
 }
 
@@ -28,7 +20,7 @@ export const WasteOrderSchema = Joi.object().keys({
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
-    originatorMSPID: Joi.string(),
+    originatorMSPID: Joi.string().required(),
     contractorMSPID: Joi.string().required()
 });
 

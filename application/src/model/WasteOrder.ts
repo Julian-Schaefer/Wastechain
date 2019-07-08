@@ -9,7 +9,7 @@ export interface WasteOrder {
     description: string;
     quantity: number;
     unitPrice: number;
-    originatorMSPID?: string;
+    originatorMSPID: string;
     contractorMSPID: string;
 }
 
@@ -20,7 +20,7 @@ export const WasteOrderSchema = Joi.object().keys({
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
-    originatorMSPID: Joi.string(),
+    originatorMSPID: Joi.string().required(),
     contractorMSPID: Joi.string().required()
 });
 
