@@ -67,7 +67,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(Token.AsValue().AsText());
     end;
 
-    procedure GetWasteOrderTransactionHistoryFromText(TransactionHistoryText: Text; var WasteOrder: Record "Waste Order WC" temporary)
+    procedure GetWasteOrderTransactionHistoryFromText(TransactionHistoryText: Text; var WasteOrder: Record "Waste Order Transaction WC" temporary)
     var
         TransactionHistoryJSONArray: JsonArray;
         TransactionJSONToken: JsonToken;

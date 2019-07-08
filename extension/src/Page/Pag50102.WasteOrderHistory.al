@@ -1,8 +1,8 @@
-page 50102 "Waste Order History WC"
+page 50102 "Waste Order Tx History WC"
 {
-    Caption = 'Wastechain: Waste Order History';
+    Caption = 'Waste Order Transaction History';
     PageType = List;
-    SourceTable = "Waste Order WC";
+    SourceTable = "Waste Order Transaction WC";
     SourceTableTemporary = true;
     Editable = false;
 
@@ -42,7 +42,6 @@ page 50102 "Waste Order History WC"
 
     trigger OnOpenPage()
     var
-        WasteOrderHistoryPage: Page "Waste Order History WC";
         TransactionHistoryText: Text;
     begin
         if WasteLine."Wastechain Key" = '' then

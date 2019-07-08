@@ -24,7 +24,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
 
                     trigger OnAction()
                     var
-                        WasteOrderHistoryPage: Page "Waste Order History WC";
+                        WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                     begin
                         WasteOrderHistoryPage.SetWasteLine(Rec);
                         WasteOrderHistoryPage.RunModal();

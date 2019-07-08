@@ -23,7 +23,7 @@ enum 50100 "Waste Order Status WC"
     }
 }
 
-table 50100 "Waste Order WC"
+table 50100 "Waste Order Transaction WC"
 {
     DataClassification = CustomerContent;
 
