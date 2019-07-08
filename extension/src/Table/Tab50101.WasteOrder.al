@@ -67,7 +67,7 @@ table 50100 "Waste Order WC"
 
         field(7; "Contractor MSP ID"; Text[250])
         {
-            Caption = 'Originator MSP ID';
+            Caption = 'Contractor MSP ID';
             DataClassification = ToBeClassified;
         }
 
