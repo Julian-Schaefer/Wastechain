@@ -37,6 +37,7 @@ export class OrderContract extends Contract {
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
         await ctx.stub.putState(wasteOrder.key, buffer);
         ctx.stub.setEvent("CREATE_ORDER", buffer);
+
         return wasteOrder;
     }
 
@@ -75,11 +76,45 @@ export class OrderContract extends Contract {
             if (result.done) {
                 await iterator.close();
                 console.info(transactionHistory);
-                break;
+                return transactionHistory;
             }
         }
 
-        return transactionHistory;
+    }
+
+    @Transaction(false)
+    public async getCommissionedWasteOrdersForMSP(ctx: Context, MSPID: string): Promise<WasteOrder[]> {
+        let query = {
+            selector: {
+                contractorMSPID: MSPID,
+                status: WasteOrderStatus.COMMISSIONED
+            }
+        };
+
+        let iterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+        let wasteOrders: WasteOrder[] = [];
+
+        while (true) {
+            let result = await iterator.next();
+
+            if (result.value && result.value.value.toString()) {
+                let wasteOrder: WasteOrder;
+
+                try {
+                    wasteOrder = JSON.parse(result.value.value.toString('utf8'));
+                } catch (err) {
+                    console.log(err);
+                    //wasteOrder = result.value.value.toString('utf8');
+                }
+
+                wasteOrders.push(wasteOrder);
+            }
+
+            if (result.done) {
+                await iterator.close();
+                return wasteOrders;
+            }
+        }
     }
 
     @Transaction(false)

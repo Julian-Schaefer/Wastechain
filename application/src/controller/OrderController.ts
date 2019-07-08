@@ -16,6 +16,7 @@ export class OrderController {
         app.get('/order/:orderId/history', this.getOrderHistory.bind(this));
         app.post('/order/:orderId', this.createOrder.bind(this));
         app.put('/order/:orderId', this.updateOrder.bind(this));
+        app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
@@ -102,6 +103,20 @@ export class OrderController {
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
             response.status(500).send('Error submitting Transaction: ' + error);
+        }
+    }
+
+    private async getCommissionedWasteOrders(_: Request, response: Response) {
+        try {
+            let MSPID = this.fabricConnection.client.getMspid();
+            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            let wasteOrdersBuffer = await contract.evaluateTransaction('getCommissionedWasteOrdersForMSP', MSPID);
+            
+            console.log('Retrieved commissioned Waste Orders for MSP: ' + MSPID);
+            response.send(wasteOrdersBuffer.toString('utf-8'));
+        } catch (error) {
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
         }
     }
 
