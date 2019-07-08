@@ -179,4 +179,12 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             end;
         end;
     end;
+
+    procedure GetUpdateWasteOrderStatusJSON(Status: enum "Waste Order Status WC"): JsonObject
+    var
+        UpdateWasteOrderStatusJSON: JsonObject;
+    begin
+        UpdateWasteOrderStatusJSON.Add('status', Status);
+        exit(UpdateWasteOrderStatusJSON);
+    end;
 }

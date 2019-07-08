@@ -4,7 +4,7 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus } from './model/WasteOrder';
+import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './model/WasteOrder';
 
 @Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
 export class OrderContract extends Contract {
@@ -165,9 +165,40 @@ export class OrderContract extends Contract {
     public async deleteOrder(ctx: Context, orderId: string): Promise<void> {
         const exists = await this.orderExists(ctx, orderId);
         if (!exists) {
-            throw new Error(`The order ${orderId} does not exist`);
+            throw new Error(`The order ${orderId} does not exist.`);
         }
         await ctx.stub.deleteState(orderId);
     }
 
+    @Transaction()
+    public async updateWasteOrderStatus(ctx: Context, orderId: string, wasteOrderUpdateStatusValue: string): Promise<void> {
+        const exists = await this.orderExists(ctx, orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
+
+        const validationResult = Joi.validate(wasteOrderUpdateStatusValue, WasteOrderUpdateStatusSchema);
+        if (validationResult.error !== null) {
+            throw "Invalid Waste Order Status Update Schema!";
+        }
+
+        let wasteOrder: WasteOrder = await this.readOrder(ctx, orderId);
+        if (wasteOrder.contractorMSPID !== ctx.clientIdentity.getMSPID()) {
+            throw new Error('The Waste Order can only be accepted by the Contractor.')
+        }
+
+        let status: WasteOrderStatus = JSON.parse(wasteOrderUpdateStatusValue).status;
+
+        if (status === WasteOrderStatus.ACCEPTED) {
+            if (wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
+                throw new Error('Only Waste Orders with Status "Commissioned" can be accepted.')
+            }
+        } else {
+            throw new Error('Other status are not supported yet.');
+        }
+
+        wasteOrder.status = status;
+        const buffer = Buffer.from(JSON.stringify(wasteOrder));
+        await ctx.stub.putState(orderId, buffer);
+    }
 }

@@ -91,7 +91,33 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure InitClient(var Client: HttpClient)
+    procedure UpdateWasteOrderStatus(WasteOrder: Record "Waste Order WC"; Status: enum "Waste Order Status WC")
+    var
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        ResponseText: Text;
+        UpdateWasteOrderJSONStatusText: Text;
+    begin
+        InitClient(Client);
+
+        WastechainJSONMgt.GetUpdateWasteOrderStatusJSON(Status).WriteTo(UpdateWasteOrderJSONStatusText);
+        Content.WriteFrom(UpdateWasteOrderJSONStatusText);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
+
+        Client.Put(StrSubstNo('http://localhost:3000/order/%1/status', WasteOrder."Key"), Content, Response);
+
+        Response.Content.ReadAs(ResponseText);
+        if Response.IsSuccessStatusCode then
+            Message('Successfully updated Waste Order Status to: %1', Format(Status))
+        else
+            Error(ResponseText);
+    end;
+
+    local procedure InitClient(var Client: HttpClient)
     begin
         //Client.SetBaseAddress('http://localhost:3000/');
     end;

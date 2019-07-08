@@ -23,6 +23,7 @@ export interface WasteOrder {
 
 export const WasteOrderSchema = Joi.object().keys({
     key: ServiceSchema.required(),
+    status: Joi.required(),
     service: ServiceSchema.required(),
     taskSite: TaskSiteSchema.required(),
     description: Joi.string().required(),
@@ -47,3 +48,7 @@ export const WasteOrderUpdateSchema = Joi.object().keys({
     unitPrice: Joi.number(),
     contractorMSPID: Joi.string()
 }).min(1);
+
+export const WasteOrderUpdateStatusSchema = Joi.object().keys({
+    status: Joi.required()
+});

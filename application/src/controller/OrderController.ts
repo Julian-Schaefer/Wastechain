@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
-import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderSchema, WasteOrder } from '../model/WasteOrder';
+import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderUpdateStatusSchema, WasteOrder } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -14,9 +14,10 @@ export class OrderController {
 
         app.get('/order', this.getOrders.bind(this));
         app.get('/order/:orderId/history', this.getOrderHistory.bind(this));
-        app.post('/order/:orderId', this.createOrder.bind(this));
-        app.put('/order/:orderId', this.updateOrder.bind(this));
+        app.post('/order/:orderId', this.createWasteOrder.bind(this));
+        app.put('/order/:orderId', this.updateWasteOrder.bind(this));
         app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
+        app.put('/order/:orderId/status', this.setWasteOrderStatus.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
@@ -62,7 +63,7 @@ export class OrderController {
         }
     }
 
-    private async createOrder(request: Request, response: Response) {
+    private async createWasteOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
         let wasteOrder = request.body;
 
@@ -84,10 +85,9 @@ export class OrderController {
         }
     }
 
-    private async updateOrder(request: Request, response: Response) {
+    private async updateWasteOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
         let wasteOrderUpdate = request.body;
-
 
         try {
             const validationResult = Joi.validate(wasteOrderUpdate, WasteOrderUpdateSchema);
@@ -114,6 +114,27 @@ export class OrderController {
             
             console.log('Retrieved commissioned Waste Orders for MSP: ' + MSPID);
             response.send(wasteOrdersBuffer.toString('utf-8'));
+        } catch (error) {
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
+        }
+    }
+
+    private async setWasteOrderStatus(request: Request, response: Response) {
+        const orderId = request.params.orderId;
+        let wasteOrderUpdateStatus = request.body;
+
+        try {
+            const validationResult = Joi.validate(wasteOrderUpdateStatus, WasteOrderUpdateStatusSchema);
+            if (validationResult.error !== null) {
+                throw validationResult.error;
+            }
+
+            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            await contract.evaluateTransaction('updateWasteOrderStatus', orderId, JSON.stringify(wasteOrderUpdateStatus));
+            
+            console.log('Updated Waste Order Status: ' + orderId);
+            response.send('Updated Waste Order Status: ' + orderId);
         } catch (error) {
             console.log('Error evaluating Transaction: ' + error);
             response.status(500).send('Error evaluating Transaction: ' + error);

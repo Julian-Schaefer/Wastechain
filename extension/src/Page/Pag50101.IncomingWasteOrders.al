@@ -96,6 +96,21 @@ page 50101 "Incoming Waste Orders WC"
     {
         area(Processing)
         {
+
+            action("Accept WC")
+            {
+                Caption = 'Accept';
+
+                trigger OnAction()
+                begin
+                    WastechainClientMgt.UpdateWasteOrderStatus(Rec, Rec.Status::Accepted);
+                end;
+            }
+        }
+
+        area(Navigation)
+        {
+
             action("Show History WC")
             {
                 Caption = 'Show History';
