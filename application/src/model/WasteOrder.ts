@@ -2,8 +2,16 @@ import { Service, ServiceSchema } from "./Service";
 import { TaskSite, TaskSiteSchema } from "./TaskSite";
 import * as Joi from '@hapi/joi';
 
+export enum WasteOrderStatus {
+    COMMISSIONED,
+    ACCEPTED,
+    REJECTED,
+    CANCELLED
+}
+
 export interface WasteOrder {
     key: string;
+    status: WasteOrderStatus;
     service: Service;
     taskSite: TaskSite;
     description: string;
