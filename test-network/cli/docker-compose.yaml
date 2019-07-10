@@ -6,9 +6,9 @@
 version: '2'
 
 networks:
-  test_basic:
+  basic:
     external:
-      name: ${COMPOSE_PROJECT_NAME}_basic
+      name: net_basic
 
 services:
   cli:
@@ -28,10 +28,6 @@ services:
     command: /bin/bash
     volumes:
         - /var/run/:/host/var/run/
-        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
     networks:
-        - test_basic
-    #depends_on:
-    #  - orderer.example.com
-    #  - peer0.org1.example.com
-    #  - couchdb
+        - basic

@@ -6,7 +6,7 @@
 version: '2'
 
 networks:
-  test_basic:
+  basic:
 
 services:
 
@@ -22,7 +22,7 @@ services:
       - ./crypto-config/peerOrganizations/ordering-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.ordering-organisation.org
     networks:
-      - test_basic
+      - basic
 
   ca.subcontractor-organisation.org:
     image: hyperledger/fabric-ca
@@ -35,7 +35,7 @@ services:
       - ./crypto-config/peerOrganizations/subcontractor-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.subcontractor-organisation.org
     networks:
-      - test_basic
+      - basic
 
   ca.third-party-organisation.org:
     image: hyperledger/fabric-ca
@@ -48,7 +48,7 @@ services:
       - ./crypto-config/peerOrganizations/third-party-organisation.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca.third-party-organisation.org
     networks:
-      - test_basic
+      - basic
 
   ## Wastechain-Orderer  
   orderer.wastechainorderer.org:
@@ -78,7 +78,7 @@ services:
         - ./crypto-config/peerOrganizations/subcontractor-organisation.org/peers/peer0.subcontractor-organisation.org/:/etc/hyperledger/crypto/peerSubcontractorOrg
         - ./crypto-config/peerOrganizations/third-party-organisation.org/peers/peer0.third-party-organisation.org/:/etc/hyperledger/crypto/thirdPartyOrg
     networks:
-      - test_basic
+      - basic
 
   ## Peers
   peer0.ordering-organisation.org:
@@ -112,7 +112,7 @@ services:
       - orderer.wastechainorderer.org
       - couchdb.ordering-organisation.org
     networks:
-      - test_basic
+      - basic
 
   peer0.subcontractor-organisation.org:
     container_name: peer0.subcontractor-organisation.org
@@ -145,7 +145,7 @@ services:
       - orderer.wastechainorderer.org
       - couchdb.subcontractor-organisation.org
     networks:
-      - test_basic
+      - basic
 
   peer0.third-party-organisation.org:
     container_name: peer0.third-party-organisation.org
@@ -178,7 +178,7 @@ services:
       - orderer.wastechainorderer.org
       - couchdb.third-party-organisation.org
     networks:
-      - test_basic
+      - basic
 
   # Databases
   couchdb.ordering-organisation.org:
@@ -190,7 +190,7 @@ services:
     ports:
       - 5984:5984
     networks:
-      - test_basic
+      - basic
 
   couchdb.subcontractor-organisation.org:
     container_name: couchdb.subcontractor-organisation.org
@@ -201,7 +201,7 @@ services:
     ports:
       - 6984:5984
     networks:
-      - test_basic
+      - basic
 
   couchdb.third-party-organisation.org:
     container_name: couchdb.third-party-organisation.org
@@ -212,4 +212,4 @@ services:
     ports:
       - 7984:5984
     networks:
-      - test_basic
+      - basic
