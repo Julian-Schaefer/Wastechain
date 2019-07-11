@@ -27,6 +27,20 @@ Organizations:
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: crypto-config/ordererOrganizations/wastechainorderer.org/msp
 
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('WastechainOrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('WastechainOrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('WastechainOrdererMSP.admin')"
+
     - &OrderingOrg
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
@@ -36,6 +50,20 @@ Organizations:
         ID: OrderingOrgMSP
 
         MSPDir: crypto-config/peerOrganizations/ordering-organisation.org/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin', 'OrderingOrgMSP.peer', 'OrderingOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin', 'OrderingOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -54,6 +82,20 @@ Organizations:
 
         MSPDir: crypto-config/peerOrganizations/subcontractor-organisation.org/msp
 
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin', 'SubcontractorOrgMSP.peer', 'SubcontractorOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin', 'SubcontractorOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin')"
+
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
@@ -70,6 +112,20 @@ Organizations:
         ID: ThirdPartyOrgMSP
 
         MSPDir: crypto-config/peerOrganizations/third-party-organisation.org/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin', 'ThirdPartyOrgMSP.peer', 'ThirdPartyOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin', 'ThirdPartyOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -91,6 +147,20 @@ Application: &ApplicationDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the application side of the network
     Organizations:
+
+    # Policies defines the set of policies at this level of the config tree
+    # For Application policies, their canonical path is
+    #   /Channel/Application/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
 
 ################################################################################
 #
@@ -137,6 +207,51 @@ Orderer: &OrdererDefaults
     # the orderer side of the network
     Organizations:
 
+    # Policies defines the set of policies at this level of the config tree
+    # For Orderer policies, their canonical path is
+    #   /Channel/Orderer/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        # BlockValidation specifies what signatures must be included in the block
+        # from the orderer for the peer to validate it.
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+################################################################################
+#
+#   CHANNEL
+#
+#   This section defines the values to encode into a config transaction or
+#   genesis block for channel related parameters.
+#
+################################################################################
+Channel: &ChannelDefaults
+    # Policies defines the set of policies at this level of the config tree
+    # For Channel policies, their canonical path is
+    #   /Channel/<PolicyName>
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
 ################################################################################
 #
 #   Profile
@@ -148,6 +263,7 @@ Orderer: &OrdererDefaults
 Profiles:
 
     WastechainOrdererGenesis:
+        <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
             Organizations:
@@ -160,6 +276,7 @@ Profiles:
                     - *ThirdPartyOrg
     WastechainChannel:
         Consortium: WastechainConsortium
+        <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
             Organizations:

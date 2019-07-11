@@ -55,28 +55,19 @@ services:
     container_name: orderer.wastechainorderer.org
     image: hyperledger/fabric-orderer
     environment:
-      - GRPC_TRACE=all
-      - GRPC_VERBOSITY=debug
-      - ORDERER_GENERAL_LOGLEVEL=debug
+      - FABRIC_LOGGING_SPEC=info
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_GENESISMETHOD=file
-      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/twoorgs.orderer.block
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
       - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
-      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer
-      - ORDERER_GENERAL_TLS_ENABLED=false
-      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/tls/orderer/key.pem
-      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/tls/orderer/cert.pem
-      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/crypto/orderer/tls/ca.crt, /etc/hyperledger/crypto/peerOrderingOrg/tls/ca.crt, /etc/hyperledger/crypto/peerSubcontractorOrg/tls/ca.crt, /etc/hyperledger/crypto/thirdPartyOrg/tls/ca.crt]
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
     command: orderer
     ports:
       - 7050:7050
     volumes:
         - ./config/:/etc/hyperledger/configtx
-        - ./crypto-config/ordererOrganizations/wastechainorderer.org/orderers/orderer.wastechainorderer.org/:/etc/hyperledger/crypto/orderer
-        - ./crypto-config/peerOrganizations/ordering-organisation.org/peers/peer0.ordering-organisation.org/:/etc/hyperledger/crypto/peerOrderingOrg
-        - ./crypto-config/peerOrganizations/subcontractor-organisation.org/peers/peer0.subcontractor-organisation.org/:/etc/hyperledger/crypto/peerSubcontractorOrg
-        - ./crypto-config/peerOrganizations/third-party-organisation.org/peers/peer0.third-party-organisation.org/:/etc/hyperledger/crypto/thirdPartyOrg
+        - ./crypto-config/ordererOrganizations/wastechainorderer.org/orderers/orderer.wastechainorderer.org/:/etc/hyperledger/msp/orderer
     networks:
       - basic
 
@@ -89,10 +80,9 @@ services:
       - CORE_PEER_ID=peer0.ordering-organisation.org
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
-      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LOCALMSPID=OrderingOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.ordering-organisation.org:7051
-      - CORE_PEER_TLS_ENABLED=false
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.ordering-organisation.org:5984
@@ -122,10 +112,9 @@ services:
       - CORE_PEER_ID=peer0.subcontractor-organisation.org
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
-      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LOCALMSPID=SubcontractorOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.subcontractor-organisation.org:7051
-      - CORE_PEER_TLS_ENABLED=false
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.subcontractor-organisation.org:5984
@@ -155,10 +144,9 @@ services:
       - CORE_PEER_ID=peer0.third-party-organisation.org
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
-      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LOCALMSPID=ThirdPartyOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.third-party-organisation.org:7051
-      - CORE_PEER_TLS_ENABLED=false
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.third-party-organisation.org:5984
