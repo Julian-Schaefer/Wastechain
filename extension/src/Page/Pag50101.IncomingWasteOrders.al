@@ -102,7 +102,29 @@ page 50101 "Incoming Waste Orders WC"
                 Caption = 'Accept';
 
                 trigger OnAction()
+                var
+                    AcceptWasteOrderWizard: Page "Accept Waste Order Wizard WC";
+                    BusinessPartner: Record "Business Partner";
+                    BusinessPartnerSite: Record "Business Partner Site";
                 begin
+                    // AcceptWasteOrderWizard.RunModal();
+                    BusinessPartner.SetRange("Wastechain MSP ID", "Originator MSP ID");
+                    if BusinessPartner.FindFirst() then begin
+                        BusinessPartnerSite.SetRange(Address, "Task Site Address");
+                        BusinessPartnerSite.SetRange("Address 2", "Task Site Address 2");
+                        BusinessPartnerSite.SetRange("Post Code", "Task Site Post Code");
+                        BusinessPartnerSite.SetRange(City, "Task Site City");
+                        BusinessPartnerSite.SetRange("Country/Region Code", "Task Site Country Code");
+                        BusinessPartnerSite.SetRange("Area Code", "Task Site Area Code");
+                        if BusinessPartnerSite.FindFirst() then begin
+
+                        end else begin
+
+                        end;
+                    end else begin
+
+                    end;
+
                     WastechainClientMgt.UpdateWasteOrderStatus(Rec, Rec.Status::Accepted);
                 end;
             }
