@@ -116,6 +116,9 @@ page 50101 "Incoming Waste Orders WC"
 
                     AcceptWasteOrderWizard.SetWasteOrder(Rec);
                     AcceptWasteOrderWizard.RunModal();
+                    Rec.DeleteAll();
+                    RefreshPage();
+                    CurrPage.Update(false);
                 end;
             }
         }
@@ -140,17 +143,22 @@ page 50101 "Incoming Waste Orders WC"
     }
 
     trigger OnOpenPage()
-    var
-        IncomingWasteOrdersText: Text;
     begin
-        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrders();
-        WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, Rec);
+        RefreshPage();
     end;
 
     var
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
         WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
         WasteLine: Record "Waste Management Line";
+
+    local procedure RefreshPage()
+    var
+        IncomingWasteOrdersText: Text;
+    begin
+        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrders();
+        WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, Rec);
+    end;
 
     procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
     begin
