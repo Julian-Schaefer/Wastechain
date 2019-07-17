@@ -100,6 +100,7 @@ page 50101 "Incoming Waste Orders WC"
             action("Accept WC")
             {
                 Caption = 'Accept';
+                Image = Approve;
 
                 trigger OnAction()
                 var
@@ -107,25 +108,14 @@ page 50101 "Incoming Waste Orders WC"
                     BusinessPartner: Record "Business Partner";
                     BusinessPartnerSite: Record "Business Partner Site";
                 begin
-                    // AcceptWasteOrderWizard.RunModal();
-                    BusinessPartner.SetRange("Wastechain MSP ID", "Originator MSP ID");
-                    if BusinessPartner.FindFirst() then begin
-                        BusinessPartnerSite.SetRange(Address, "Task Site Address");
-                        BusinessPartnerSite.SetRange("Address 2", "Task Site Address 2");
-                        BusinessPartnerSite.SetRange("Post Code", "Task Site Post Code");
-                        BusinessPartnerSite.SetRange(City, "Task Site City");
-                        BusinessPartnerSite.SetRange("Country/Region Code", "Task Site Country Code");
-                        BusinessPartnerSite.SetRange("Area Code", "Task Site Area Code");
-                        if BusinessPartnerSite.FindFirst() then begin
+                    if Rec.Count = 0 then
+                        Error('Please select a Waste Order.')
+                    else
+                        if Rec.Count > 1 then
+                            Error('Please select only one Waste Order.');
 
-                        end else begin
-
-                        end;
-                    end else begin
-
-                    end;
-
-                    WastechainClientMgt.UpdateWasteOrderStatus(Rec, Rec.Status::Accepted);
+                    AcceptWasteOrderWizard.SetWasteOrder(Rec);
+                    AcceptWasteOrderWizard.RunModal();
                 end;
             }
         }
@@ -136,6 +126,7 @@ page 50101 "Incoming Waste Orders WC"
             action("Show History WC")
             {
                 Caption = 'Show History';
+                Image = History;
 
                 trigger OnAction()
                 var
