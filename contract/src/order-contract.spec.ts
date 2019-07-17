@@ -4,7 +4,7 @@
 
 import { Context } from 'fabric-contract-api';
 import { ChaincodeStub, ClientIdentity } from 'fabric-shim';
-import { OrderContract } from '.';
+import { WasteOrderContract } from '.';
 
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -25,77 +25,77 @@ class TestContext implements Context {
      };
 }
 
-describe('OrderContract', () => {
+describe('WasteOrderContract', () => {
 
-    let contract: OrderContract;
+    let contract: WasteOrderContract;
     let ctx: TestContext;
 
     beforeEach(() => {
-        contract = new OrderContract();
+        contract = new WasteOrderContract();
         ctx = new TestContext();
         ctx.stub.getState.withArgs('1001').resolves(Buffer.from('{"value":"order 1001 value"}'));
         ctx.stub.getState.withArgs('1002').resolves(Buffer.from('{"value":"order 1002 value"}'));
     });
 
-    describe('#orderExists', () => {
+    describe('#checkWasteOrderExists', () => {
 
         it('should return true for a order', async () => {
-            await contract.orderExists(ctx, '1001').should.eventually.be.true;
+            await contract.checkWasteOrderExists(ctx, '1001').should.eventually.be.true;
         });
 
         it('should return false for a order that does not exist', async () => {
-            await contract.orderExists(ctx, '1003').should.eventually.be.false;
+            await contract.checkWasteOrderExists(ctx, '1003').should.eventually.be.false;
         });
 
     });
 
-    describe('#createOrder', () => {
+    describe('#createWasteOrder', () => {
 
         it('should create a order', async () => {
-            await contract.createOrder(ctx, '1003', 'order 1003 value');
+            await contract.createWasteOrder(ctx, '1003', 'order 1003 value');
             ctx.stub.putState.should.have.been.calledOnceWithExactly('1003', Buffer.from('{"value":"order 1003 value"}'));
         });
 
         it('should throw an error for a order that already exists', async () => {
-            await contract.createOrder(ctx, '1001', 'myvalue').should.be.rejectedWith(/The order 1001 already exists/);
+            await contract.createWasteOrder(ctx, '1001', 'myvalue').should.be.rejectedWith(/The order 1001 already exists/);
         });
 
     });
 
-    describe('#readOrder', () => {
+    describe('#getWasteOrder', () => {
 
         it('should return a order', async () => {
-            await contract.readOrder(ctx, '1001').should.eventually.deep.equal({ value: 'order 1001 value' });
+            await contract.getWasteOrder(ctx, '1001').should.eventually.deep.equal({ value: 'order 1001 value' });
         });
 
         it('should throw an error for a order that does not exist', async () => {
-            await contract.readOrder(ctx, '1003').should.be.rejectedWith(/The order 1003 does not exist/);
+            await contract.getWasteOrder(ctx, '1003').should.be.rejectedWith(/The order 1003 does not exist/);
         });
 
     });
 
-    describe('#updateOrder', () => {
+    describe('#updateWasteOrder', () => {
 
         it('should update a order', async () => {
-            await contract.updateOrder(ctx, '1001', 'order 1001 new value');
+            await contract.updateWasteOrder(ctx, '1001', 'order 1001 new value');
             ctx.stub.putState.should.have.been.calledOnceWithExactly('1001', Buffer.from('{"value":"order 1001 new value"}'));
         });
 
         it('should throw an error for a order that does not exist', async () => {
-            await contract.updateOrder(ctx, '1003', 'order 1003 new value').should.be.rejectedWith(/The order 1003 does not exist/);
+            await contract.updateWasteOrder(ctx, '1003', 'order 1003 new value').should.be.rejectedWith(/The order 1003 does not exist/);
         });
 
     });
 
-    describe('#deleteOrder', () => {
+    describe('#deleteWasteOrder', () => {
 
         it('should delete a order', async () => {
-            await contract.deleteOrder(ctx, '1001');
+            await contract.deleteWasteOrder(ctx, '1001');
             ctx.stub.deleteState.should.have.been.calledOnceWithExactly('1001');
         });
 
         it('should throw an error for a order that does not exist', async () => {
-            await contract.deleteOrder(ctx, '1003').should.be.rejectedWith(/The order 1003 does not exist/);
+            await contract.deleteWasteOrder(ctx, '1003').should.be.rejectedWith(/The order 1003 does not exist/);
         });
 
     });

@@ -12,8 +12,8 @@ export class OrderController {
     constructor(app: Express, fabricConnection: FabricConnection) {
         this.fabricConnection = fabricConnection;
 
-        app.get('/order', this.getOrders.bind(this));
-        app.get('/order/:orderId/history', this.getOrderHistory.bind(this));
+        app.get('/order', this.getWasteOrders.bind(this));
+        app.get('/order/:orderId/history', this.getWasteOrderHistory.bind(this));
         app.post('/order/:orderId', this.createWasteOrder.bind(this));
         app.put('/order/:orderId', this.updateWasteOrder.bind(this));
         app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
@@ -32,7 +32,7 @@ export class OrderController {
         });
     }
 
-    private getOrders = (request: Request, response: Response) => {
+    private getWasteOrders = (request: Request, response: Response) => {
         // SSE Setup
         response.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -49,11 +49,11 @@ export class OrderController {
         });
     };
 
-    private async getOrderHistory(request: Request, response: Response) {
+    private async getWasteOrderHistory(request: Request, response: Response) {
         const orderId = request.params.orderId;
         try {
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            let result = await contract.evaluateTransaction('getHistory', orderId);
+            let contract = await this.fabricConnection.wasteOrderContract;
+            let result = await contract.evaluateTransaction('getWasteOrderHistory', orderId);
 
             let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = JSON.parse(result.toString('utf-8'));
             response.send(JSON.stringify(history));
@@ -73,8 +73,8 @@ export class OrderController {
                 throw validationResult.error;
             }
 
-            const contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            const submittedWasteOrderBuffer = await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
+            const contract = this.fabricConnection.wasteOrderContract;
+            const submittedWasteOrderBuffer = await contract.submitTransaction('createWasteOrder', orderId, JSON.stringify(wasteOrder));
             const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
 
             console.log('Submitted Contract with ID: ' + submittedWasteOrder.key);
@@ -95,8 +95,8 @@ export class OrderController {
                 throw validationResult.error;
             }
 
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            await contract.submitTransaction('updateOrder', orderId, JSON.stringify(wasteOrderUpdate));
+            let contract = await this.fabricConnection.wasteOrderContract;
+            await contract.submitTransaction('updateWasteOrder', orderId, JSON.stringify(wasteOrderUpdate));
 
             console.log('Updated Contract with ID: ' + orderId);
             response.send('Updated Contract with ID: ' + request.params.orderId);
@@ -109,7 +109,7 @@ export class OrderController {
     private async getCommissionedWasteOrders(_: Request, response: Response) {
         try {
             let MSPID = this.fabricConnection.client.getMspid();
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            let contract = await this.fabricConnection.wasteOrderContract;
             let wasteOrdersBuffer = await contract.evaluateTransaction('getCommissionedWasteOrdersForMSP', MSPID);
             
             console.log('Retrieved commissioned Waste Orders for MSP: ' + MSPID);
@@ -130,7 +130,7 @@ export class OrderController {
                 throw validationResult.error;
             }
 
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
+            let contract = await this.fabricConnection.wasteOrderContract;
             await contract.submitTransaction('updateWasteOrderStatus', orderId, JSON.stringify(wasteOrderUpdateStatus));
             
             console.log('Updated Waste Order Status: ' + orderId);

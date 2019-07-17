@@ -6,18 +6,18 @@ import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-a
 import * as Joi from '@hapi/joi';
 import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './model/WasteOrder';
 
-@Info({ title: 'OrderContract', description: 'Contract to exchange Waste Orders' })
-export class OrderContract extends Contract {
+@Info({ title: 'WasteOrderContract', description: 'Contract to exchange Waste Orders' })
+export class WasteOrderContract extends Contract {
 
     @Transaction(false)
     @Returns('boolean')
-    public async orderExists(ctx: Context, orderId: string): Promise<boolean> {
+    public async checkWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
         const buffer = await ctx.stub.getState(orderId);
         return (!!buffer && buffer.length > 0);
     }
 
     @Transaction()
-    public async createOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
+    public async createWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
 
         let validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
@@ -26,7 +26,7 @@ export class OrderContract extends Contract {
         }
 
         wasteOrder.key = ctx.clientIdentity.getMSPID() + '-' + orderId;
-        const exists = await this.orderExists(ctx, wasteOrder.key);
+        const exists = await this.checkWasteOrderExists(ctx, wasteOrder.key);
         if (exists) {
             throw new Error(`The order ${wasteOrder.key} already exists`);
         }
@@ -42,7 +42,7 @@ export class OrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getHistory(ctx: Context, key: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
+    public async getWasteOrderHistory(ctx: Context, key: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
         let iterator = await ctx.stub.getHistoryForKey(key);
         let transactionHistory: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
 
@@ -119,8 +119,8 @@ export class OrderContract extends Contract {
 
     @Transaction(false)
     @Returns('Order')
-    public async readOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
-        const exists = await this.orderExists(ctx, orderId);
+    public async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
@@ -130,8 +130,8 @@ export class OrderContract extends Contract {
     }
 
     @Transaction()
-    public async updateOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
-        const exists = await this.orderExists(ctx, orderId);
+    public async updateWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
@@ -143,7 +143,7 @@ export class OrderContract extends Contract {
             throw "Invalid Waste Order Update Schema!";
         }
 
-        let oldWasteOrder = await this.readOrder(ctx, orderId);
+        let oldWasteOrder = await this.getWasteOrder(ctx, orderId);
         if (wasteOrder.quantity !== undefined) {
             oldWasteOrder.quantity = wasteOrder.quantity;
         }
@@ -162,8 +162,8 @@ export class OrderContract extends Contract {
     }
 
     @Transaction()
-    public async deleteOrder(ctx: Context, orderId: string): Promise<void> {
-        const exists = await this.orderExists(ctx, orderId);
+    public async deleteWasteOrder(ctx: Context, orderId: string): Promise<void> {
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist.`);
         }
@@ -172,7 +172,7 @@ export class OrderContract extends Contract {
 
     @Transaction()
     public async updateWasteOrderStatus(ctx: Context, orderId: string, wasteOrderUpdateStatusValue: string): Promise<void> {
-        const exists = await this.orderExists(ctx, orderId);
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
@@ -182,7 +182,7 @@ export class OrderContract extends Contract {
             throw "Invalid Waste Order Status Update Schema!";
         }
 
-        let wasteOrder: WasteOrder = await this.readOrder(ctx, orderId);
+        let wasteOrder: WasteOrder = await this.getWasteOrder(ctx, orderId);
         if (wasteOrder.contractorMSPID !== ctx.clientIdentity.getMSPID()) {
             throw new Error('The Waste Order can only be accepted by the Contractor.')
         }

@@ -1,4 +1,4 @@
-import { FileSystemWallet, Gateway, GatewayOptions, Network } from 'fabric-network';
+import { FileSystemWallet, Gateway, GatewayOptions, Network, Contract } from 'fabric-network';
 import * as FabricClient from 'fabric-client';
 
 export class FabricConnection {
@@ -64,5 +64,9 @@ export class FabricConnection {
 
     get client(): FabricClient {
         return this._client;
+    }
+
+    get wasteOrderContract(): Contract {
+        return this.network.getContract('Wastechain', 'WasteOrderContract');
     }
 }
