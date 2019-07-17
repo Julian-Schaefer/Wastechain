@@ -17,7 +17,7 @@ export class OrderController {
         app.post('/order/:orderId', this.createWasteOrder.bind(this));
         app.put('/order/:orderId', this.updateWasteOrder.bind(this));
         app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
-        app.put('/order/:orderId/status', this.setWasteOrderStatus.bind(this));
+        app.put('/order/:orderId/status', this.updateWasteOrderStatus.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
@@ -120,7 +120,7 @@ export class OrderController {
         }
     }
 
-    private async setWasteOrderStatus(request: Request, response: Response) {
+    private async updateWasteOrderStatus(request: Request, response: Response) {
         const orderId = request.params.orderId;
         let wasteOrderUpdateStatus = request.body;
 
@@ -131,7 +131,7 @@ export class OrderController {
             }
 
             let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            await contract.evaluateTransaction('updateWasteOrderStatus', orderId, JSON.stringify(wasteOrderUpdateStatus));
+            await contract.submitTransaction('updateWasteOrderStatus', orderId, JSON.stringify(wasteOrderUpdateStatus));
             
             console.log('Updated Waste Order Status: ' + orderId);
             response.send('Updated Waste Order Status: ' + orderId);
