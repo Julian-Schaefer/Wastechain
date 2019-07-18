@@ -1,4 +1,4 @@
-pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Subform"
+pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Subform"
 {
     actions
     {
@@ -9,6 +9,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                 action("Commission Waste Order WC")
                 {
                     Caption = 'Commission Waste Order';
+                    Image = SendTo;
 
                     trigger OnAction()
                     var
@@ -25,6 +26,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                 action("Show History WC")
                 {
                     Caption = 'Show History';
+                    Image = History;
 
                     trigger OnAction()
                     var
@@ -41,6 +43,7 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                 action("Cancel Waste Order WC")
                 {
                     Caption = 'Cancel Waste Order';
+                    Image = Cancel;
 
                     trigger OnAction()
                     var
