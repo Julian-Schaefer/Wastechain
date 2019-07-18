@@ -182,19 +182,32 @@ export class WasteOrderContract extends Contract {
             throw "Invalid Waste Order Status Update Schema!";
         }
 
-        let wasteOrder: WasteOrder = await this.getWasteOrder(ctx, orderId);
-        if (wasteOrder.contractorMSPID !== ctx.clientIdentity.getMSPID()) {
-            throw new Error('The Waste Order can only be accepted by the Contractor.')
-        }
+        const wasteOrder: WasteOrder = await this.getWasteOrder(ctx, orderId);
+        const status: WasteOrderStatus = JSON.parse(wasteOrderUpdateStatusValue).status;
+        const MSPID = ctx.clientIdentity.getMSPID();
 
-        let status: WasteOrderStatus = JSON.parse(wasteOrderUpdateStatusValue).status;
+        if (status === WasteOrderStatus.ACCEPTED || status === WasteOrderStatus.REJECTED) {
+            if (wasteOrder.contractorMSPID !== MSPID) {
+                throw new Error('The Waste Order can only be accepted or rejected by the Contractor.')
+            }
 
-        if (status === WasteOrderStatus.ACCEPTED) {
             if (wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
-                throw new Error('Only Waste Orders with Status "Commissioned" can be accepted.')
+                throw new Error('Only Waste Orders with Status "Commissioned" can be accepted or rejected.')
+            }
+        } else if (status === WasteOrderStatus.CANCELLED) {
+            if (wasteOrder.contractorMSPID !== MSPID || wasteOrder.originatorMSPID !== MSPID) {
+                throw new Error('The Waste Order can only be cancelled by the Originator or the Contractor.');
+            }
+
+            if (wasteOrder.contractorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
+                throw new Error('Only Waste Orders with Status "Accepted" can be cancelled.');
+            }
+
+            if (wasteOrder.originatorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
+                throw new Error('Only Waste Orders with Status "Commissioned" can be cancelled.');
             }
         } else {
-            throw new Error('Other status are not supported yet.');
+            throw new Error('The specified status is not supported.');
         }
 
         wasteOrder.status = status;
