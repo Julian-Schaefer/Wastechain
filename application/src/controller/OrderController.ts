@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import * as Joi from '@hapi/joi';
 import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
-import { WasteOrderSchema, WasteOrderUpdateSchema, WasteOrder } from '../model/WasteOrder';
+import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderUpdateStatusSchema, WasteOrder } from '../model/WasteOrder';
 
 export class OrderController {
 
@@ -12,10 +12,12 @@ export class OrderController {
     constructor(app: Express, fabricConnection: FabricConnection) {
         this.fabricConnection = fabricConnection;
 
-        app.get('/order', this.getOrders.bind(this));
-        app.get('/order/:orderId/history', this.getOrderHistory.bind(this));
-        app.post('/order/:orderId', this.createOrder.bind(this));
-        app.put('/order/:orderId', this.updateOrder.bind(this));
+        app.get('/order', this.getWasteOrders.bind(this));
+        app.get('/order/:orderId/history', this.getWasteOrderHistory.bind(this));
+        app.post('/order/:orderId', this.createWasteOrder.bind(this));
+        app.put('/order/:orderId', this.updateWasteOrder.bind(this));
+        app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
+        app.put('/order/:orderId/status', this.updateWasteOrderStatus.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
@@ -30,7 +32,7 @@ export class OrderController {
         });
     }
 
-    private getOrders = (request: Request, response: Response) => {
+    private getWasteOrders = (request: Request, response: Response) => {
         // SSE Setup
         response.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -47,11 +49,11 @@ export class OrderController {
         });
     };
 
-    private async getOrderHistory(request: Request, response: Response) {
+    private async getWasteOrderHistory(request: Request, response: Response) {
         const orderId = request.params.orderId;
         try {
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            let result = await contract.evaluateTransaction('getHistory', orderId);
+            let contract = await this.fabricConnection.wasteOrderContract;
+            let result = await contract.evaluateTransaction('getWasteOrderHistory', orderId);
 
             let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = JSON.parse(result.toString('utf-8'));
             response.send(JSON.stringify(history));
@@ -61,31 +63,31 @@ export class OrderController {
         }
     }
 
-    private async createOrder(request: Request, response: Response) {
+    private async createWasteOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
         let wasteOrder = request.body;
 
         try {
-            const validationResult = Joi.validate(wasteOrder, WasteOrderSchema);
+            const validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
             if (validationResult.error !== null) {
                 throw validationResult.error;
             }
 
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            await contract.submitTransaction('createOrder', orderId, JSON.stringify(wasteOrder));
+            const contract = this.fabricConnection.wasteOrderContract;
+            const submittedWasteOrderBuffer = await contract.submitTransaction('createWasteOrder', orderId, JSON.stringify(wasteOrder));
+            const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
 
-            console.log('Submitted Contract with ID: ' + orderId);
-            response.send('Submitted Contract with ID: ' + request.params.orderId);
+            console.log('Submitted Contract with ID: ' + submittedWasteOrder.key);
+            response.send(JSON.stringify(submittedWasteOrder));
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
-            response.send('Error submitting Transaction: ' + error);
+            response.status(500).send('Error submitting Transaction: ' + error);
         }
     }
 
-    private async updateOrder(request: Request, response: Response) {
+    private async updateWasteOrder(request: Request, response: Response) {
         const orderId = request.params.orderId;
         let wasteOrderUpdate = request.body;
-
 
         try {
             const validationResult = Joi.validate(wasteOrderUpdate, WasteOrderUpdateSchema);
@@ -93,14 +95,49 @@ export class OrderController {
                 throw validationResult.error;
             }
 
-            let contract = await this.fabricConnection.network.getContract('Wastechain', 'OrderContract');
-            await contract.submitTransaction('updateOrder', orderId, JSON.stringify(wasteOrderUpdate));
+            let contract = await this.fabricConnection.wasteOrderContract;
+            await contract.submitTransaction('updateWasteOrder', orderId, JSON.stringify(wasteOrderUpdate));
 
             console.log('Updated Contract with ID: ' + orderId);
             response.send('Updated Contract with ID: ' + request.params.orderId);
         } catch (error) {
             console.log('Error submitting Transaction: ' + error);
-            response.send('Error submitting Transaction: ' + error);
+            response.status(500).send('Error submitting Transaction: ' + error);
+        }
+    }
+
+    private async getCommissionedWasteOrders(_: Request, response: Response) {
+        try {
+            let MSPID = this.fabricConnection.client.getMspid();
+            let contract = await this.fabricConnection.wasteOrderContract;
+            let wasteOrdersBuffer = await contract.evaluateTransaction('getCommissionedWasteOrdersForMSP', MSPID);
+            
+            console.log('Retrieved commissioned Waste Orders for MSP: ' + MSPID);
+            response.send(wasteOrdersBuffer.toString('utf-8'));
+        } catch (error) {
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
+        }
+    }
+
+    private async updateWasteOrderStatus(request: Request, response: Response) {
+        const orderId = request.params.orderId;
+        let wasteOrderUpdateStatus = request.body;
+
+        try {
+            const validationResult = Joi.validate(wasteOrderUpdateStatus, WasteOrderUpdateStatusSchema);
+            if (validationResult.error !== null) {
+                throw validationResult.error;
+            }
+
+            let contract = await this.fabricConnection.wasteOrderContract;
+            await contract.submitTransaction('updateWasteOrderStatus', orderId, JSON.stringify(wasteOrderUpdateStatus));
+            
+            console.log('Updated Waste Order Status: ' + orderId);
+            response.send('Updated Waste Order Status: ' + orderId);
+        } catch (error) {
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
         }
     }
 

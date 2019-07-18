@@ -7,4 +7,4 @@ npm run build
 cd cli
 docker-compose up -d cli
 docker exec cli peer chaincode install -n Wastechain -v 0 -p /opt/gopath/src/github.com/contract -l node
-docker exec cli peer chaincode instantiate -n Wastechain -v 0 -l node -c '{"Args":["orderExists", "test001"]}' -C mychannel -P "AND ('Org1MSP.member')"
+docker exec cli peer chaincode instantiate -n Wastechain -v 0 -l node -c '{"Args":["checkWasteOrderExists", "test001"]}' -C mychannel -P "AND ('Org1MSP.member')"

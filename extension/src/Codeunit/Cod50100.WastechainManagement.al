@@ -1,75 +1,95 @@
 codeunit 50100 "Wastechain Management"
 {
-    procedure CreateWasteOrderOnBlockchain(WasteHeader: Record "Waste Management Header")
-    var
-        Client: HttpClient;
-        ResponseMessage: HttpResponseMessage;
-        Content: HttpContent;
-        ResponseText: Text;
-        WasteOrder: Record "Waste Order WC";
-        asd: Text;
-    begin
-        WasteOrder.Init();
-        WasteOrder.Id := 'test001';
-        WasteOrder.Description := 'Test-Description';
-        WasteOrder.Address := 'Address 1';
-        WasteOrder.Insert();
 
-        WasteOrder.ConvertToJSON().WriteTo(asd);
-        Message(asd);
-
-        InitClient(Client);
-        //if Client.SetBaseAddress('http://localhost:3000/') then begin
-        Message(Client.GetBaseAddress());
-        Client.Post('/order/new', Content, ResponseMessage);
-        ResponseMessage.Content.ReadAs(ResponseText);
-        Message(ResponseText);
-        // end else
-        //     Error('Could not POST: ' + GetLastErrorText);
-        //end else
-        //    Error('Could not set URI');
-    end;
-
-    local procedure InitClient(var Client: HttpClient)
-    begin
-        Client.DefaultRequestHeaders.Remove('Content-Type');
-        Client.DefaultRequestHeaders().Add('Content-Type', 'application/json;charset=utf-8');
-        Client.SetBaseAddress('http://localhost:3000');
-    end;
-
-    procedure GenerateWasteOrderJSON(WasteLine: Record "Waste Management Line"): JsonObject
+    procedure CommissionWasteOrder(WasteLine: Record "Waste Management Line")
     var
         BusinessPartner: Record "Business Partner";
-        BusinessPartnerSite: Record "Business Partner Site";
-        Service: Record Service;
-        WasteOrderJSON: JsonObject;
-        TaskSiteJSON: JsonObject;
-        ServiceJSON: JsonObject;
     begin
+        if WasteLine."Wastechain Key" <> '' then
+            Error('Waste Order %1 has already been commissioned.', WasteLine."Wastechain Key");
 
-        with WasteLine do begin
-            WasteOrderJSON.Add('description', Description);
-            WasteOrderJSON.Add('quantity', Quantity);
-            WasteOrderJSON.Add('unitPrice', "Unit Price");
+        BusinessPartner.Get(WasteLine."Post-with No.");
+        BusinessPartner.TestField("Wastechain MSP ID");
 
-            BusinessPartner.Get("Business-with No.");
-            WasteOrderJSON.Add('contractorMSPID', BusinessPartner."Wastechain MSP ID");
+        WastechainClientMgt.PostWasteOrder(WasteLine);
+    end;
 
-            BusinessPartnerSite.Get("Task-at Code");
-            TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
-            TaskSiteJSON.Add('address2', BusinessPartnerSite."Address 2");
-            TaskSiteJSON.Add('postCode', BusinessPartnerSite."Post Code");
-            TaskSiteJSON.Add('city', BusinessPartnerSite.City);
-            TaskSiteJSON.Add('countryCode', BusinessPartnerSite."Country/Region Code");
-            TaskSiteJSON.Add('areaCode', BusinessPartnerSite."Area Code");
+    procedure UpdateWasteOrder(OldWasteLine: Record "Waste Management Line"; NewWasteLine: Record "Waste Management Line")
+    var
+        WasteOrderJSON: JsonObject;
+    begin
+        if NewWasteLine."Wastechain Key" = '' then
+            Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ', NewWasteLine."Wastechain Key");
 
-            WasteOrderJSON.Add('taskSite', TaskSiteJSON);
+        WasteOrderJSON := WastechainJSONMgt.GenerateUpdateWasteOrderJSON(OldWasteLine, NewWasteLine);
+        WastechainClientMgt.UpdateWasteOrder(NewWasteLine."Wastechain Key", WasteOrderJSON);
+    end;
 
-            Service.Get("No.");
-            ServiceJSON.Add('description', Service.Description);
-            ServiceJSON.Add('description2', Service."Description 2");
 
-            WasteOrderJSON.Add('service', ServiceJSON);
+    procedure FindOrCreateBusinessPartnerSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[10]
+    var
+        BusinessPartnerSite: Record "Business Partner Site";
+    begin
+        with WasteOrder do begin
+            BusinessPartnerSite.SetRange("Business Partner No.", BusinessPartnerNo);
+            BusinessPartnerSite.SetRange(Address, "Task Site Address");
+            BusinessPartnerSite.SetRange("Address 2", "Task Site Address 2");
+            BusinessPartnerSite.SetRange("Post Code", "Task Site Post Code");
+            BusinessPartnerSite.SetRange(City, "Task Site City");
+            BusinessPartnerSite.SetRange("Country/Region Code", "Task Site Country Code");
+            BusinessPartnerSite.SetRange("Area Code", "Task Site Area Code");
+            if BusinessPartnerSite.FindFirst() then begin
+                exit(BusinessPartnerSite.Code);
+            end else begin
+                BusinessPartnerSite.Init();
+                BusinessPartnerSite.Validate("Business Partner No.", BusinessPartnerNo);
+                BusinessPartnerSite.Insert(true);
+
+                BusinessPartnerSite.Validate(Address, "Task Site Address");
+                BusinessPartnerSite.Validate("Address 2", "Task Site Address 2");
+                BusinessPartnerSite.Validate("Area Code", "Task Site Area Code");
+                BusinessPartnerSite.Validate(City, "Task Site City");
+                BusinessPartnerSite.Validate("Country/Region Code", "Task Site Country Code");
+                BusinessPartnerSite.Validate("Post Code", "Task Site Post Code");
+                BusinessPartnerSite.Validate("Name 2", 'Auto generated from Wastechain');
+                BusinessPartnerSite.Modify();
+
+                exit(BusinessPartnerSite.Code);
+            end;
         end;
     end;
+
+
+    procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])
+    var
+        WasteMgtOrderHeader: Record "Waste Management Header";
+        WasteMgtOrderLine: Record "Waste Management Line";
+    begin
+        WasteMgtOrderHeader.Init();
+        WasteMgtOrderHeader.Validate("Document Type", WasteMgtOrderHeader."Document Type"::Order);
+        WasteMgtOrderHeader.Validate("Business-with No.", BusinessPartnerNo);
+        WasteMgtOrderHeader.Insert(true);
+
+        with WasteOrder do begin
+            WasteMgtOrderLine.Init();
+            WasteMgtOrderLine.Validate("Document Type", WasteMgtOrderLine."Document Type"::Order);
+            WasteMgtOrderLine.Validate("Document No.", WasteMgtOrderHeader."No.");
+            WasteMgtOrderLine.Validate("Type", WasteMgtOrderLine.Type::Service);
+            WasteMgtOrderLine.Validate("No.", ServiceNo);
+            WasteMgtOrderLine.Validate(Quantity, Quantity);
+            WasteMgtOrderLine.Validate("Unit Price", "Unit Price");
+            WasteMgtOrderLine.Validate(Description, Description);
+            WasteMgtOrderLine.Validate("Posting Type", WasteMgtOrderLine."Posting Type"::Sales);
+            WasteMgtOrderLine.Validate("Post-with No.", BusinessPartnerNo);
+            WasteMgtOrderLine.Validate("Invoice-with No.", BusinessPartnerNo);
+            WasteMgtOrderLine.Validate("Task-at Code", BusinessPartnerSiteCode);
+            WasteMgtOrderLine.Insert(true);
+        end;
+
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Accepted);
+    end;
+
+    var
+        WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
+        WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
 }

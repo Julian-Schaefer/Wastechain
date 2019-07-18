@@ -1,4 +1,4 @@
-import { FileSystemWallet, Gateway, GatewayOptions, Network } from 'fabric-network';
+import { FileSystemWallet, Gateway, GatewayOptions, Network, Contract } from 'fabric-network';
 import * as FabricClient from 'fabric-client';
 
 export class FabricConnection {
@@ -8,7 +8,7 @@ export class FabricConnection {
     private channelName: string;
     private connectionProfile: any;
     private connectionOptions: GatewayOptions;
-    private client: FabricClient;
+    private _client: FabricClient;
     private _channel: FabricClient.Channel;
     private _eventHub: FabricClient.ChannelEventHub;
     private _network: Network;
@@ -26,10 +26,10 @@ export class FabricConnection {
 
     async connect() {
         await this.gateway.connect(this.connectionProfile, this.connectionOptions);
-        this.client = this.gateway.getClient();
+        this._client = this.gateway.getClient();
 
         if (this.username) {
-            let user = await this.client.getUserContext(this.username, true);
+            let user = await this._client.getUserContext(this.username, true);
             if (!user) {
                 throw new Error('User was not found :' + this.username);
             } else {
@@ -37,7 +37,7 @@ export class FabricConnection {
             }
         }
 
-        this._channel = this.client.getChannel(this.channelName, true);
+        this._channel = this._client.getChannel(this.channelName, true);
         this._eventHub = this._channel.newChannelEventHub(this._channel.getChannelPeers()[0].getPeer());
         this._eventHub.connect({ full_block: true }, (error, status) => {
             if (error) {
@@ -60,5 +60,13 @@ export class FabricConnection {
 
     get network(): Network {
         return this._network;
+    }
+
+    get client(): FabricClient {
+        return this._client;
+    }
+
+    get wasteOrderContract(): Contract {
+        return this.network.getContract('Wastechain', 'WasteOrderContract');
     }
 }
