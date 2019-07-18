@@ -11,7 +11,7 @@ export class WastechainServer {
 
     constructor(fabricConnection: FabricConnection) {
         this.app.use(bodyparser.json());
-        this.app.listen(3000, function () {
+        this.app.listen(process.env.PORT, function () {
             console.log('Wastechain-Server listening on port 3000!');
         });
         this._orderController = new OrderController(this.app, fabricConnection);
