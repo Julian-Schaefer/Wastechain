@@ -7,10 +7,10 @@ import { WastechainServer } from './server';
 async function main() {
     dotenv.config();
 
-    const username = 'Admin@org1.example.com';
-    const channelName = 'mychannel';
-    const walletLocation = '../identity/user/balaji/wallet';
-    let networkConnectionString = fs.readFileSync('networkConnection.yaml', 'utf8');
+    const username = process.env.USERNAME;
+    const channelName = process.env.CHANNEL_NAME;
+    const walletLocation = process.env.WALLET_LOCATION;
+    let networkConnectionString = fs.readFileSync(process.env.CONNECTION_FILE, 'utf8');
     let connectionProfile = yaml.safeLoad(networkConnectionString.split('${FABRIC_NETWORK_URL}').join(process.env.FABRIC_NETWORK_URL));
 
     const fabricConnection = new FabricConnection(username, channelName, walletLocation, connectionProfile);
