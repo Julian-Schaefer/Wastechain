@@ -13,7 +13,11 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                     trigger OnAction()
                     var
                         WastechainMgt: Codeunit "Wastechain Management";
+                        ConfirmCommisionLbl: Label 'Do you want to commission the selected Line as Waste Order?';
                     begin
+                        if not Confirm(ConfirmCommisionLbl) then
+                            exit;
+
                         WastechainMgt.CommissionWasteOrder(Rec);
                     end;
                 }
@@ -41,9 +45,13 @@ pageextension 50102 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                     trigger OnAction()
                     var
                         WastechainMgt: Codeunit "Wastechain Management";
+                        ConfirmCancelLbl: Label 'Do you really want to cancel the commissioned Waste Order?';
                     begin
                         if "Wastechain Key" = '' then
                             Error('This line has not been commissioned.');
+
+                        if not Confirm(ConfirmCancelLbl) then
+                            exit;
 
                         WastechainMgt.CancelWasteOrder("Wastechain Key");
                     end;

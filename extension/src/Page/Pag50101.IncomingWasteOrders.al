@@ -126,12 +126,17 @@ page 50101 "Incoming Waste Orders WC"
                 Image = Reject;
 
                 trigger OnAction()
+                var
+                    ConfirmRejectionLbl: Label 'Do you really want to reject the selected Waste Order?';
                 begin
                     if Rec.Count = 0 then
                         Error('Please select a Waste Order.')
                     else
                         if Rec.Count > 1 then
                             Error('Please select only one Waste Order.');
+
+                    if not Confirm(ConfirmRejectionLbl) then
+                        exit;
 
                     WastechainMgt.RejectWasteOrder(Rec);
                     RefreshPage();
