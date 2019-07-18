@@ -206,6 +206,14 @@ export class WasteOrderContract extends Contract {
             if (wasteOrder.originatorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
                 throw new Error('Only Waste Orders with Status "Commissioned" can be cancelled.');
             }
+        } else if (status === WasteOrderStatus.COMPLETED) {
+            if (wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
+                throw new Error('Only Waste Orders with the Status "Accepted" can be completed.');
+            }
+
+            if (MSPID !== wasteOrder.contractorMSPID) {
+                throw new Error('The Waste Order can only be completed by the Contractor.');
+            }
         } else {
             throw new Error('The specified status is not supported.');
         }

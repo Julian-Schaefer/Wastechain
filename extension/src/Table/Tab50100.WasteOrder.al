@@ -21,6 +21,11 @@ enum 50100 "Waste Order Status WC"
     {
         Caption = 'Cancelled';
     }
+
+    value(4; Completed)
+    {
+        Caption = 'Completed';
+    }
 }
 
 table 50100 "Waste Order WC"

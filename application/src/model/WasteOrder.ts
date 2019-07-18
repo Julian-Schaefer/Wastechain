@@ -6,7 +6,8 @@ export enum WasteOrderStatus {
     COMMISSIONED,
     ACCEPTED,
     REJECTED,
-    CANCELLED
+    CANCELLED,
+    COMPLETED
 }
 
 export interface WasteOrder {
