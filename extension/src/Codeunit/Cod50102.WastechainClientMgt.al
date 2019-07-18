@@ -79,7 +79,7 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure UpdateWasteOrderStatus(WasteOrder: Record "Waste Order WC"; Status: enum "Waste Order Status WC")
+    procedure UpdateWasteOrderStatus(WasteOrderKey: Text; Status: enum "Waste Order Status WC")
     var
         Response: HttpResponseMessage;
         Content: HttpContent;
@@ -93,7 +93,7 @@ codeunit 50102 "Wastechain Client Mgt. WC"
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
 
-        Put(StrSubstNo('/order/%1/status', WasteOrder."Key"), Content, Response);
+        Put(StrSubstNo('/order/%1/status', WasteOrderKey), Content, Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then

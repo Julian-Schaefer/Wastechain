@@ -95,17 +95,19 @@ codeunit 50100 "Wastechain Management"
             WasteMgtOrderLine.Insert(true);
         end;
 
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Accepted);
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder."Key", WasteOrder.Status::Accepted);
     end;
 
     procedure RejectWasteOrder(WasteOrder: Record "Waste Order WC")
     begin
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Rejected);
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder."Key", WasteOrder.Status::Rejected);
     end;
 
-    procedure CancelWasteOrder(WasteOrder: Record "Waste Order WC")
+    procedure CancelWasteOrder(WasteOrderKey: Text)
+    var
+        WasteOrderStatus: Enum "Waste Order Status WC";
     begin
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Cancelled);
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrderKey, WasteOrderStatus::Cancelled);
     end;
 
     var
