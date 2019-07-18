@@ -65,7 +65,7 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure GetIncomingWasteOrders(): Text
+    procedure GetIncomingWasteOrdersAsText(): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;

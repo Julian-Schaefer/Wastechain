@@ -59,6 +59,15 @@ codeunit 50100 "Wastechain Management"
         end;
     end;
 
+    procedure GetIncomingWasteOrders(var WasteOrder: Record "Waste Order WC")
+    var
+        WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
+        WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
+        IncomingWasteOrdersText: Text;
+    begin
+        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrdersAsText();
+        WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, WasteOrder);
+    end;
 
     procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])
     var
@@ -87,6 +96,16 @@ codeunit 50100 "Wastechain Management"
         end;
 
         WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Accepted);
+    end;
+
+    procedure RejectWasteOrder(WasteOrder: Record "Waste Order WC")
+    begin
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Rejected);
+    end;
+
+    procedure CancelWasteOrder(WasteOrder: Record "Waste Order WC")
+    begin
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder, WasteOrder.Status::Cancelled);
     end;
 
     var

@@ -105,8 +105,6 @@ page 50101 "Incoming Waste Orders WC"
                 trigger OnAction()
                 var
                     AcceptWasteOrderWizard: Page "Accept Waste Order Wizard WC";
-                    BusinessPartner: Record "Business Partner";
-                    BusinessPartnerSite: Record "Business Partner Site";
                 begin
                     if Rec.Count = 0 then
                         Error('Please select a Waste Order.')
@@ -117,6 +115,25 @@ page 50101 "Incoming Waste Orders WC"
                     AcceptWasteOrderWizard.SetWasteOrder(Rec);
                     AcceptWasteOrderWizard.RunModal();
                     Rec.DeleteAll();
+                    RefreshPage();
+                    CurrPage.Update(false);
+                end;
+            }
+
+            action("Reject WC")
+            {
+                Caption = 'Reject';
+                Image = Reject;
+
+                trigger OnAction()
+                begin
+                    if Rec.Count = 0 then
+                        Error('Please select a Waste Order.')
+                    else
+                        if Rec.Count > 1 then
+                            Error('Please select only one Waste Order.');
+
+                    WastechainMgt.RejectWasteOrder(Rec);
                     RefreshPage();
                     CurrPage.Update(false);
                 end;
@@ -148,16 +165,13 @@ page 50101 "Incoming Waste Orders WC"
     end;
 
     var
-        WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
-        WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
+        WastechainMgt: Codeunit "Wastechain Management";
         WasteLine: Record "Waste Management Line";
 
     local procedure RefreshPage()
-    var
-        IncomingWasteOrdersText: Text;
     begin
-        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrders();
-        WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, Rec);
+        Rec.DeleteAll();
+        WastechainMgt.GetIncomingWasteOrders(Rec);
     end;
 
     procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
