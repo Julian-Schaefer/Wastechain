@@ -22,10 +22,12 @@ export FABRIC_START_TIMEOUT=10
 sleep ${FABRIC_START_TIMEOUT}
 
 # Create the channel
-docker exec -e "CORE_PEER_LOCALMSPID=OrderingOrgMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@ordering-organisation.org/msp" peer0.ordering-organisation.org peer channel create -o orderer.wastechainorderer.org:7050 -c wastechain -f /etc/hyperledger/configtx/channel.tx
+docker exec cli peer channel create -o orderer.wastechain.org:7050 -c wastechain -f /opt/gopath/src/github.com/hyperledger/fabric/peer/config/channel.tx
+
+#docker exec -e "CORE_PEER_LOCALMSPID=OrderingOrgMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@ordering-organisation.org/msp" peer0.ordering-organisation.org peer channel create -o orderer.wastechainorderer.org:7050 -c wastechain -f /etc/hyperledger/configtx/channel.tx
 # Join peer0.ordering-organisation.org to the channel.
-docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@ordering-organisation.org/msp" peer0.ordering-organisation.org peer channel join -b wastechain.block
+#docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@ordering-organisation.org/msp" peer0.ordering-organisation.org peer channel join -b wastechain.block
 # Join peer0.subcontractor-organisation.org to the channel.
-docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@subcontractor-organisation.org/msp" peer0.subcontractor-organisation.org peer channel join -b wastechain.block
+#docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@subcontractor-organisation.org/msp" peer0.subcontractor-organisation.org peer channel join -b wastechain.block
 # Join peer0.third-party-organisation.org to the channel.
-docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@third-party-organisation.org/msp" peer0.third-party-organisation.org peer channel join -b wastechain.block
+#docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@third-party-organisation.org/msp" peer0.third-party-organisation.org peer channel join -b wastechain.block

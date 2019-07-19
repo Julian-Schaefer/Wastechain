@@ -51,8 +51,8 @@ services:
       - basic
 
   ## Wastechain-Orderer  
-  orderer.wastechainorderer.org:
-    container_name: orderer.wastechainorderer.org
+  orderer.wastechain.org:
+    container_name: orderer.wastechain.org
     image: hyperledger/fabric-orderer
     environment:
       - FABRIC_LOGGING_SPEC=info
@@ -67,7 +67,7 @@ services:
       - 7050:7050
     volumes:
         - ./config/:/etc/hyperledger/configtx
-        - ./crypto-config/ordererOrganizations/wastechainorderer.org/orderers/orderer.wastechainorderer.org/:/etc/hyperledger/msp/orderer
+        - ./crypto-config/ordererOrganizations/wastechain.org/orderers/orderer.wastechain.org/:/etc/hyperledger/msp/orderer
     networks:
       - basic
 
@@ -99,7 +99,7 @@ services:
         - ./crypto-config/peerOrganizations/ordering-organisation.org/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
     depends_on:
-      - orderer.wastechainorderer.org
+      - orderer.wastechain.org
       - couchdb.ordering-organisation.org
     networks:
       - basic
@@ -131,7 +131,7 @@ services:
         - ./crypto-config/peerOrganizations/subcontractor-organisation.org/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
     depends_on:
-      - orderer.wastechainorderer.org
+      - orderer.wastechain.org
       - couchdb.subcontractor-organisation.org
     networks:
       - basic
@@ -163,7 +163,7 @@ services:
         - ./crypto-config/peerOrganizations/third-party-organisation.org/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
     depends_on:
-      - orderer.wastechainorderer.org
+      - orderer.wastechain.org
       - couchdb.third-party-organisation.org
     networks:
       - basic
@@ -199,5 +199,28 @@ services:
       - COUCHDB_PASSWORD=
     ports:
       - 7984:5984
+    networks:
+      - basic
+
+  ## CLI
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.ordering-organisation.org:7051
+      - CORE_PEER_LOCALMSPID=OrderingOrgMSP
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ordering-organisation.com/users/Admin@ordering-organisation.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash -c 'sleep 1000'
+    volumes:
+      - /var/run:/host/var/run/
+      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ./../contract:/opt/gopath/src/github.com/contract
+      - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config
     networks:
       - basic

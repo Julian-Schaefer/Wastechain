@@ -19,8 +19,10 @@ if [ "$?" -ne 0 ]; then
   exit 1
 fi
 
+mkdir config
+
 # generate genesis block for orderer
-configtxgen -profile WastechainOrdererGenesis -outputBlock ./config/genesis.block
+configtxgen -profile OrdererGenesis -outputBlock ./config/genesis.block
 if [ "$?" -ne 0 ]; then
   echo "Failed to generate orderer genesis block..."
   exit 1
@@ -34,19 +36,19 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # generate anchor peer transaction
-configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/OrderingOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg OrderingOrg
+configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/OrderingOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg OrderingOrgMSP
 if [ "$?" -ne 0 ]; then
   echo "Failed to generate anchor peer update for OrderingOrg..."
   exit 1
 fi
 
-configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/SubcontractorOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg SubcontractorOrg
+configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/SubcontractorOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg SubcontractorOrgMSP
 if [ "$?" -ne 0 ]; then
   echo "Failed to generate anchor peer update for SubcontractorOrg..."
   exit 1
 fi
 
-configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/ThirdPartyOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ThirdPartyOrg
+configtxgen -profile WastechainChannel -outputAnchorPeersUpdate ./config/ThirdPartyOrgMSPanchors.tx -channelID $CHANNEL_NAME -asOrg ThirdPartyOrgMSP
 if [ "$?" -ne 0 ]; then
   echo "Failed to generate anchor peer update for ThirdPartyOrg..."
   exit 1
