@@ -34,7 +34,7 @@ PeerOrgs:
   # Third-Party Organisation
   # ---------------------------------------------------------------------------
   - Name: ThirdPartyOrg
-    Domain: third-party-organisation.org
+    Domain: third-party-organisation.com
     EnableNodeOUs: true
     Template:
       Count: 1

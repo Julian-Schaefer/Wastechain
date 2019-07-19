@@ -25,9 +25,9 @@ Organizations:
     - &ThirdPartyOrg
         Name: ThirdPartyOrgMSP
         ID: ThirdPartyOrgMSP
-        MSPDir: crypto-config/peerOrganizations/third-party-organisation.org/msp
+        MSPDir: crypto-config/peerOrganizations/third-party-organisation.com/msp
         AnchorPeers:
-            - Host: peer0.third-party-organisation.org
+            - Host: peer0.third-party-organisation.com
               Port: 7051
 
 Orderer: &OrdererDefaults
