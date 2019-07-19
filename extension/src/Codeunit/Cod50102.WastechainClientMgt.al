@@ -19,7 +19,7 @@ codeunit 50102 "Wastechain Client Mgt. WC"
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then begin
-            WasteLine."Wastechain Key" := WastechainJSONMgt.GetWasteOrderKeyFromJSONText(ResponseText);
+            WasteLine."Waste Order Key WC" := WastechainJSONMgt.GetWasteOrderKeyFromJSONText(ResponseText);
             WasteLine.Modify();
             Message('Successfully commissioned Waste Order to Wastechain.');
         end else
@@ -48,15 +48,15 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure GetWasteOrderHistoryAsText(WastechainKey: Text): Text
+    procedure GetWasteOrderHistoryAsText(WasteOrderKey: Text): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;
     begin
-        if WastechainKey = '' then
-            Error('Please provide a Wastechain Key.');
+        if WasteOrderKey = '' then
+            Error('Please provide a Waste Order Waste Order Key.');
 
-        Get(StrSubstNo('/order/%1/history', WastechainKey), Response);
+        Get(StrSubstNo('/order/%1/history', WasteOrderKey), Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then

@@ -16,10 +16,10 @@ pageextension 50102 "Completed Order Subform Ext WC" extends "Completed Orders S
                     var
                         WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                     begin
-                        if "Wastechain Key" = '' then
+                        if "Waste Order Key WC" = '' then
                             Error('This line has not been commissioned.');
 
-                        WasteOrderHistoryPage.SetWastechainKey("Wastechain Key");
+                        WasteOrderHistoryPage.SetWasteOrderKey("Waste Order Key WC");
                         WasteOrderHistoryPage.RunModal();
                     end;
                 }
@@ -34,13 +34,13 @@ pageextension 50102 "Completed Order Subform Ext WC" extends "Completed Orders S
                         WastechainMgt: Codeunit "Wastechain Management";
                         ConfirmCancelLbl: Label 'Do you really want to cancel the commissioned Waste Order?';
                     begin
-                        if "Wastechain Key" = '' then
+                        if "Waste Order Key WC" = '' then
                             Error('This line has not been commissioned.');
 
                         if not Confirm(ConfirmCancelLbl) then
                             exit;
 
-                        WastechainMgt.CancelWasteOrder("Wastechain Key");
+                        WastechainMgt.CancelWasteOrder("Waste Order Key WC");
                     end;
                 }
             }

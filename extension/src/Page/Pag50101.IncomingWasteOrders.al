@@ -157,7 +157,7 @@ page 50101 "Incoming Waste Orders WC"
                 var
                     WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                 begin
-                    WasteOrderHistoryPage.SetWastechainKey("Key");
+                    WasteOrderHistoryPage.SetWasteOrderKey("Key");
                     WasteOrderHistoryPage.RunModal();
                 end;
             }

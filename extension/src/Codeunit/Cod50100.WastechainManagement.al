@@ -5,8 +5,8 @@ codeunit 50100 "Wastechain Management"
     var
         BusinessPartner: Record "Business Partner";
     begin
-        if WasteLine."Wastechain Key" <> '' then
-            Error('Waste Order %1 has already been commissioned.', WasteLine."Wastechain Key");
+        if WasteLine."Waste Order Key WC" <> '' then
+            Error('Waste Order %1 has already been commissioned.', WasteLine."Waste Order Key WC");
 
         WasteLine.TestField(Quantity);
         WasteLine.TestField("Unit Price");
@@ -21,11 +21,11 @@ codeunit 50100 "Wastechain Management"
     var
         WasteOrderJSON: JsonObject;
     begin
-        if NewWasteLine."Wastechain Key" = '' then
-            Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ', NewWasteLine."Wastechain Key");
+        if NewWasteLine."Waste Order Key WC" = '' then
+            Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ', NewWasteLine."Waste Order Key WC");
 
         WasteOrderJSON := WastechainJSONMgt.GenerateUpdateWasteOrderJSON(OldWasteLine, NewWasteLine);
-        WastechainClientMgt.UpdateWasteOrder(NewWasteLine."Wastechain Key", WasteOrderJSON);
+        WastechainClientMgt.UpdateWasteOrder(NewWasteLine."Waste Order Key WC", WasteOrderJSON);
     end;
 
 
