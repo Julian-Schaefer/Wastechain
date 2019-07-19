@@ -14,13 +14,14 @@ export class OrderController {
 
         // GET
         app.get('/order', this.getWasteOrders.bind(this));
+        app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
         app.get('/order/:orderId', this.getWasteOrder.bind(this));
         app.get('/order/:orderId/history', this.getWasteOrderHistory.bind(this));
-        app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
         // POST
         app.post('/order/:orderId', this.createWasteOrder.bind(this));
         // PUT
-        app.put('/order/:orderId', this.updateWasteOrder.bind(this)); app.put('/order/:orderId/status', this.updateWasteOrderStatus.bind(this));
+        app.put('/order/:orderId', this.updateWasteOrder.bind(this));
+        app.put('/order/:orderId/status', this.updateWasteOrderStatus.bind(this));
 
         fabricConnection.eventHub.registerChaincodeEvent('Wastechain', 'CREATE_ORDER', (event: FabricClient.ChaincodeEvent, blockNumber?: number, transactionId?: string, status?: string) => {
             return new Promise((resolve) => {
@@ -63,8 +64,8 @@ export class OrderController {
             console.log('Got Waste Order with ID: ' + wasteOrder.key);
             response.send(JSON.stringify(wasteOrder));
         } catch (error) {
-            console.log('Error submitting Transaction: ' + error);
-            response.status(500).send('Error submitting Transaction: ' + error);
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
         }
     }
 
@@ -121,8 +122,8 @@ export class OrderController {
             console.log('Updated Contract with ID: ' + orderId);
             response.send('Updated Contract with ID: ' + request.params.orderId);
         } catch (error) {
-            console.log('Error submitting Transaction: ' + error);
-            response.status(500).send('Error submitting Transaction: ' + error);
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
         }
     }
 
