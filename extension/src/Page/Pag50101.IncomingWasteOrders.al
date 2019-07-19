@@ -106,17 +106,9 @@ page 50101 "Incoming Waste Orders WC"
                 var
                     AcceptWasteOrderWizard: Page "Accept Waste Order Wizard WC";
                 begin
-                    if Rec.Count = 0 then
-                        Error('Please select a Waste Order.')
-                    else
-                        if Rec.Count > 1 then
-                            Error('Please select only one Waste Order.');
-
                     AcceptWasteOrderWizard.SetWasteOrder(Rec);
                     AcceptWasteOrderWizard.RunModal();
-                    Rec.DeleteAll();
                     RefreshPage();
-                    CurrPage.Update(false);
                 end;
             }
 
@@ -129,18 +121,11 @@ page 50101 "Incoming Waste Orders WC"
                 var
                     ConfirmRejectionLbl: Label 'Do you really want to reject the selected Waste Order?';
                 begin
-                    if Rec.Count = 0 then
-                        Error('Please select a Waste Order.')
-                    else
-                        if Rec.Count > 1 then
-                            Error('Please select only one Waste Order.');
-
                     if not Confirm(ConfirmRejectionLbl) then
                         exit;
 
                     WastechainMgt.RejectWasteOrder(Rec);
                     RefreshPage();
-                    CurrPage.Update(false);
                 end;
             }
         }
@@ -175,7 +160,7 @@ page 50101 "Incoming Waste Orders WC"
 
     local procedure RefreshPage()
     begin
-        Rec.DeleteAll();
+        DeleteAll();
         WastechainMgt.GetIncomingWasteOrders(Rec);
     end;
 
