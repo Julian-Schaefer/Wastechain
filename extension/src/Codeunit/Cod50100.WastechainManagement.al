@@ -95,6 +95,7 @@ codeunit 50100 "Wastechain Management"
             WasteMgtOrderLine.Validate("Post-with No.", BusinessPartnerNo);
             WasteMgtOrderLine.Validate("Invoice-with No.", BusinessPartnerNo);
             WasteMgtOrderLine.Validate("Task-at Code", BusinessPartnerSiteCode);
+            WasteMgtOrderLine.Validate("Waste Order Key WC", "Key");
             WasteMgtOrderLine.Insert(true);
         end;
 
@@ -107,13 +108,32 @@ codeunit 50100 "Wastechain Management"
     end;
 
     procedure CancelWasteOrder(WasteOrderKey: Text)
-    var
-        WasteOrderStatus: Enum "Waste Order Status WC";
     begin
         WastechainClientMgt.UpdateWasteOrderStatus(WasteOrderKey, WasteOrderStatus::Cancelled);
     end;
 
+    procedure CompleteWasteOrder(WasteOrderKey: Text)
     var
+        WasteOrder: Record "Waste Order WC";
+    begin
+        GetWasteOrder(WasteOrderKey, WasteOrder);
+
+        if WasteOrder.Status <> WasteOrderStatus::Accepted then
+            Error('Only Waste Orders with Status "Accepted" can be completed.');
+
+        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrderKey, WasteOrderStatus::Completed);
+    end;
+
+    procedure GetWasteOrder(WasteOrderKey: Text; var WasteOrder: Record "Waste Order WC")
+    var
+        WasteOrderText: Text;
+    begin
+        WasteOrderText := WastechainClientMgt.GetWasteOrderAsText(WasteOrderKey);
+        WastechainJSONMgt.GetWasteOrderFromText(WasteOrderText, WasteOrder);
+    end;
+
+    var
+        WasteOrderStatus: Enum "Waste Order Status WC";
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
         WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
 }

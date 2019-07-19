@@ -108,75 +108,82 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
     var
         WasteOrderJSONArray: JsonArray;
         WasteOrderJSONToken: JsonToken;
-        WasteOrderJSONObject: JsonObject;
-        ServiceJSONToken: JsonToken;
-        ServiceJSONObject: JsonObject;
-        TaskSiteJSONToken: JsonToken;
-        TaskSiteJSONObject: JsonObject;
-        ValueJSONToken: JsonToken;
+        WasteOrderText: Text;
     begin
         WasteOrderJSONArray.ReadFrom(WasteOrdersText);
 
         foreach WasteOrderJSONToken in WasteOrderJSONArray do begin
-            with WasteOrder do begin
-                WasteOrderJSONObject := WasteOrderJSONToken.AsObject();
+            WasteOrderText := Format(WasteOrderJSONToken.AsObject());
+            GetWasteOrderFromText(WasteOrderText, WasteOrder);
+            WasteOrder.Insert();
+        end;
+    end;
 
-                Init();
-                WasteOrderJSONObject.Get('key', ValueJSONToken);
-                "Key" := ValueJSONToken.AsValue().AsText();
+    procedure GetWasteOrderFromText(WasteOrderText: Text; var WasteOrder: Record "Waste Order WC")
+    var
+        WasteOrderJSONObject: JsonObject;
+        ValueJSONToken: JsonToken;
+        ServiceJSONToken: JsonToken;
+        ServiceJSONObject: JsonObject;
+        TaskSiteJSONToken: JsonToken;
+        TaskSiteJSONObject: JsonObject;
+    begin
+        WasteOrderJSONObject.ReadFrom(WasteOrderText);
 
-                WasteOrderJSONObject.Get('status', ValueJSONToken);
-                Status := ValueJSONToken.AsValue().AsOption();
+        with WasteOrder do begin
+            Init();
+            WasteOrderJSONObject.Get('key', ValueJSONToken);
+            "Key" := ValueJSONToken.AsValue().AsText();
 
-                WasteOrderJSONObject.Get('description', ValueJSONToken);
-                Description := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('status', ValueJSONToken);
+            Status := ValueJSONToken.AsValue().AsOption();
 
-                WasteOrderJSONObject.Get('quantity', ValueJSONToken);
-                Quantity := ValueJSONToken.AsValue().AsDecimal();
+            WasteOrderJSONObject.Get('description', ValueJSONToken);
+            Description := ValueJSONToken.AsValue().AsText();
 
-                WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
-                "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
+            WasteOrderJSONObject.Get('quantity', ValueJSONToken);
+            Quantity := ValueJSONToken.AsValue().AsDecimal();
 
-                WasteOrderJSONObject.Get('originatorMSPID', ValueJSONToken);
-                "Originator MSP ID" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
+            "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
 
-                WasteOrderJSONObject.Get('contractorMSPID', ValueJSONToken);
-                "Contractor MSP ID" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('originatorMSPID', ValueJSONToken);
+            "Originator MSP ID" := ValueJSONToken.AsValue().AsText();
 
-                // Service
-                WasteOrderJSONObject.Get('service', ServiceJSONToken);
-                ServiceJSONObject := ServiceJSONToken.AsObject();
+            WasteOrderJSONObject.Get('contractorMSPID', ValueJSONToken);
+            "Contractor MSP ID" := ValueJSONToken.AsValue().AsText();
 
-                ServiceJSONObject.Get('description', ValueJSONToken);
-                "Service Description" := ValueJSONToken.AsValue().AsText();
+            // Service
+            WasteOrderJSONObject.Get('service', ServiceJSONToken);
+            ServiceJSONObject := ServiceJSONToken.AsObject();
 
-                ServiceJSONObject.Get('description2', ValueJSONToken);
-                "Service Description 2" := ValueJSONToken.AsValue().AsText();
+            ServiceJSONObject.Get('description', ValueJSONToken);
+            "Service Description" := ValueJSONToken.AsValue().AsText();
 
-                // Task Site
-                WasteOrderJSONObject.Get('taskSite', TaskSiteJSONToken);
-                TaskSiteJSONObject := TaskSiteJSONToken.AsObject();
+            ServiceJSONObject.Get('description2', ValueJSONToken);
+            "Service Description 2" := ValueJSONToken.AsValue().AsText();
 
-                TaskSiteJSONObject.Get('address', ValueJSONToken);
-                "Task Site Address" := ValueJSONToken.AsValue().AsText();
+            // Task Site
+            WasteOrderJSONObject.Get('taskSite', TaskSiteJSONToken);
+            TaskSiteJSONObject := TaskSiteJSONToken.AsObject();
 
-                TaskSiteJSONObject.Get('address2', ValueJSONToken);
-                "Task Site Address 2" := ValueJSONToken.AsValue().AsText();
+            TaskSiteJSONObject.Get('address', ValueJSONToken);
+            "Task Site Address" := ValueJSONToken.AsValue().AsText();
 
-                TaskSiteJSONObject.Get('areaCode', ValueJSONToken);
-                "Task Site Area Code" := ValueJSONToken.AsValue().AsText();
+            TaskSiteJSONObject.Get('address2', ValueJSONToken);
+            "Task Site Address 2" := ValueJSONToken.AsValue().AsText();
 
-                TaskSiteJSONObject.Get('city', ValueJSONToken);
-                "Task Site City" := ValueJSONToken.AsValue().AsText();
+            TaskSiteJSONObject.Get('areaCode', ValueJSONToken);
+            "Task Site Area Code" := ValueJSONToken.AsValue().AsText();
 
-                TaskSiteJSONObject.Get('countryCode', ValueJSONToken);
-                "Task Site Country Code" := ValueJSONToken.AsValue().AsText();
+            TaskSiteJSONObject.Get('city', ValueJSONToken);
+            "Task Site City" := ValueJSONToken.AsValue().AsText();
 
-                TaskSiteJSONObject.Get('postCode', ValueJSONToken);
-                "Task Site Post Code" := ValueJSONToken.AsValue().AsText();
+            TaskSiteJSONObject.Get('countryCode', ValueJSONToken);
+            "Task Site Country Code" := ValueJSONToken.AsValue().AsText();
 
-                Insert();
-            end;
+            TaskSiteJSONObject.Get('postCode', ValueJSONToken);
+            "Task Site Post Code" := ValueJSONToken.AsValue().AsText();
         end;
     end;
 

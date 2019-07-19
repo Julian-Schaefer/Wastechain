@@ -48,13 +48,30 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
+    procedure GetWasteOrderAsText(WasteOrderKey: Text): Text
+    var
+        Response: HttpResponseMessage;
+        ResponseText: Text;
+    begin
+        if WasteOrderKey = '' then
+            Error('Please provide a Waste Order Key.');
+
+        Get(StrSubstNo('/order/%1', WasteOrderKey), Response);
+
+        Response.Content.ReadAs(ResponseText);
+        if Response.IsSuccessStatusCode then
+            exit(ResponseText)
+        else
+            Error(ResponseText);
+    end;
+
     procedure GetWasteOrderHistoryAsText(WasteOrderKey: Text): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;
     begin
         if WasteOrderKey = '' then
-            Error('Please provide a Waste Order Waste Order Key.');
+            Error('Please provide a Waste Order Key.');
 
         Get(StrSubstNo('/order/%1/history', WasteOrderKey), Response);
 
