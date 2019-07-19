@@ -22,7 +22,7 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
                                 end;
                             "Posting Type"::Sales:
                                 begin
-                                    if WasteOrder.Status <> WasteOrder.Status::Completed then
+                                    if WasteOrder.Status <> WasteOrder.Status::Accepted then
                                         Error('Line %1 has a commissioned Waste Order which can not be completed because it does not have the Status "Accepted".', "Line No.");
                                 end;
                         end;
