@@ -23,4 +23,5 @@ main().then(() => {
     console.log('Application started.');
 }).catch((e: Error) => {
     console.log('Error starting application: ' + e);
+    console.log(e.stack);
 });
