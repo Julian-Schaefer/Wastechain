@@ -10,4 +10,6 @@ steps:
   inputs:
     containerRegistry: wastechain
     repository: 'wastechain-api'
-
+    tags: |
+     $(Build.BuildId)
+     master
