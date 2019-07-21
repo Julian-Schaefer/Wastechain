@@ -62,18 +62,21 @@ channels:
         # produce events but the app typically only needs to connect to one to listen to events.
         # Default: true
         eventSource: true
+        discover: true
 
     peer0.subcontractor-organisation.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
+        discover: true
     
     peer0.third-party-organisation.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
+        discover: true
 
 #
 # list of participating organizations in this network

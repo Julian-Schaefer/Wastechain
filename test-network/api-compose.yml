@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+
+  api.subcontractor-organisation.com:
+    container_name: api.subcontractor-organisation.com
+    image: wastechain.azurecr.io/wastechain-api:master
+    environment:
+      - CHANNEL_NAME=wastechain
+      - USERNAME=Admin@subcontractor-organisation.com
+      - WALLET_LOCATION=/wallet
+      - CONNECTION_FILE=/connection-profiles/network-connection.yaml
+      - PORT=6000
+      - FABRIC_NETWORK_URL=host.docker.internal
+    ports:
+      - 6000:6000
+    volumes:
+        - ./wallet/subcontractor-organisation:/wallet
+        - ./connection-profiles:/connection-profiles

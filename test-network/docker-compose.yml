@@ -83,6 +83,9 @@ services:
       - CORE_PEER_LOCALMSPID=OrderingOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.ordering-organisation.com:7051
+      - CORE_PEER_LISTENADDRESS=peer0.ordering-organisation.com:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer0.ordering-organisation.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ordering-organisation.com:7051
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.ordering-organisation.com:5984
@@ -115,6 +118,9 @@ services:
       - CORE_PEER_LOCALMSPID=SubcontractorOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.subcontractor-organisation.com:7051
+      - CORE_PEER_LISTENADDRESS=peer0.subcontractor-organisation.com:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer0.subcontractor-organisation.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.subcontractor-organisation.com:7051
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.subcontractor-organisation.com:5984
@@ -147,6 +153,9 @@ services:
       - CORE_PEER_LOCALMSPID=ThirdPartyOrgMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
       - CORE_PEER_ADDRESS=peer0.third-party-organisation.com:7051
+      - CORE_PEER_LISTENADDRESS=peer0.third-party-organisation.com:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer0.third-party-organisation.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.third-party-organisation.com:7051
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.third-party-organisation.com:5984
@@ -224,3 +233,23 @@ services:
       - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config
     networks:
       - basic
+
+  ## APIs
+  # api.ordering-organisation.com:
+  #   container_name: api.ordering-organisation.com
+  #   image: wastechain.azurecr.io/wastechain-api:master
+  #   environment:
+  #     - CHANNEL_NAME=wastechain
+  #     - USERNAME=Admin@ordering-organisation.com
+  #     - WALLET_LOCATION=/wallet
+  #     - CONNECTION_FILE=/connection-profiles/network-connection.yaml
+  #     - PORT=3000
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #       - ./wallet/ordering-organisation:/wallet
+  #       - ./connection-profiles:/connection-profiles
+  #   depends_on:
+  #     - peer0.ordering-organisation.com
+  #   networks:
+  #     - basic
