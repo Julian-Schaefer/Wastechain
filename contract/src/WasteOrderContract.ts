@@ -42,8 +42,13 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getWasteOrderHistory(ctx: Context, key: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
-        let iterator = await ctx.stub.getHistoryForKey(key);
+    public async getWasteOrderHistory(ctx: Context, orderId: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
+
+        let iterator = await ctx.stub.getHistoryForKey(orderId);
         let transactionHistory: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
 
         while (true) {
