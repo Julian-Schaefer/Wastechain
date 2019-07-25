@@ -27,10 +27,10 @@ peers:
     chaincodeQuery: true
     ledgerQuery: true
     eventSource: true
-    url: grpc://localhost:8051
+    url: grpc://${FABRIC_NETWORK_URL}:8051
 orderers:
   orderer.wastechain.org:
-    url: grpc://localhost:7050
+    url: grpc://${FABRIC_NETWORK_URL}:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
