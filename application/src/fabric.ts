@@ -20,7 +20,7 @@ export class FabricConnection {
         this.connectionOptions = {
             identity: username,
             wallet: new FileSystemWallet(walletLocation),
-            discovery: { enabled: false, asLocalhost: true }
+            discovery: { enabled: false }
         };
     }
 

@@ -13,4 +13,4 @@ docker exec -e "CORE_PEER_LOCALMSPID=SubcontractorOrgMSP" -e "CORE_PEER_MSPCONFI
 docker exec -e "CORE_PEER_LOCALMSPID=ThirdPartyOrgMSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/third-party-organisation.com/users/Admin@third-party-organisation.com/msp" -e "CORE_PEER_ADDRESS=peer0.third-party-organisation.com:7051" cli peer chaincode install -n Wastechain -v 0 -p /opt/gopath/src/github.com/contract -l node
 
 # Instantiate Chaincode
-docker exec cli peer chaincode instantiate -n Wastechain -v 0 -l node -c '{"Args":["checkWasteOrderExists", "test001"]}' -C wastechain -P "AND('OrderingOrgMSP.peer', 'SubcontractorOrgMSP.peer', 'ThirdPartyOrgMSP.peer')"
+docker exec cli peer chaincode instantiate -n Wastechain -v 0 -l node -c '{"Args":["checkWasteOrderExists", "test001"]}' -C wastechain -P "OR('OrderingOrgMSP.peer', 'SubcontractorOrgMSP.peer', 'ThirdPartyOrgMSP.peer')"
