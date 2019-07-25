@@ -1,4 +1,4 @@
-name: first-network-org3
+name: wastechain-subcontractor-org
 version: 1.0.0
 client:
   organization: SubcontractorOrg
@@ -9,7 +9,7 @@ client:
 channels:
     wastechain:
         orderers:
-        - orderer.example.com
+        - orderer.wastechain.org
         peers:
           peer0.subcontractor-organisation.com:
             endorsingPeer: true
@@ -26,4 +26,13 @@ peers:
     endorsingPeer: true
     chaincodeQuery: true
     ledgerQuery: true
+    eventSource: true
     url: grpc://localhost:8051
+orderers:
+  orderer.wastechain.org:
+    url: grpc://localhost:7050
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer.wastechain.org
