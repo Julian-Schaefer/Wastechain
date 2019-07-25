@@ -22,7 +22,7 @@ async function main() {
     let wallet = new FileSystemWallet(walletLocation);
 
     let keyName = await new Promise((resolve) => {
-        rl.question('Please enter the Key File Name: ', (response) => {
+        rl.question('Please enter the Key File Name: (under "/msp/keystore/")', (response) => {
             keyName = response;
             rl.close();
             resolve(keyName)
