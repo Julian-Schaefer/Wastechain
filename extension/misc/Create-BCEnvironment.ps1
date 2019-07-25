@@ -23,7 +23,8 @@ if ($module) {
     Write-Host "NavContainerHelper $VersionStr installed"
 }
 
-New-NavContainer -containerName RC -accept_eula -auth UserPassword -additionalParameters @("-p 80:80", "-p 7049:7049")
+New-NavContainer -containerName Orderer -accept_eula -auth UserPassword -additionalParameters @("-p 80:80", "-p 7049:7049")
+New-NavContainer -containerName Subcontractor -accept_eula -auth UserPassword -additionalParameters @("-p 14080:80", "-p 14049:7049")
 
 # Optional: Import License File
 #Import-NavContainerLicense -containerName RC -licenseFile "PATH TO .flf"
