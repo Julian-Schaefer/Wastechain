@@ -1,6 +1,8 @@
 import { Service, ServiceSchema } from "./Service";
 import { TaskSite, TaskSiteSchema } from "./TaskSite";
 import * as Joi from '@hapi/joi';
+import { startTimer } from "winston";
+import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 
 export enum WasteOrderStatus {
     COMMISSIONED,
@@ -13,13 +15,22 @@ export enum WasteOrderStatus {
 export interface WasteOrder {
     key: string;
     status: WasteOrderStatus;
-    service: Service;
+    subcontractorMSPID: string;
+    originatorMSPID: string;
+    customerName: string;
     taskSite: TaskSite;
+    service: Service;
     description: string;
     quantity: number;
     unitPrice: number;
-    originatorMSPID: string;
-    contractorMSPID: string;
+    unitOfMeasure: string;
+    taskDate: Date
+    startTime: Timestamp;
+    endTime: Timestamp;
+    referenceNo: string;
+    weighbridgeTicketNo: string;
+    lastChanged: Date;
+    lastChangedByMSPID: string;
 }
 
 export const WasteOrderSchema = Joi.object().keys({
