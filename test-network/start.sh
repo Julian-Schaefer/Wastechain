@@ -10,7 +10,7 @@ set -ev
 # don't rewrite paths for Windows Git Bash users
 export MSYS_NO_PATHCONV=1
 
-docker-compose -f docker-compose.yml down
+./teardown.sh
 
 docker-compose -f docker-compose.yml up -d
 docker ps -a
