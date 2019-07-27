@@ -51,7 +51,6 @@ export const WasteOrderCreateSchema = Joi.object().keys({
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
-    originatorMSPID: Joi.string(),
     contractorMSPID: Joi.string().required()
 });
 
