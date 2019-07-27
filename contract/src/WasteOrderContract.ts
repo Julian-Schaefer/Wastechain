@@ -22,7 +22,7 @@ export class WasteOrderContract extends Contract {
 
         let validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
         if (validationResult.error !== null) {
-            throw "Invalid Waste Order Schema!";
+            throw "Invalid Waste Order Schema: " + validationResult.error.message;
         }
 
         wasteOrder.key = ctx.clientIdentity.getMSPID() + '-' + orderId;
