@@ -91,7 +91,7 @@ export class WasteOrderContract extends Contract {
     public async getCommissionedWasteOrdersForMSP(ctx: Context, MSPID: string): Promise<WasteOrder[]> {
         let query = {
             selector: {
-                contractorMSPID: MSPID,
+                subcontractorMSPID: MSPID,
                 status: WasteOrderStatus.COMMISSIONED
             }
         };
@@ -157,8 +157,8 @@ export class WasteOrderContract extends Contract {
             oldWasteOrder.unitPrice = wasteOrder.unitPrice;
         }
 
-        if (wasteOrder.contractorMSPID !== undefined) {
-            oldWasteOrder.contractorMSPID = wasteOrder.contractorMSPID;
+        if (wasteOrder.subcontractorMSPID !== undefined) {
+            oldWasteOrder.subcontractorMSPID = wasteOrder.subcontractorMSPID;
         }
 
         const buffer = Buffer.from(JSON.stringify(oldWasteOrder));
@@ -192,7 +192,7 @@ export class WasteOrderContract extends Contract {
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (status === WasteOrderStatus.ACCEPTED || status === WasteOrderStatus.REJECTED) {
-            if (wasteOrder.contractorMSPID !== MSPID) {
+            if (wasteOrder.subcontractorMSPID !== MSPID) {
                 throw new Error('The Waste Order can only be accepted or rejected by the Contractor.')
             }
 
@@ -200,11 +200,11 @@ export class WasteOrderContract extends Contract {
                 throw new Error('Only Waste Orders with Status "Commissioned" can be accepted or rejected.')
             }
         } else if (status === WasteOrderStatus.CANCELLED) {
-            if (wasteOrder.contractorMSPID !== MSPID || wasteOrder.originatorMSPID !== MSPID) {
+            if (wasteOrder.subcontractorMSPID !== MSPID || wasteOrder.originatorMSPID !== MSPID) {
                 throw new Error('The Waste Order can only be cancelled by the Originator or the Contractor.');
             }
 
-            if (wasteOrder.contractorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
+            if (wasteOrder.subcontractorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
                 throw new Error('Only Waste Orders with Status "Accepted" can be cancelled.');
             }
 
@@ -216,7 +216,7 @@ export class WasteOrderContract extends Contract {
                 throw new Error('Only Waste Orders with the Status "Accepted" can be completed.');
             }
 
-            if (MSPID !== wasteOrder.contractorMSPID) {
+            if (MSPID !== wasteOrder.subcontractorMSPID) {
                 throw new Error('The Waste Order can only be completed by the Contractor.');
             }
         } else {

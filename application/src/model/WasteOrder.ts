@@ -19,7 +19,7 @@ export interface WasteOrder {
     quantity: number;
     unitPrice: number;
     originatorMSPID: string;
-    contractorMSPID: string;
+    subcontractorMSPID: string;
 }
 
 export const WasteOrderSchema = Joi.object().keys({
@@ -31,7 +31,7 @@ export const WasteOrderSchema = Joi.object().keys({
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
     originatorMSPID: Joi.string().required(),
-    contractorMSPID: Joi.string().required()
+    subcontractorMSPID: Joi.string().required()
 });
 
 export const WasteOrderCreateSchema = Joi.object().keys({
@@ -41,13 +41,13 @@ export const WasteOrderCreateSchema = Joi.object().keys({
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
     originatorMSPID: Joi.string(),
-    contractorMSPID: Joi.string().required()
+    subcontractorMSPID: Joi.string().required()
 });
 
 export const WasteOrderUpdateSchema = Joi.object().keys({
     quantity: Joi.number(),
     unitPrice: Joi.number(),
-    contractorMSPID: Joi.string()
+    subcontractorMSPID: Joi.string()
 }).min(1);
 
 export const WasteOrderUpdateStatusSchema = Joi.object().keys({

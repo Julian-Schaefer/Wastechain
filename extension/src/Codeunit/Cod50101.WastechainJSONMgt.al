@@ -15,7 +15,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSON.Add('unitPrice', "Unit Price");
 
             BusinessPartner.Get("Business-with No.");
-            WasteOrderJSON.Add('contractorMSPID', BusinessPartner."Wastechain MSP ID");
+            WasteOrderJSON.Add('subcontractorMSPID', BusinessPartner."Wastechain MSP ID");
 
             BusinessPartnerSite.Get("Post-with No.", "Task-at Code");
             TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
@@ -150,7 +150,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSONObject.Get('originatorMSPID', ValueJSONToken);
             "Originator MSP ID" := ValueJSONToken.AsValue().AsText();
 
-            WasteOrderJSONObject.Get('contractorMSPID', ValueJSONToken);
+            WasteOrderJSONObject.Get('subcontractorMSPID', ValueJSONToken);
             "Contractor MSP ID" := ValueJSONToken.AsValue().AsText();
 
             // Service
