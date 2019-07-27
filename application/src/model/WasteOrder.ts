@@ -13,41 +13,54 @@ export enum WasteOrderStatus {
 export interface WasteOrder {
     key: string;
     status: WasteOrderStatus;
-    service: Service;
+    subcontractorMSPID: string;
+    originatorMSPID: string;
+    customerName: string;
     taskSite: TaskSite;
+    service: Service;
     description: string;
     quantity: number;
     unitPrice: number;
-    originatorMSPID: string;
-    subcontractorMSPID: string;
+    unitOfMeasure: string;
+    taskDate: Date
+    startTime: string;
+    endTime: string;
+    referenceNo: string;
+    weighbridgeTicketNo: string;
+    lastChanged: Date;
+    lastChangedByMSPID: string;
 }
 
 export const WasteOrderSchema = Joi.object().keys({
     key: ServiceSchema.required(),
     status: Joi.required(),
-    service: ServiceSchema.required(),
+    subcontractorMSPID: Joi.string().required(),
+    originatorMSPID: Joi.string().required(),
+    customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
+    service: ServiceSchema.required(),
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
-    originatorMSPID: Joi.string().required(),
-    subcontractorMSPID: Joi.string().required()
+    taskDate: Joi.date().required(),
+    referenceNo: Joi.string().required()
 });
 
 export const WasteOrderCreateSchema = Joi.object().keys({
-    service: ServiceSchema.required(),
+    subcontractorMSPID: Joi.string().required(),
+    customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
+    service: ServiceSchema.required(),
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
-    originatorMSPID: Joi.string(),
-    subcontractorMSPID: Joi.string().required()
+    taskDate: Joi.date().required(),
+    referenceNo: Joi.string().required()
 });
 
 export const WasteOrderUpdateSchema = Joi.object().keys({
     quantity: Joi.number(),
-    unitPrice: Joi.number(),
-    subcontractorMSPID: Joi.string()
+    unitPrice: Joi.number()
 }).min(1);
 
 export const WasteOrderUpdateStatusSchema = Joi.object().keys({

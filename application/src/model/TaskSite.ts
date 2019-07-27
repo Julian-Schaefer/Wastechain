@@ -1,6 +1,8 @@
 import * as Joi from '@hapi/joi';
 
 export interface TaskSite {
+    name: string;
+    name2: string;
     address: string;
     address2: string;
     postCode: string;
@@ -10,6 +12,8 @@ export interface TaskSite {
 }
 
 export const TaskSiteSchema = Joi.object().keys({
+    name: Joi.string().required(),
+    name2: Joi.string().required(),
     address: Joi.string().required(),
     address2: Joi.string().required(),
     postCode: Joi.string().required(),
