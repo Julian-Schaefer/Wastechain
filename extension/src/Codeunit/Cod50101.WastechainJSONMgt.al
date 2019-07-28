@@ -5,19 +5,29 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         BusinessPartner: Record "Business Partner";
         BusinessPartnerSite: Record "Business Partner Site";
         Service: Record Service;
+        Item: Record Item;
+        IntMaterialCatalog: Record "Global Int. Material Catalog";
+        Equipment: Record Equipment;
         WasteOrderJSON: JsonObject;
         TaskSiteJSON: JsonObject;
         ServiceJSON: JsonObject;
     begin
         with WasteLine do begin
-            WasteOrderJSON.Add('description', Description);
-            WasteOrderJSON.Add('quantity', Quantity);
-            WasteOrderJSON.Add('unitPrice', "Unit Price");
-
             BusinessPartner.Get("Business-with No.");
             WasteOrderJSON.Add('subcontractorMSPID', BusinessPartner."Wastechain MSP ID");
 
+            BusinessPartner.Get("Bal. Acc. Post-with No.");
+            WasteOrderJSON.Add('customerName', BusinessPartner.Name);
+
+            WasteOrderJSON.Add('description', Description);
+            WasteOrderJSON.Add('quantity', Quantity);
+            WasteOrderJSON.Add('unitPrice', "Unit Price");
+            WasteOrderJSON.Add('taskDate', Format("Task Date"));
+            WasteOrderJSON.Add('referenceNo', "Document No.");
+
             BusinessPartnerSite.Get("Post-with No.", "Task-at Code");
+            TaskSiteJSON.Add('name', BusinessPartnerSite.Name);
+            TaskSiteJSON.Add('name2', BusinessPartnerSite."Name 2");
             TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
             TaskSiteJSON.Add('address2', BusinessPartnerSite."Address 2");
             TaskSiteJSON.Add('postCode', BusinessPartnerSite."Post Code");
@@ -30,6 +40,16 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             Service.Get("No.");
             ServiceJSON.Add('description', Service.Description);
             ServiceJSON.Add('description2', Service."Description 2");
+            if Service."Material Reference Type" = Service."Material Reference Type"::Item then begin
+                Item.Get(Service."Int. Material Catalog");
+                ServiceJSON.Add('materialDescription', Item.Description);
+            end else begin
+                IntMaterialCatalog.Get(Service."Int. Material Catalog");
+                ServiceJSON.Add('materialDescription', IntMaterialCatalog.Description);
+            end;
+            ServiceJSON.Add('equipmentType', Format(Service."Equipment Type"));
+            Equipment.Get(Service."Equipment No.");
+            ServiceJSON.Add('equipmentDescription', Equipment.Description);
 
             WasteOrderJSON.Add('service', ServiceJSON);
         end;
