@@ -13,7 +13,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         ServiceJSON: JsonObject;
     begin
         with WasteLine do begin
-            BusinessPartner.Get("Business-with No.");
+            BusinessPartner.Get("Post-with No.");
             WasteOrderJSON.Add('subcontractorMSPID', BusinessPartner."Wastechain MSP ID");
 
             BusinessPartner.Get("Bal. Acc. Post-with No.");
@@ -22,7 +22,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSON.Add('description', Description);
             WasteOrderJSON.Add('quantity', Quantity);
             WasteOrderJSON.Add('unitPrice', "Unit Price");
-            WasteOrderJSON.Add('taskDate', Format("Task Date"));
+            WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Month,2>/<Day,2>/<Year4>'));
             WasteOrderJSON.Add('referenceNo', "Document No.");
 
             BusinessPartnerSite.Get("Post-with No.", "Task-at Code");
