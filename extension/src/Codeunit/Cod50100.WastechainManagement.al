@@ -8,11 +8,13 @@ codeunit 50100 "Wastechain Management"
         if WasteLine."Waste Order Key WC" <> '' then
             Error('Waste Order %1 has already been commissioned.', WasteLine."Waste Order Key WC");
 
-        WasteLine.TestField(Quantity);
         WasteLine.TestField("Unit Price");
+        WasteLine.TestField("Unit of Measure");
         WasteLine.TestField("Posting Type", WasteLine."Posting Type"::Purchase);
         BusinessPartner.Get(WasteLine."Post-with No.");
         BusinessPartner.TestField("Wastechain MSP ID");
+        WasteLine.TestField("Bal. Acc. Post-with No.");
+        WasteLine.TestField("Bal. Acc. Task-at Code");
 
         WastechainClientMgt.PostWasteOrder(WasteLine);
     end;

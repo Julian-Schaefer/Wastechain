@@ -22,10 +22,17 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSON.Add('description', Description);
             WasteOrderJSON.Add('quantity', Quantity);
             WasteOrderJSON.Add('unitPrice', "Unit Price");
+            WasteOrderJSON.Add('unitOfMeasure', "Unit of Measure");
             WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Month,2>/<Day,2>/<Year4>'));
+            if "Starting Time" <> 0T then
+                WasteOrderJSON.Add('startingTime', Format("Starting Time"));
+            if "Finishing Time" <> 0T then
+                WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
             WasteOrderJSON.Add('referenceNo', "Document No.");
+            if "Weighbridge Ticket No." <> '' then
+                WasteOrderJSON.Add('weighbridgeTicketNo', "Weighbridge Ticket No.");
 
-            BusinessPartnerSite.Get("Post-with No.", "Task-at Code");
+            BusinessPartnerSite.Get("Bal. Acc. Post-with No.", "Bal. Acc. Task-at Code");
             TaskSiteJSON.Add('name', BusinessPartnerSite.Name);
             TaskSiteJSON.Add('name2', BusinessPartnerSite."Name 2");
             TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
@@ -158,6 +165,15 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSONObject.Get('status', ValueJSONToken);
             Status := ValueJSONToken.AsValue().AsOption();
 
+            WasteOrderJSONObject.Get('subcontractorMSPID', ValueJSONToken);
+            "Subcontractor MSP ID" := ValueJSONToken.AsValue().AsText();
+
+            WasteOrderJSONObject.Get('originatorMSPID', ValueJSONToken);
+            "Originator MSP ID" := ValueJSONToken.AsValue().AsText();
+
+            WasteOrderJSONObject.Get('customerName', ValueJSONToken);
+            "Customer Name" := ValueJSONToken.AsValue().AsText();
+
             WasteOrderJSONObject.Get('description', ValueJSONToken);
             Description := ValueJSONToken.AsValue().AsText();
 
@@ -167,25 +183,39 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
             "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
 
-            WasteOrderJSONObject.Get('originatorMSPID', ValueJSONToken);
-            "Originator MSP ID" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('unitOfMeasure', ValueJSONToken);
+            "Unit of Measure" := ValueJSONToken.AsValue().AsText();
 
-            WasteOrderJSONObject.Get('subcontractorMSPID', ValueJSONToken);
-            "Contractor MSP ID" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('taskDate', ValueJSONToken);
+            Evaluate("Task Date", ValueJSONToken.AsValue().AsText());
 
-            // Service
-            WasteOrderJSONObject.Get('service', ServiceJSONToken);
-            ServiceJSONObject := ServiceJSONToken.AsObject();
+            if WasteOrderJSONObject.Get('startingTime', ValueJSONToken) then
+                Evaluate("Starting Time", ValueJSONToken.AsValue().AsText());
 
-            ServiceJSONObject.Get('description', ValueJSONToken);
-            "Service Description" := ValueJSONToken.AsValue().AsText();
+            if WasteOrderJSONObject.Get('finishingTime', ValueJSONToken) then
+                Evaluate("Finishing Time", ValueJSONToken.AsValue().AsText());
 
-            ServiceJSONObject.Get('description2', ValueJSONToken);
-            "Service Description 2" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('referenceNo', ValueJSONToken);
+            Evaluate("Reference No.", ValueJSONToken.AsValue().AsText());
+
+            if WasteOrderJSONObject.Get('weighbridgeTicketNo', ValueJSONToken) then
+                Evaluate("Weighbridge Ticket No.", ValueJSONToken.AsValue().AsText());
+
+            WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
+            Evaluate("Last Changed", ValueJSONToken.AsValue().AsText());
+
+            WasteOrderJSONObject.Get('lastChangedByMSPID', ValueJSONToken);
+            Evaluate("Last Changed By MSPID", ValueJSONToken.AsValue().AsText());
 
             // Task Site
             WasteOrderJSONObject.Get('taskSite', TaskSiteJSONToken);
             TaskSiteJSONObject := TaskSiteJSONToken.AsObject();
+
+            TaskSiteJSONObject.Get('name', ValueJSONToken);
+            "Task Site Name" := ValueJSONToken.AsValue().AsText();
+
+            TaskSiteJSONObject.Get('name2', ValueJSONToken);
+            "Task Site Name 2" := ValueJSONToken.AsValue().AsText();
 
             TaskSiteJSONObject.Get('address', ValueJSONToken);
             "Task Site Address" := ValueJSONToken.AsValue().AsText();
@@ -204,6 +234,25 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
 
             TaskSiteJSONObject.Get('postCode', ValueJSONToken);
             "Task Site Post Code" := ValueJSONToken.AsValue().AsText();
+
+            // Service
+            WasteOrderJSONObject.Get('service', ServiceJSONToken);
+            ServiceJSONObject := ServiceJSONToken.AsObject();
+
+            ServiceJSONObject.Get('description', ValueJSONToken);
+            "Service Description" := ValueJSONToken.AsValue().AsText();
+
+            ServiceJSONObject.Get('description2', ValueJSONToken);
+            "Service Description 2" := ValueJSONToken.AsValue().AsText();
+
+            ServiceJSONObject.Get('materialDescription', ValueJSONToken);
+            "Service Material Description" := ValueJSONToken.AsValue().AsText();
+
+            ServiceJSONObject.Get('equipmentType', ValueJSONToken);
+            "Service Equipment Type" := ValueJSONToken.AsValue().AsOption();
+
+            ServiceJSONObject.Get('equipmentDescription', ValueJSONToken);
+            "Service Equipment Description" := ValueJSONToken.AsValue().AsText();
         end;
     end;
 

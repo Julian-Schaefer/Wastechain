@@ -28,6 +28,18 @@ table 50101 "Waste Order Transaction WC"
         {
             Caption = 'Unit Price';
         }
+
+        field(6; "Last Changed"; DateTime)
+        {
+            Caption = 'Last Changed';
+            DataClassification = ToBeClassified;
+        }
+
+        field(7; "Last Changed By MSPID"; Text[100])
+        {
+            Caption = 'Last Changed By MSPID';
+            DataClassification = ToBeClassified;
+        }
     }
 
     keys

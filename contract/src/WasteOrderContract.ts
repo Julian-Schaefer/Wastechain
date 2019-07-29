@@ -33,6 +33,8 @@ export class WasteOrderContract extends Contract {
 
         wasteOrder.status = WasteOrderStatus.COMMISSIONED;
         wasteOrder.originatorMSPID = ctx.clientIdentity.getMSPID();
+        wasteOrder.lastChanged = new Date();
+        wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
         await ctx.stub.putState(wasteOrder.key, buffer);
@@ -161,6 +163,9 @@ export class WasteOrderContract extends Contract {
             oldWasteOrder.subcontractorMSPID = wasteOrder.subcontractorMSPID;
         }
 
+        oldWasteOrder.lastChanged = new Date();
+        oldWasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
+
         const buffer = Buffer.from(JSON.stringify(oldWasteOrder));
         await ctx.stub.putState(orderId, buffer);
         //ctx.stub.setEvent("CREATE_ORDER", buffer);
@@ -224,6 +229,9 @@ export class WasteOrderContract extends Contract {
         }
 
         wasteOrder.status = status;
+        wasteOrder.lastChanged = new Date();
+        wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
+
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
         await ctx.stub.putState(orderId, buffer);
     }

@@ -23,8 +23,8 @@ export interface WasteOrder {
     unitPrice: number;
     unitOfMeasure: string;
     taskDate: Date
-    startTime: string;
-    endTime: string;
+    startingTime: string;
+    finishingTime: string;
     referenceNo: string;
     weighbridgeTicketNo: string;
     lastChanged: Date;
@@ -42,8 +42,14 @@ export const WasteOrderSchema = Joi.object().keys({
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
+    unitOfMeasure: Joi.string().required(),
     taskDate: Joi.date().required(),
-    referenceNo: Joi.string().required()
+    startingTime: Joi.string(),
+    finishingTime: Joi.string(),
+    referenceNo: Joi.string().required(),
+    weighbridgeTicketNo: Joi.string(),
+    lastChanged: Joi.date().required(),
+    lastChangedByMSPID: Joi.string().required()
 });
 
 export const WasteOrderCreateSchema = Joi.object().keys({
@@ -54,8 +60,12 @@ export const WasteOrderCreateSchema = Joi.object().keys({
     description: Joi.string().required(),
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
+    unitOfMeasure: Joi.string().required(),
     taskDate: Joi.date().required(),
-    referenceNo: Joi.string().required()
+    startingTime: Joi.string(),
+    finishingTime: Joi.string(),
+    referenceNo: Joi.string().required(),
+    weighbridgeTicketNo: Joi.string()
 });
 
 export const WasteOrderUpdateSchema = Joi.object().keys({

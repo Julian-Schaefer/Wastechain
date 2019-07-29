@@ -44,7 +44,7 @@ page 50101 "Incoming Waste Orders WC"
                     ApplicationArea = All;
                 }
 
-                field("Contractor MSP ID"; "Contractor MSP ID")
+                field("Subcontractor MSP ID"; "Subcontractor MSP ID")
                 {
                     ApplicationArea = All;
                 }
@@ -55,6 +55,31 @@ page 50101 "Incoming Waste Orders WC"
                 }
 
                 field("Service Description 2"; "Service Description 2")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Service Material Description"; "Service Material Description")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Service Equipment Type"; "Service Equipment Type")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Service Equipment Description"; "Service Equipment Description")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Task Site Name"; "Task Site Name")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Task Site Name 2"; "Task Site Name 2")
                 {
                     ApplicationArea = All;
                 }
