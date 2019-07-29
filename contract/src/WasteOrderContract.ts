@@ -31,6 +31,10 @@ export class WasteOrderContract extends Contract {
             throw new Error(`The order ${wasteOrder.key} already exists`);
         }
 
+        if (wasteOrder.subcontractorMSPID === ctx.clientIdentity.getMSPID()) {
+            throw new Error('It is not possible to commision a Waste Order to yourself.');
+        }
+
         wasteOrder.status = WasteOrderStatus.COMMISSIONED;
         wasteOrder.originatorMSPID = ctx.clientIdentity.getMSPID();
         wasteOrder.lastChanged = new Date();
@@ -147,10 +151,19 @@ export class WasteOrderContract extends Contract {
 
         let validationResult = Joi.validate(wasteOrder, WasteOrderUpdateSchema);
         if (validationResult.error !== null) {
-            throw "Invalid Waste Order Update Schema!";
+            throw 'Invalid Waste Order Update Schema: ' + validationResult.error.message;
         }
 
         let oldWasteOrder = await this.getWasteOrder(ctx, orderId);
+        if (ctx.clientIdentity.getMSPID() === oldWasteOrder.originatorMSPID && oldWasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
+            throw new Error('Only Waste Orders with the Status "Commissioned" can be changed by the Originator.');
+        }
+
+        if (ctx.clientIdentity.getMSPID() === oldWasteOrder.subcontractorMSPID && oldWasteOrder.status !== WasteOrderStatus.ACCEPTED) {
+            throw new Error('Only Waste Orders with the Status "Accepted" can be changed by the Subcontractor.');
+        }
+
+        // Change old Waste Order Values
         if (wasteOrder.quantity !== undefined) {
             oldWasteOrder.quantity = wasteOrder.quantity;
         }
@@ -168,7 +181,6 @@ export class WasteOrderContract extends Contract {
 
         const buffer = Buffer.from(JSON.stringify(oldWasteOrder));
         await ctx.stub.putState(orderId, buffer);
-        //ctx.stub.setEvent("CREATE_ORDER", buffer);
     }
 
     @Transaction()
@@ -196,36 +208,37 @@ export class WasteOrderContract extends Contract {
         const status: WasteOrderStatus = JSON.parse(wasteOrderUpdateStatusValue).status;
         const MSPID = ctx.clientIdentity.getMSPID();
 
-        if (status === WasteOrderStatus.ACCEPTED || status === WasteOrderStatus.REJECTED) {
-            if (wasteOrder.subcontractorMSPID !== MSPID) {
-                throw new Error('The Waste Order can only be accepted or rejected by the Contractor.')
-            }
-
-            if (wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
-                throw new Error('Only Waste Orders with Status "Commissioned" can be accepted or rejected.')
-            }
-        } else if (status === WasteOrderStatus.CANCELLED) {
-            if (wasteOrder.subcontractorMSPID !== MSPID || wasteOrder.originatorMSPID !== MSPID) {
-                throw new Error('The Waste Order can only be cancelled by the Originator or the Contractor.');
-            }
-
-            if (wasteOrder.subcontractorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
-                throw new Error('Only Waste Orders with Status "Accepted" can be cancelled.');
-            }
-
-            if (wasteOrder.originatorMSPID === MSPID && wasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
-                throw new Error('Only Waste Orders with Status "Commissioned" can be cancelled.');
-            }
-        } else if (status === WasteOrderStatus.COMPLETED) {
-            if (wasteOrder.status !== WasteOrderStatus.ACCEPTED) {
-                throw new Error('Only Waste Orders with the Status "Accepted" can be completed.');
-            }
-
-            if (MSPID !== wasteOrder.subcontractorMSPID) {
-                throw new Error('The Waste Order can only be completed by the Contractor.');
-            }
-        } else {
-            throw new Error('The specified status is not supported.');
+        switch (status) {
+            case WasteOrderStatus.REJECTED:
+                if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
+                    throw new Error('The Waste Order can only be rejected by the Subcontractor and needs to have the Status "Commissioned".');
+                }
+                break;
+            case WasteOrderStatus.ACCEPTED:
+                if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
+                    throw new Error('The Waste Order can only be accepted by the Subcontractor and needs to have the Status "Commissioned".');
+                }
+                break;
+            case WasteOrderStatus.CANCELLED:
+                if (wasteOrder.status === WasteOrderStatus.COMMISSIONED) {
+                    if (!(wasteOrder.originatorMSPID === MSPID)) {
+                        throw new Error('Waste Orders with Status "Commissioned" can only be cancelled by the Originator.');
+                    }
+                } else if (wasteOrder.status == WasteOrderStatus.ACCEPTED) {
+                    if (!(wasteOrder.originatorMSPID === MSPID || wasteOrder.subcontractorMSPID === MSPID)) {
+                        throw new Error('Waste Orders with Status "Accepted" can only be cancelled by the Subcontractor or the Originator.');
+                    }
+                } else {
+                    throw new Error('Only Waste Orders with Status "Commissioned" or "Accepted" can be cancelled.');
+                }
+                break;
+            case WasteOrderStatus.COMPLETED:
+                if (!(wasteOrder.status === WasteOrderStatus.ACCEPTED && wasteOrder.subcontractorMSPID === MSPID)) {
+                    throw new Error('The Waste Order can only be completed by the Subcontractor and needs to have the Status "Accepted".');
+                }
+                break;
+            default:
+                throw new Error('The specified status is not supported.');
         }
 
         wasteOrder.status = status;
