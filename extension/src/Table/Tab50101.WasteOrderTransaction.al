@@ -29,7 +29,7 @@ table 50101 "Waste Order Transaction WC"
             Caption = 'Unit Price';
         }
 
-        field(6; "Last Changed"; DateTime)
+        field(6; "Last Changed"; Text[100])
         {
             Caption = 'Last Changed';
             DataClassification = ToBeClassified;

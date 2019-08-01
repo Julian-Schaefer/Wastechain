@@ -54,7 +54,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 IntMaterialCatalog.Get(Service."Int. Material Catalog");
                 ServiceJSON.Add('materialDescription', IntMaterialCatalog.Description);
             end;
-            ServiceJSON.Add('equipmentType', Format(Service."Equipment Type"));
+            ServiceJSON.Add('equipmentType', Format(Service."Equipment Type", 0, 2));
             Equipment.Get(Service."Equipment No.");
             ServiceJSON.Add('equipmentDescription', Equipment.Description);
 
@@ -126,6 +126,12 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
                 "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
 
+                WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
+                "Last Changed" := ValueJSONToken.AsValue().AsText();
+
+                WasteOrderJSONObject.Get('lastChangedByMSPID', ValueJSONToken);
+                "Last Changed By MSPID" := ValueJSONToken.AsValue().AsText();
+
                 Insert();
             end;
         end;
@@ -187,7 +193,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             "Unit of Measure" := ValueJSONToken.AsValue().AsText();
 
             WasteOrderJSONObject.Get('taskDate', ValueJSONToken);
-            Evaluate("Task Date", ValueJSONToken.AsValue().AsText());
+            "Task Date" := GetDateFromText(ValueJSONToken.AsValue().AsText());
 
             if WasteOrderJSONObject.Get('startingTime', ValueJSONToken) then
                 Evaluate("Starting Time", ValueJSONToken.AsValue().AsText());
@@ -196,16 +202,16 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 Evaluate("Finishing Time", ValueJSONToken.AsValue().AsText());
 
             WasteOrderJSONObject.Get('referenceNo', ValueJSONToken);
-            Evaluate("Reference No.", ValueJSONToken.AsValue().AsText());
+            "Reference No." := ValueJSONToken.AsValue().AsText();
 
             if WasteOrderJSONObject.Get('weighbridgeTicketNo', ValueJSONToken) then
-                Evaluate("Weighbridge Ticket No.", ValueJSONToken.AsValue().AsText());
+                "Weighbridge Ticket No." := ValueJSONToken.AsValue().AsText();
 
             WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
-            Evaluate("Last Changed", ValueJSONToken.AsValue().AsText());
+            "Last Changed" := ValueJSONToken.AsValue().AsText();
 
             WasteOrderJSONObject.Get('lastChangedByMSPID', ValueJSONToken);
-            Evaluate("Last Changed By MSPID", ValueJSONToken.AsValue().AsText());
+            "Last Changed By MSPID" := ValueJSONToken.AsValue().AsText();
 
             // Task Site
             WasteOrderJSONObject.Get('taskSite', TaskSiteJSONToken);
@@ -262,5 +268,17 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
     begin
         UpdateWasteOrderStatusJSON.Add('status', Status);
         exit(UpdateWasteOrderStatusJSON);
+    end;
+
+    local procedure GetDateFromText(DateText: Text): Date
+    var
+        Day: Integer;
+        Month: Integer;
+        Year: Integer;
+    begin
+        Evaluate(Day, CopyStr(DateText, 4, 2));
+        Evaluate(Month, CopyStr(DateText, 1, 2));
+        Evaluate(Year, CopyStr(DateText, 7, 4));
+        exit(DMY2Date(Day, Month, Year));
     end;
 }

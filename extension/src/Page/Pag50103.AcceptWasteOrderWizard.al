@@ -19,7 +19,14 @@ page 50103 "Accept Waste Order Wizard WC"
                     ApplicationArea = All;
 
                     trigger OnValidate()
+                    var
+                        BusinessPartner: Record "Business Partner";
+                        MSPIDNotMatchingErr: Label 'The Wastechain MSP ID of the selected Business Partner does not match the MSP ID of the Originator';
                     begin
+                        BusinessPartner.Get(BusinessPartnerNo);
+                        if BusinessPartner."Wastechain MSP ID" <> WasteOrder."Originator MSP ID" then
+                            Error(MSPIDNotMatchingErr);
+
                         EnableControls();
                     end;
                 }

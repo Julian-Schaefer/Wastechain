@@ -118,7 +118,7 @@ table 50100 "Waste Order WC"
             DataClassification = ToBeClassified;
         }
 
-        field(15; "Last Changed"; DateTime)
+        field(15; "Last Changed"; Text[100])
         {
             Caption = 'Last Changed';
             DataClassification = ToBeClassified;
@@ -141,7 +141,7 @@ table 50100 "Waste Order WC"
             Caption = 'Service Description 2';
             DataClassification = ToBeClassified;
         }
-        
+
         field(22; "Service Material Description"; Text[250])
         {
             Caption = 'Service Material Description';
@@ -155,7 +155,7 @@ table 50100 "Waste Order WC"
             OptionMembers = " ",Submission,"Pick-up",Exchange,Clearance,"Purchase (Stock)","Sales (Stock)";
             DataClassification = ToBeClassified;
         }
-        
+
         field(24; "Service Equipment Description"; Text[250])
         {
             Caption = 'Service Equipment Description';

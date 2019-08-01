@@ -36,6 +36,16 @@ page 50102 "Waste Order Tx History WC"
                 {
                     ApplicationArea = All;
                 }
+
+                field("Last Changed"; "Last Changed")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Last Changed by MSPID"; "Last Changed by MSPID")
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }
