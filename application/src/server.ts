@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as bodyparser from 'body-parser';
 import { ValidationError } from '@hapi/joi';
-import { OrderController } from './controller/OrderController';
+import { WasteOrderController } from './controller/WasteOrderController';
 import { FabricConnection } from './fabric';
 import { SettingsController } from './controller/SettingsController';
 
 export class WastechainServer {
     private app = express();
-    private _orderController: OrderController;
+    private _orderController: WasteOrderController;
 
     constructor(fabricConnection: FabricConnection) {
         this.app.use(bodyparser.json());
@@ -20,7 +20,7 @@ export class WastechainServer {
             next();
         })
 
-        this._orderController = new OrderController(this.app, fabricConnection);
+        this._orderController = new WasteOrderController(this.app, fabricConnection);
         new SettingsController(this.app);
 
         this.app.use(function (error: Error, _: any, response: any, next: any) {
@@ -34,7 +34,7 @@ export class WastechainServer {
         });
     }
 
-    get getOrderController(): OrderController {
+    get getOrderController(): WasteOrderController {
         return this._orderController;
     }
 }

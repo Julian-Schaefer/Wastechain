@@ -5,6 +5,7 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
 import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './model/WasteOrder';
+import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'WasteOrderContract', description: 'Contract to exchange Waste Orders' })
 export class WasteOrderContract extends Contract {
@@ -94,15 +95,32 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getCommissionedWasteOrdersForMSP(ctx: Context, MSPID: string): Promise<WasteOrder[]> {
+    public async getWasteOrdersForSubcontractorWithStatus(ctx: Context, MSPID: string, status: string): Promise<WasteOrder[]> {
         let query = {
             selector: {
                 subcontractorMSPID: MSPID,
-                status: WasteOrderStatus.COMMISSIONED
+                status: Number(status)
             }
         };
 
-        let iterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+        let iterator: Iterators.StateQueryIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+        return this.getWasteOrdersFromIterator(iterator);
+    }
+
+    @Transaction(false)
+    public async getWasteOrdersForOriginatorWithStatus(ctx: Context, MSPID: string, status: string): Promise<WasteOrder[]> {
+        let query = {
+            selector: {
+                originatorMSPID: MSPID,
+                status: Number(status)
+            }
+        };
+
+        let iterator: Iterators.StateQueryIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+        return this.getWasteOrdersFromIterator(iterator);
+    }
+
+    private async getWasteOrdersFromIterator(iterator: Iterators.StateQueryIterator): Promise<WasteOrder[]> {
         let wasteOrders: WasteOrder[] = [];
 
         while (true) {

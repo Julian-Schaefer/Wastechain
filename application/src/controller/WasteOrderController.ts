@@ -4,7 +4,7 @@ import * as FabricClient from 'fabric-client';
 import { FabricConnection } from '../fabric';
 import { WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderUpdateStatusSchema, WasteOrder } from '../model/WasteOrder';
 
-export class OrderController {
+export class WasteOrderController {
 
     private responses: Response[] = [];
     private fabricConnection: FabricConnection;
@@ -14,7 +14,8 @@ export class OrderController {
 
         // GET
         app.get('/order', this.getWasteOrders.bind(this));
-        app.get('/order/commissioned', this.getCommissionedWasteOrders.bind(this));
+        app.get('/order/incoming/status/:status', this.getWasteOrdersForSubcontractorWithStatus.bind(this));
+        app.get('/order/outgoing/status/:status', this.getWasteOrdersForOriginatorWithStatus.bind(this));
         app.get('/order/:orderId', this.getWasteOrder.bind(this));
         app.get('/order/:orderId/history', this.getWasteOrderHistory.bind(this));
         // POST
@@ -127,13 +128,31 @@ export class OrderController {
         }
     }
 
-    private async getCommissionedWasteOrders(_: Request, response: Response) {
+    private async getWasteOrdersForSubcontractorWithStatus(request: Request, response: Response) {
+        const status = request.params.status;
+
         try {
             let MSPID = this.fabricConnection.client.getMspid();
             let contract = await this.fabricConnection.wasteOrderContract;
-            let wasteOrdersBuffer = await contract.evaluateTransaction('getCommissionedWasteOrdersForMSP', MSPID);
+            let wasteOrdersBuffer = await contract.evaluateTransaction('getWasteOrdersForSubcontractorWithStatus', MSPID, status);
 
-            console.log('Retrieved commissioned Waste Orders for MSP: ' + MSPID);
+            console.log('Retrieved Waste Orders with status ' + status + ' for Subcontractor: ' + MSPID);
+            response.send(wasteOrdersBuffer.toString('utf-8'));
+        } catch (error) {
+            console.log('Error evaluating Transaction: ' + error);
+            response.status(500).send('Error evaluating Transaction: ' + error);
+        }
+    }
+
+    private async getWasteOrdersForOriginatorWithStatus(request: Request, response: Response) {
+        const status = request.params.status;
+
+        try {
+            let MSPID = this.fabricConnection.client.getMspid();
+            let contract = await this.fabricConnection.wasteOrderContract;
+            let wasteOrdersBuffer = await contract.evaluateTransaction('getWasteOrdersForOriginatorWithStatus', MSPID, status);
+
+            console.log('Retrieved Waste Orders with status ' + status + ' for Originator: ' + MSPID);
             response.send(wasteOrdersBuffer.toString('utf-8'));
         } catch (error) {
             console.log('Error evaluating Transaction: ' + error);
