@@ -23,7 +23,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSON.Add('quantity', Quantity);
             WasteOrderJSON.Add('unitPrice', "Unit Price");
             WasteOrderJSON.Add('unitOfMeasure', "Unit of Measure");
-            WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Month,2>/<Day,2>/<Year4>'));
+            WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Day,2>/<Month,2>/<Year4>'));
             if "Starting Time" <> 0T then
                 WasteOrderJSON.Add('startingTime', Format("Starting Time"));
             if "Finishing Time" <> 0T then
@@ -276,8 +276,8 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         Month: Integer;
         Year: Integer;
     begin
-        Evaluate(Day, CopyStr(DateText, 4, 2));
-        Evaluate(Month, CopyStr(DateText, 1, 2));
+        Evaluate(Day, CopyStr(DateText, 1, 2));
+        Evaluate(Month, CopyStr(DateText, 4, 2));
         Evaluate(Year, CopyStr(DateText, 7, 4));
         exit(DMY2Date(Day, Month, Year));
     end;

@@ -1,6 +1,9 @@
 import { Service, ServiceSchema } from "./Service";
 import { TaskSite, TaskSiteSchema } from "./TaskSite";
 import * as Joi from '@hapi/joi';
+import * as JoiDate from '@hapi/joi-date';
+
+const JoiExtended: any = Joi.extend(JoiDate);
 
 export enum WasteOrderStatus {
     COMMISSIONED,
@@ -43,7 +46,7 @@ export const WasteOrderSchema = Joi.object().keys({
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
     unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
+    taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
     referenceNo: Joi.string().required(),
@@ -61,7 +64,7 @@ export const WasteOrderCreateSchema = Joi.object().keys({
     quantity: Joi.number().required(),
     unitPrice: Joi.number().required(),
     unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
+    taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
     referenceNo: Joi.string().required(),
