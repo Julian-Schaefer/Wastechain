@@ -59,7 +59,6 @@ export class WasteOrderContract extends Contract {
 
         const newWasteOrder: WasteOrder = {
             ...wasteOrder,
-            rejectionMessage: undefined,
             status: WasteOrderStatus.ACCEPTED
         }
 
@@ -110,7 +109,6 @@ export class WasteOrderContract extends Contract {
 
         const newWasteOrder: WasteOrder = {
             ...wasteOrder,
-            rejectionMessage: undefined,
             status: WasteOrderStatus.CANCELLED
         }
 
@@ -161,6 +159,7 @@ export class WasteOrderContract extends Contract {
         const newWasteOrder: WasteOrder = {
             ...wasteOrder,
             ...updatedWasteOrder,
+            rejectionMessage: undefined,
             status: WasteOrderStatus.COMMISSIONED
         }
 
