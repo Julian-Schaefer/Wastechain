@@ -82,12 +82,26 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure GetIncomingWasteOrdersAsText(): Text
+    procedure GetIncomingWasteOrdersWithStatusAsText(Status: enum "Waste Order Status WC"): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;
     begin
-        Get('/order/commissioned', Response);
+        Get(StrSubstNo('/order/incoming/status/%1', Format(Status, 0, 2)), Response);
+
+        Response.Content.ReadAs(ResponseText);
+        if Response.IsSuccessStatusCode then
+            exit(ResponseText)
+        else
+            Error(ResponseText);
+    end;
+
+    procedure GetOutgoingWasteOrdersWithStatusAsText(Status: enum "Waste Order Status WC"): Text
+    var
+        Response: HttpResponseMessage;
+        ResponseText: Text;
+    begin
+        Get(StrSubstNo('/order/outgoing/status/%1', Format(Status, 0, 2)), Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then

@@ -64,14 +64,24 @@ codeunit 50100 "Wastechain Management"
         end;
     end;
 
-    procedure GetIncomingWasteOrders(var WasteOrder: Record "Waste Order WC")
+    procedure GetIncomingWasteOrdersWithStatus(var WasteOrder: Record "Waste Order WC"; status: enum "Waste Order Status WC")
     var
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
         WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
         IncomingWasteOrdersText: Text;
     begin
-        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrdersAsText();
+        IncomingWasteOrdersText := WastechainClientMgt.GetIncomingWasteOrdersWithStatusAsText(status);
         WastechainJSONMgt.GetWasteOrdersFromText(IncomingWasteOrdersText, WasteOrder);
+    end;
+
+    procedure GetOutgoingWasteOrdersWithStatus(var WasteOrder: Record "Waste Order WC"; status: enum "Waste Order Status WC")
+    var
+        WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
+        WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
+        OutgoingWasteOrdersText: Text;
+    begin
+        OutgoingWasteOrdersText := WastechainClientMgt.GetOutgoingWasteOrdersWithStatusAsText(status);
+        WastechainJSONMgt.GetWasteOrdersFromText(OutgoingWasteOrdersText, WasteOrder);
     end;
 
     procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])

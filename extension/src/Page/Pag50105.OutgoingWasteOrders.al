@@ -1,6 +1,6 @@
-page 50101 "Incoming Waste Orders WC"
+page 50105 "Outgoing Waste Orders WC"
 {
-    Caption = 'Incoming Waste Orders';
+    Caption = 'Outgoing Waste Orders';
     PageType = List;
     ApplicationArea = All;
     UsageCategory = Lists;
@@ -21,6 +21,8 @@ page 50101 "Incoming Waste Orders WC"
 
                 field("Status Filter"; StatusFilter)
                 {
+                    Caption = 'Status';
+
                     trigger OnValidate()
                     begin
                         RefreshPage();
@@ -139,52 +141,6 @@ page 50101 "Incoming Waste Orders WC"
     {
         area(Processing)
         {
-            action("Accept")
-            {
-                Caption = 'Accept';
-                Image = Approve;
-                Promoted = true;
-                PromotedCategory = Category4;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                Visible = (StatusFilter = StatusFilter::Commissioned);
-                Enabled = "Key" <> '';
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    AcceptWasteOrderWizard: Page "Accept Waste Order Wizard WC";
-                begin
-                    AcceptWasteOrderWizard.SetWasteOrder(Rec);
-                    AcceptWasteOrderWizard.RunModal();
-                    RefreshPage();
-                end;
-            }
-
-            action("Reject")
-            {
-                Caption = 'Reject';
-                Image = Reject;
-                Promoted = true;
-                PromotedCategory = Category4;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                Visible = (StatusFilter = StatusFilter::Commissioned);
-                Enabled = "Key" <> '';
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    ConfirmRejectionLbl: Label 'Do you really want to reject the selected Waste Order?';
-                begin
-                    if not Confirm(ConfirmRejectionLbl) then
-                        exit;
-
-                    WastechainMgt.RejectWasteOrder(Rec);
-                    RefreshPage();
-                end;
-            }
-
             action("Cancel")
             {
                 Caption = 'Cancel';
@@ -193,7 +149,7 @@ page 50101 "Incoming Waste Orders WC"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 PromotedOnly = true;
-                Visible = (StatusFilter = StatusFilter::Accepted);
+                Visible = (StatusFilter = StatusFilter::Commissioned) OR (StatusFilter = StatusFilter::Accepted);
                 Enabled = "Key" <> '';
                 ApplicationArea = All;
 
@@ -267,7 +223,7 @@ page 50101 "Incoming Waste Orders WC"
 
     trigger OnOpenPage()
     begin
-        Status := Status::Commissioned;
+        StatusFilter := StatusFilter::Commissioned;
         RefreshPage();
     end;
 
@@ -279,7 +235,7 @@ page 50101 "Incoming Waste Orders WC"
     local procedure RefreshPage()
     begin
         DeleteAll();
-        WastechainMgt.GetIncomingWasteOrdersWithStatus(Rec, StatusFilter);
+        WastechainMgt.GetOutgoingWasteOrdersWithStatus(Rec, StatusFilter);
     end;
 
     procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
