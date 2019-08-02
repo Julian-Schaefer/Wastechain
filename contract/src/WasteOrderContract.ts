@@ -4,7 +4,7 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { WasteOrder, WasteOrderCreateSchema, WasteOrderUpdateSchema, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './model/WasteOrder';
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrderRecommissionSchema } from './model/WasteOrder';
 import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'WasteOrderContract', description: 'Contract to exchange Waste Orders' })
@@ -18,10 +18,10 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction()
-    public async createWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
+    public async commissionWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
         let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
 
-        let validationResult = Joi.validate(wasteOrder, WasteOrderCreateSchema);
+        let validationResult = Joi.validate(wasteOrder, WasteOrderCommissionSchema);
         if (validationResult.error !== null) {
             throw "Invalid Waste Order Schema: " + validationResult.error.message;
         }
@@ -43,8 +43,139 @@ export class WasteOrderContract extends Contract {
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
         await ctx.stub.putState(wasteOrder.key, buffer);
-        ctx.stub.setEvent("CREATE_ORDER", buffer);
+        ctx.stub.setEvent("COMMISSION_WASTE_ORDER", buffer);
 
+        return wasteOrder;
+    }
+
+    @Transaction()
+    public async acceptWasteOrder(ctx: Context, orderId: string): Promise<void> {
+        let wasteOrder = await this.getWasteOrder(ctx, orderId);
+        const MSPID = ctx.clientIdentity.getMSPID();
+
+        if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
+            throw new Error('The Waste Order can only be accepted by the Subcontractor and needs to have the Status "Commissioned".');
+        }
+
+        const newWasteOrder: WasteOrder = {
+            ...wasteOrder,
+            rejectionMessage: undefined,
+            status: WasteOrderStatus.ACCEPTED
+        }
+
+        await this.saveWasteOrder(ctx, newWasteOrder);
+    }
+
+    @Transaction()
+    public async rejectWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+        let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
+
+        let validationResult = Joi.validate(updatedWasteOrder, WasteOrderRejectSchema);
+        if (validationResult.error !== null) {
+            throw 'Invalid Schema: ' + validationResult.error.message;
+        }
+
+        let wasteOrder = await this.getWasteOrder(ctx, orderId);
+        const MSPID = ctx.clientIdentity.getMSPID();
+
+        if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
+            throw new Error('The Waste Order can only be rejected by the Subcontractor and needs to have the Status "Commissioned".');
+        }
+
+        const newWasteOrder: WasteOrder = {
+            ...wasteOrder,
+            ...updatedWasteOrder,
+            status: WasteOrderStatus.REJECTED
+        }
+
+        await this.saveWasteOrder(ctx, newWasteOrder);
+    }
+
+    @Transaction()
+    public async cancelWasteOrder(ctx: Context, orderId: string): Promise<void> {
+        let wasteOrder = await this.getWasteOrder(ctx, orderId);
+        const MSPID = ctx.clientIdentity.getMSPID();
+
+        if (wasteOrder.status === WasteOrderStatus.COMMISSIONED) {
+            if (!(wasteOrder.originatorMSPID === MSPID)) {
+                throw new Error('Waste Orders with Status "Commissioned" can only be cancelled by the Originator.');
+            }
+        } else if (wasteOrder.status == WasteOrderStatus.ACCEPTED) {
+            if (!(wasteOrder.originatorMSPID === MSPID || wasteOrder.subcontractorMSPID === MSPID)) {
+                throw new Error('Waste Orders with Status "Accepted" can only be cancelled by the Subcontractor or the Originator.');
+            }
+        } else {
+            throw new Error('Only Waste Orders with Status "Commissioned" or "Accepted" can be cancelled.');
+        }
+
+        const newWasteOrder: WasteOrder = {
+            ...wasteOrder,
+            rejectionMessage: undefined,
+            status: WasteOrderStatus.CANCELLED
+        }
+
+        await this.saveWasteOrder(ctx, newWasteOrder);
+    }
+
+    @Transaction()
+    public async completeWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+        let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
+
+        let validationResult = Joi.validate(updatedWasteOrder, WasteOrderCompleteSchema);
+        if (validationResult.error !== null) {
+            throw 'Invalid Schema: ' + validationResult.error.message;
+        }
+
+        let wasteOrder = await this.getWasteOrder(ctx, orderId);
+        const MSPID = ctx.clientIdentity.getMSPID();
+
+        if (!(wasteOrder.status === WasteOrderStatus.ACCEPTED && wasteOrder.subcontractorMSPID === MSPID)) {
+            throw new Error('The Waste Order can only be completed by the Subcontractor and needs to have the Status "Accepted".');
+        }
+
+        const newWasteOrder: WasteOrder = {
+            ...wasteOrder,
+            ...updatedWasteOrder,
+            status: WasteOrderStatus.COMPLETED
+        }
+
+        await this.saveWasteOrder(ctx, newWasteOrder);
+    }
+
+    @Transaction()
+    public async recommissionWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+        let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
+
+        let validationResult = Joi.validate(updatedWasteOrder, WasteOrderRecommissionSchema);
+        if (validationResult.error !== null) {
+            throw 'Invalid Schema: ' + validationResult.error.message;
+        }
+
+        const wasteOrder = await this.getWasteOrder(ctx, orderId);
+        const MSPID = ctx.clientIdentity.getMSPID();
+
+        if (!(wasteOrder.status === WasteOrderStatus.REJECTED && wasteOrder.originatorMSPID === MSPID)) {
+            throw new Error('The Waste Order can only be recomissioned by the Originator and needs to have the Status "Rejected".');
+        }
+
+        const newWasteOrder: WasteOrder = {
+            ...wasteOrder,
+            ...updatedWasteOrder,
+            status: WasteOrderStatus.COMMISSIONED
+        }
+
+        await this.saveWasteOrder(ctx, newWasteOrder);
+    }
+
+    @Transaction(false)
+    @Returns('Order')
+    public async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
+        const exists = await this.checkWasteOrderExists(ctx, orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
+        const buffer = await ctx.stub.getState(orderId);
+        const wasteOrder = JSON.parse(buffer.toString()) as WasteOrder;
         return wasteOrder;
     }
 
@@ -91,7 +222,6 @@ export class WasteOrderContract extends Contract {
                 return transactionHistory;
             }
         }
-
     }
 
     @Transaction(false)
@@ -120,6 +250,14 @@ export class WasteOrderContract extends Contract {
         return this.getWasteOrdersFromIterator(iterator);
     }
 
+    private async saveWasteOrder(ctx: Context, wasteOrder: WasteOrder) {
+        wasteOrder.lastChanged = new Date();
+        wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
+
+        const buffer = Buffer.from(JSON.stringify(wasteOrder));
+        await ctx.stub.putState(wasteOrder.key, buffer);
+    }
+
     private async getWasteOrdersFromIterator(iterator: Iterators.StateQueryIterator): Promise<WasteOrder[]> {
         let wasteOrders: WasteOrder[] = [];
 
@@ -144,126 +282,5 @@ export class WasteOrderContract extends Contract {
                 return wasteOrders;
             }
         }
-    }
-
-    @Transaction(false)
-    @Returns('Order')
-    public async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
-        if (!exists) {
-            throw new Error(`The order ${orderId} does not exist`);
-        }
-        const buffer = await ctx.stub.getState(orderId);
-        const wasteOrder = JSON.parse(buffer.toString()) as WasteOrder;
-        return wasteOrder;
-    }
-
-    @Transaction()
-    public async updateWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<void> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
-        if (!exists) {
-            throw new Error(`The order ${orderId} does not exist`);
-        }
-
-        let wasteOrder: WasteOrder = JSON.parse(wasteOrderValue);
-
-        let validationResult = Joi.validate(wasteOrder, WasteOrderUpdateSchema);
-        if (validationResult.error !== null) {
-            throw 'Invalid Waste Order Update Schema: ' + validationResult.error.message;
-        }
-
-        let oldWasteOrder = await this.getWasteOrder(ctx, orderId);
-        if (ctx.clientIdentity.getMSPID() === oldWasteOrder.originatorMSPID && oldWasteOrder.status !== WasteOrderStatus.COMMISSIONED) {
-            throw new Error('Only Waste Orders with the Status "Commissioned" can be changed by the Originator.');
-        }
-
-        if (ctx.clientIdentity.getMSPID() === oldWasteOrder.subcontractorMSPID && oldWasteOrder.status !== WasteOrderStatus.ACCEPTED) {
-            throw new Error('Only Waste Orders with the Status "Accepted" can be changed by the Subcontractor.');
-        }
-
-        // Change old Waste Order Values
-        if (wasteOrder.quantity !== undefined) {
-            oldWasteOrder.quantity = wasteOrder.quantity;
-        }
-
-        if (wasteOrder.unitPrice !== undefined) {
-            oldWasteOrder.unitPrice = wasteOrder.unitPrice;
-        }
-
-        if (wasteOrder.subcontractorMSPID !== undefined) {
-            oldWasteOrder.subcontractorMSPID = wasteOrder.subcontractorMSPID;
-        }
-
-        oldWasteOrder.lastChanged = new Date();
-        oldWasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
-
-        const buffer = Buffer.from(JSON.stringify(oldWasteOrder));
-        await ctx.stub.putState(orderId, buffer);
-    }
-
-    @Transaction()
-    public async deleteWasteOrder(ctx: Context, orderId: string): Promise<void> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
-        if (!exists) {
-            throw new Error(`The order ${orderId} does not exist.`);
-        }
-        await ctx.stub.deleteState(orderId);
-    }
-
-    @Transaction()
-    public async updateWasteOrderStatus(ctx: Context, orderId: string, wasteOrderUpdateStatusValue: string): Promise<void> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
-        if (!exists) {
-            throw new Error(`The order ${orderId} does not exist`);
-        }
-
-        const validationResult = Joi.validate(wasteOrderUpdateStatusValue, WasteOrderUpdateStatusSchema);
-        if (validationResult.error !== null) {
-            throw "Invalid Waste Order Status Update Schema!";
-        }
-
-        const wasteOrder: WasteOrder = await this.getWasteOrder(ctx, orderId);
-        const status: WasteOrderStatus = JSON.parse(wasteOrderUpdateStatusValue).status;
-        const MSPID = ctx.clientIdentity.getMSPID();
-
-        switch (status) {
-            case WasteOrderStatus.REJECTED:
-                if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
-                    throw new Error('The Waste Order can only be rejected by the Subcontractor and needs to have the Status "Commissioned".');
-                }
-                break;
-            case WasteOrderStatus.ACCEPTED:
-                if (!(wasteOrder.status === WasteOrderStatus.COMMISSIONED && wasteOrder.subcontractorMSPID === MSPID)) {
-                    throw new Error('The Waste Order can only be accepted by the Subcontractor and needs to have the Status "Commissioned".');
-                }
-                break;
-            case WasteOrderStatus.CANCELLED:
-                if (wasteOrder.status === WasteOrderStatus.COMMISSIONED) {
-                    if (!(wasteOrder.originatorMSPID === MSPID)) {
-                        throw new Error('Waste Orders with Status "Commissioned" can only be cancelled by the Originator.');
-                    }
-                } else if (wasteOrder.status == WasteOrderStatus.ACCEPTED) {
-                    if (!(wasteOrder.originatorMSPID === MSPID || wasteOrder.subcontractorMSPID === MSPID)) {
-                        throw new Error('Waste Orders with Status "Accepted" can only be cancelled by the Subcontractor or the Originator.');
-                    }
-                } else {
-                    throw new Error('Only Waste Orders with Status "Commissioned" or "Accepted" can be cancelled.');
-                }
-                break;
-            case WasteOrderStatus.COMPLETED:
-                if (!(wasteOrder.status === WasteOrderStatus.ACCEPTED && wasteOrder.subcontractorMSPID === MSPID)) {
-                    throw new Error('The Waste Order can only be completed by the Subcontractor and needs to have the Status "Accepted".');
-                }
-                break;
-            default:
-                throw new Error('The specified status is not supported.');
-        }
-
-        wasteOrder.status = status;
-        wasteOrder.lastChanged = new Date();
-        wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
-
-        const buffer = Buffer.from(JSON.stringify(wasteOrder));
-        await ctx.stub.putState(orderId, buffer);
     }
 }

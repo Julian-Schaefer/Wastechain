@@ -29,7 +29,7 @@ export interface WasteOrder {
     startingTime: string;
     finishingTime: string;
     referenceNo: string;
-    weighbridgeTicketNo: string;
+    rejectionMessage: string;
     lastChanged: Date;
     lastChangedByMSPID: string;
 }
@@ -50,12 +50,12 @@ export const WasteOrderSchema = Joi.object().keys({
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
     referenceNo: Joi.string().required(),
-    weighbridgeTicketNo: Joi.string(),
+    rejectionMessage: Joi.string(),
     lastChanged: Joi.date().required(),
     lastChangedByMSPID: Joi.string().required()
 });
 
-export const WasteOrderCreateSchema = Joi.object().keys({
+export const WasteOrderCommissionSchema = Joi.object().keys({
     subcontractorMSPID: Joi.string().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
@@ -67,15 +67,34 @@ export const WasteOrderCreateSchema = Joi.object().keys({
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
-    referenceNo: Joi.string().required(),
-    weighbridgeTicketNo: Joi.string()
+    referenceNo: Joi.string().required()
 });
 
-export const WasteOrderUpdateSchema = Joi.object().keys({
-    quantity: Joi.number(),
-    unitPrice: Joi.number()
-}).min(1);
+export const WasteOrderRecommissionSchema = Joi.object().keys({
+    subcontractorMSPID: Joi.string().required(),
+    customerName: Joi.string().required(),
+    taskSite: TaskSiteSchema.required(),
+    service: ServiceSchema.required(),
+    description: Joi.string().required(),
+    quantity: Joi.number().required(),
+    unitPrice: Joi.number().required(),
+    unitOfMeasure: Joi.string().required(),
+    taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
+    startingTime: Joi.string(),
+    finishingTime: Joi.string()
+});
 
-export const WasteOrderUpdateStatusSchema = Joi.object().keys({
-    status: Joi.number().required()
+export const WasteOrderCompleteSchema = Joi.object().keys({
+    service: ServiceSchema.required(),
+    description: Joi.string().required(),
+    quantity: Joi.number().required(),
+    unitPrice: Joi.number().required(),
+    unitOfMeasure: Joi.string().required(),
+    taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
+    startingTime: Joi.string(),
+    finishingTime: Joi.string()
+});
+
+export const WasteOrderRejectSchema = Joi.object().keys({
+    rejectionMessage: Joi.string().required()
 });
