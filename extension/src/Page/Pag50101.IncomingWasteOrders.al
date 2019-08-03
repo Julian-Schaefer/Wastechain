@@ -180,7 +180,7 @@ page 50101 "Incoming Waste Orders WC"
                     if not Confirm(ConfirmRejectionLbl) then
                         exit;
 
-                    WastechainMgt.RejectWasteOrder(Rec);
+                    WastechainMgt.RejectWasteOrder(Rec, 'Rejected because of Test.');
                     RefreshPage();
                 end;
             }

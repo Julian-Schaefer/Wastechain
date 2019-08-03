@@ -1,16 +1,9 @@
 codeunit 50101 "Wastechain JSON Mgt. WC"
 {
-    procedure GenerateCreateWasteOrderJSON(WasteLine: Record "Waste Management Line"): JsonObject
+    procedure CreateWasteOrderCommissionSchemaJSON(WasteLine: Record "Waste Management Line"): JsonObject
     var
         BusinessPartner: Record "Business Partner";
-        BusinessPartnerSite: Record "Business Partner Site";
-        Service: Record Service;
-        Item: Record Item;
-        IntMaterialCatalog: Record "Global Int. Material Catalog";
-        Equipment: Record Equipment;
         WasteOrderJSON: JsonObject;
-        TaskSiteJSON: JsonObject;
-        ServiceJSON: JsonObject;
     begin
         with WasteLine do begin
             BusinessPartner.Get("Post-with No.");
@@ -29,9 +22,103 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             if "Finishing Time" <> 0T then
                 WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
             WasteOrderJSON.Add('referenceNo', "Document No.");
-            if "Weighbridge Ticket No." <> '' then
-                WasteOrderJSON.Add('weighbridgeTicketNo', "Weighbridge Ticket No.");
 
+            // Task Site
+            WasteOrderJSON.Add('taskSite', CreateTaskSiteJSON(WasteLine));
+
+            // Service
+            WasteOrderJSON.Add('service', CreateServiceJSON(WasteLine));
+        end;
+
+        exit(WasteOrderJSON);
+    end;
+
+    procedure CreateWasteOrderRecommissionSchemaJSON(WasteLine: Record "Waste Management Line"; Status: enum "Waste Order Status WC"): JsonObject
+    var
+        BusinessPartner: Record "Business Partner";
+        WasteOrderJSON: JsonObject;
+    begin
+        with WasteLine do begin
+            WasteOrderJSON.Add('status', Status);
+
+            BusinessPartner.Get("Post-with No.");
+            WasteOrderJSON.Add('subcontractorMSPID', BusinessPartner."Wastechain MSP ID");
+
+            BusinessPartner.Get("Bal. Acc. Post-with No.");
+            WasteOrderJSON.Add('customerName', BusinessPartner.Name);
+
+            WasteOrderJSON.Add('description', Description);
+            WasteOrderJSON.Add('quantity', Quantity);
+            WasteOrderJSON.Add('unitPrice', "Unit Price");
+            WasteOrderJSON.Add('unitOfMeasure', "Unit of Measure");
+            WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Day,2>/<Month,2>/<Year4>'));
+            if "Starting Time" <> 0T then
+                WasteOrderJSON.Add('startingTime', Format("Starting Time"));
+            if "Finishing Time" <> 0T then
+                WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
+
+            // Task Site
+            WasteOrderJSON.Add('taskSite', CreateTaskSiteJSON(WasteLine));
+
+            // Service
+            WasteOrderJSON.Add('service', CreateServiceJSON(WasteLine));
+        end;
+
+        exit(WasteOrderJSON);
+    end;
+
+    procedure CreateWasteOrderCompleteSchemaJSON(WasteLine: Record "Waste Management Line"; Status: enum "Waste Order Status WC"): JsonObject
+    var
+        WasteOrderJSON: JsonObject;
+    begin
+        with WasteLine do begin
+            WasteOrderJSON.Add('status', Status);
+
+            WasteOrderJSON.Add('description', Description);
+            WasteOrderJSON.Add('quantity', Quantity);
+            WasteOrderJSON.Add('unitPrice', "Unit Price");
+            WasteOrderJSON.Add('unitOfMeasure', "Unit of Measure");
+            WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Day,2>/<Month,2>/<Year4>'));
+            if "Starting Time" <> 0T then
+                WasteOrderJSON.Add('startingTime', Format("Starting Time"));
+            if "Finishing Time" <> 0T then
+                WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
+
+            // Task Site
+            WasteOrderJSON.Add('taskSite', CreateTaskSiteJSON(WasteLine));
+
+            // Service
+            WasteOrderJSON.Add('service', CreateServiceJSON(WasteLine));
+        end;
+
+        exit(WasteOrderJSON);
+    end;
+
+    procedure CreateWasteOrderRejectionSchemaJSON(Status: enum "Waste Order Status WC"; RejectionMessage: Text[250]): JsonObject
+    var
+        WasteOrderJSON: JsonObject;
+    begin
+        WasteOrderJSON.Add('status', Status);
+        WasteOrderJSON.Add('rejectionMessage', RejectionMessage);
+
+        exit(WasteOrderJSON);
+    end;
+
+    procedure CreateWasteOrderStatusUpdateSchemaJSON(Status: enum "Waste Order Status WC"): JsonObject
+    var
+        WasteOrderJSON: JsonObject;
+    begin
+        WasteOrderJSON.Add('status', Status);
+
+        exit(WasteOrderJSON);
+    end;
+
+    local procedure CreateTaskSiteJSON(WasteLine: Record "Waste Management Line"): JsonObject
+    var
+        BusinessPartnerSite: Record "Business Partner Site";
+        TaskSiteJSON: JsonObject;
+    begin
+        with WasteLine do begin
             BusinessPartnerSite.Get("Bal. Acc. Post-with No.", "Bal. Acc. Task-at Code");
             TaskSiteJSON.Add('name', BusinessPartnerSite.Name);
             TaskSiteJSON.Add('name2', BusinessPartnerSite."Name 2");
@@ -42,8 +129,19 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             TaskSiteJSON.Add('countryCode', BusinessPartnerSite."Country/Region Code");
             TaskSiteJSON.Add('areaCode', BusinessPartnerSite."Area Code");
 
-            WasteOrderJSON.Add('taskSite', TaskSiteJSON);
+            exit(TaskSiteJSON);
+        end;
+    end;
 
+    local procedure CreateServiceJSON(WasteLine: Record "Waste Management Line"): JsonObject
+    var
+        Service: Record Service;
+        Item: Record Item;
+        IntMaterialCatalog: Record "Global Int. Material Catalog";
+        Equipment: Record Equipment;
+        ServiceJSON: JsonObject;
+    begin
+        with WasteLine do begin
             Service.Get("No.");
             ServiceJSON.Add('description', Service.Description);
             ServiceJSON.Add('description2', Service."Description 2");
@@ -58,29 +156,8 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             Equipment.Get(Service."Equipment No.");
             ServiceJSON.Add('equipmentDescription', Equipment.Description);
 
-            WasteOrderJSON.Add('service', ServiceJSON);
+            exit(ServiceJSON);
         end;
-
-        exit(WasteOrderJSON);
-    end;
-
-    procedure GenerateUpdateWasteOrderJSON(OldWasteLine: Record "Waste Management Line"; NewWasteLine: Record "Waste Management Line"): JsonObject
-    var
-        Service: Record Service;
-        WasteOrderJSON: JsonObject;
-    begin
-        if OldWasteLine.Quantity <> NewWasteLine.Quantity then
-            WasteOrderJSON.Add('quantity', NewWasteLine.Quantity);
-
-        if OldWasteLine."Unit Price" <> NewWasteLine."Unit Price" then
-            WasteOrderJSON.Add('unitPrice', NewWasteLine."Unit Price");
-
-        exit(WasteOrderJSON);
-    end;
-
-    procedure GetWasteOrderKey(WasteLine: Record "Waste Management Line"): Text
-    begin
-        exit(WasteLine."Document No." + '-' + Format(WasteLine."Line No."));
     end;
 
     procedure GetWasteOrderKeyFromJSONText(JSONText: Text): Text
@@ -125,6 +202,9 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
 
                 WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
                 "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
+
+                WasteOrderJSONObject.Get('rejectionMessage', ValueJSONToken);
+                "Rejection Message" := ValueJSONToken.AsValue().AsText();
 
                 WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
                 "Last Changed" := ValueJSONToken.AsValue().AsText();
@@ -204,9 +284,6 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             WasteOrderJSONObject.Get('referenceNo', ValueJSONToken);
             "Reference No." := ValueJSONToken.AsValue().AsText();
 
-            if WasteOrderJSONObject.Get('weighbridgeTicketNo', ValueJSONToken) then
-                "Weighbridge Ticket No." := ValueJSONToken.AsValue().AsText();
-
             WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
             "Last Changed" := ValueJSONToken.AsValue().AsText();
 
@@ -262,12 +339,9 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         end;
     end;
 
-    procedure GetUpdateWasteOrderStatusJSON(Status: enum "Waste Order Status WC"): JsonObject
-    var
-        UpdateWasteOrderStatusJSON: JsonObject;
+    procedure GetWasteOrderKey(WasteLine: Record "Waste Management Line"): Text
     begin
-        UpdateWasteOrderStatusJSON.Add('status', Status);
-        exit(UpdateWasteOrderStatusJSON);
+        exit(WasteLine."Document No." + '-' + Format(WasteLine."Line No."));
     end;
 
     local procedure GetDateFromText(DateText: Text): Date

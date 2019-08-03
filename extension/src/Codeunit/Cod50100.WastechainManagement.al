@@ -1,35 +1,95 @@
 codeunit 50100 "Wastechain Management"
 {
 
-    procedure CommissionWasteOrder(WasteLine: Record "Waste Management Line")
+    procedure CommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
     var
         BusinessPartner: Record "Business Partner";
     begin
-        if WasteLine."Waste Order Key WC" <> '' then
-            Error('Waste Order %1 has already been commissioned.', WasteLine."Waste Order Key WC");
+        if WasteMgtLine."Waste Order Key WC" <> '' then
+            Error('Waste Order %1 has already been commissioned.', WasteMgtLine."Waste Order Key WC");
 
-        WasteLine.TestField("Unit Price");
-        WasteLine.TestField("Unit of Measure");
-        WasteLine.TestField("Posting Type", WasteLine."Posting Type"::Purchase);
-        BusinessPartner.Get(WasteLine."Post-with No.");
+        WasteMgtLine.TestField("Unit Price");
+        WasteMgtLine.TestField("Unit of Measure");
+        WasteMgtLine.TestField("Posting Type", WasteMgtLine."Posting Type"::Purchase);
+        BusinessPartner.Get(WasteMgtLine."Post-with No.");
         BusinessPartner.TestField("Wastechain MSP ID");
-        WasteLine.TestField("Bal. Acc. Post-with No.");
-        WasteLine.TestField("Bal. Acc. Task-at Code");
+        WasteMgtLine.TestField("Bal. Acc. Post-with No.");
+        WasteMgtLine.TestField("Bal. Acc. Task-at Code");
 
-        WastechainClientMgt.PostWasteOrder(WasteLine);
+        WastechainClientMgt.PostWasteOrder(WasteMgtLine);
     end;
 
-    procedure UpdateWasteOrder(OldWasteLine: Record "Waste Management Line"; NewWasteLine: Record "Waste Management Line")
+    procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])
     var
-        WasteOrderJSON: JsonObject;
+        WasteMgtHeader: Record "Waste Management Header";
+        WasteMgtLine: Record "Waste Management Line";
+        WasteOrderUpdateJSON: JsonObject;
     begin
-        if NewWasteLine."Waste Order Key WC" = '' then
-            Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ', NewWasteLine."Waste Order Key WC");
+        WasteMgtHeader.Init();
+        WasteMgtHeader.Validate("Document Type", WasteMgtHeader."Document Type"::Order);
+        WasteMgtHeader.Validate("Business-with No.", BusinessPartnerNo);
+        WasteMgtHeader.Insert(true);
 
-        WasteOrderJSON := WastechainJSONMgt.GenerateUpdateWasteOrderJSON(OldWasteLine, NewWasteLine);
-        WastechainClientMgt.UpdateWasteOrder(NewWasteLine."Waste Order Key WC", WasteOrderJSON);
+        with WasteOrder do begin
+            WasteMgtLine.Init();
+            WasteMgtLine.Validate("Document Type", WasteMgtLine."Document Type"::Order);
+            WasteMgtLine.Validate("Document No.", WasteMgtHeader."No.");
+            WasteMgtLine.Validate("Type", WasteMgtLine.Type::Service);
+            WasteMgtLine.Validate("No.", ServiceNo);
+            WasteMgtLine.Validate(Quantity, Quantity);
+            WasteMgtLine.Validate("Unit Price", "Unit Price");
+            WasteMgtLine.Validate(Description, Description);
+            WasteMgtLine.Validate("Posting Type", WasteMgtLine."Posting Type"::Sales);
+            WasteMgtLine.Validate("Post-with No.", BusinessPartnerNo);
+            WasteMgtLine.Validate("Invoice-with No.", BusinessPartnerNo);
+            WasteMgtLine.Validate("Task-at Code", BusinessPartnerSiteCode);
+            WasteMgtLine.Validate("Waste Order Key WC", "Key");
+            WasteMgtLine.Insert(true);
+        end;
+
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderStatusUpdateSchemaJSON(WasteOrderStatus::Accepted);
+        UpdateWasteOrder(WasteOrder."Key", WasteOrderUpdateJSON);
     end;
 
+    procedure CancelWasteOrder(WasteOrderKey: Text)
+    var
+        WasteOrderUpdateJSON: JsonObject;
+    begin
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderStatusUpdateSchemaJSON(WasteOrderStatus::Cancelled);
+        UpdateWasteOrder(WasteOrderKey, WasteOrderUpdateJSON);
+    end;
+
+    procedure RejectWasteOrder(WasteOrder: Record "Waste Order WC"; RejectionMessage: Text[250])
+    var
+        WasteOrderUpdateJSON: JsonObject;
+    begin
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRejectionSchemaJSON(WasteOrderStatus::Rejected, RejectionMessage);
+        UpdateWasteOrder(WasteOrder."Key", WasteOrderUpdateJSON);
+    end;
+
+    procedure CompleteWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    var
+        WasteOrderUpdateJSON: JsonObject;
+    begin
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCompleteSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
+        UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
+    end;
+
+    procedure RecommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    var
+        WasteOrderUpdateJSON: JsonObject;
+    begin
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
+        UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
+    end;
+
+    local procedure UpdateWasteOrder(WasteOrderKey: Text; WasteOrderUpdateJSON: JsonObject)
+    begin
+        if WasteOrderKey = '' then
+            Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ');
+
+        WastechainClientMgt.UpdateWasteOrder(WasteOrderKey, WasteOrderUpdateJSON);
+    end;
 
     procedure FindOrCreateBusinessPartnerSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[10]
     var
@@ -84,65 +144,6 @@ codeunit 50100 "Wastechain Management"
         WastechainJSONMgt.GetWasteOrdersFromText(OutgoingWasteOrdersText, WasteOrder);
     end;
 
-    procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])
-    var
-        WasteMgtOrderHeader: Record "Waste Management Header";
-        WasteMgtOrderLine: Record "Waste Management Line";
-    begin
-        WasteMgtOrderHeader.Init();
-        WasteMgtOrderHeader.Validate("Document Type", WasteMgtOrderHeader."Document Type"::Order);
-        WasteMgtOrderHeader.Validate("Business-with No.", BusinessPartnerNo);
-        WasteMgtOrderHeader.Insert(true);
-
-        with WasteOrder do begin
-            WasteMgtOrderLine.Init();
-            WasteMgtOrderLine.Validate("Document Type", WasteMgtOrderLine."Document Type"::Order);
-            WasteMgtOrderLine.Validate("Document No.", WasteMgtOrderHeader."No.");
-            WasteMgtOrderLine.Validate("Type", WasteMgtOrderLine.Type::Service);
-            WasteMgtOrderLine.Validate("No.", ServiceNo);
-            WasteMgtOrderLine.Validate(Quantity, Quantity);
-            WasteMgtOrderLine.Validate("Unit Price", "Unit Price");
-            WasteMgtOrderLine.Validate(Description, Description);
-            WasteMgtOrderLine.Validate("Posting Type", WasteMgtOrderLine."Posting Type"::Sales);
-            WasteMgtOrderLine.Validate("Post-with No.", BusinessPartnerNo);
-            WasteMgtOrderLine.Validate("Invoice-with No.", BusinessPartnerNo);
-            WasteMgtOrderLine.Validate("Task-at Code", BusinessPartnerSiteCode);
-            WasteMgtOrderLine.Validate("Waste Order Key WC", "Key");
-            WasteMgtOrderLine.Insert(true);
-        end;
-
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder."Key", WasteOrder.Status::Accepted);
-    end;
-
-    procedure RejectWasteOrder(WasteOrder: Record "Waste Order WC")
-    begin
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrder."Key", WasteOrder.Status::Rejected);
-    end;
-
-    procedure CancelWasteOrder(WasteOrderKey: Text)
-    begin
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrderKey, WasteOrderStatus::Cancelled);
-    end;
-
-    procedure CompleteWasteOrder(WasteOrderKey: Text)
-    var
-        WasteOrder: Record "Waste Order WC";
-    begin
-        GetWasteOrder(WasteOrderKey, WasteOrder);
-
-        if WasteOrder.Status <> WasteOrderStatus::Accepted then
-            Error('Only Waste Orders with Status "Accepted" can be completed.');
-
-        WastechainClientMgt.UpdateWasteOrderStatus(WasteOrderKey, WasteOrderStatus::Completed);
-    end;
-
-    procedure GetWasteOrder(WasteOrderKey: Text; var WasteOrder: Record "Waste Order WC")
-    var
-        WasteOrderText: Text;
-    begin
-        WasteOrderText := WastechainClientMgt.GetWasteOrderAsText(WasteOrderKey);
-        WastechainJSONMgt.GetWasteOrderFromText(WasteOrderText, WasteOrder);
-    end;
 
     var
         WasteOrderStatus: Enum "Waste Order Status WC";

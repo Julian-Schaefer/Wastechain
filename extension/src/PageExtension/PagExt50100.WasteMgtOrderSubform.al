@@ -62,18 +62,4 @@ pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
             }
         }
     }
-
-    trigger OnModifyRecord(): Boolean
-    var
-        WastechainMgt: Codeunit "Wastechain Management";
-    begin
-        if "Waste Order Key WC" = '' then
-            exit;
-
-        if (Rec.Quantity <> xRec.Quantity) or
-           (Rec."Unit Price" <> xRec."Unit Price") then begin
-            if Confirm('Do you also want to update the Waste Order on the Wastechain?') then
-                WastechainMgt.UpdateWasteOrder(xRec, Rec);
-        end;
-    end;
 }
