@@ -117,7 +117,7 @@ export class WasteOrderController {
 
             switch (updatedWasteOrder.status) {
                 case WasteOrderStatus.COMMISSIONED:
-                    validationSchema = WasteOrderCommissionSchema;
+                    validationSchema = WasteOrderRecommissionSchema;
                     procedure = 'recommissionWasteOrder';
                     sendBody = true;
                     break;
