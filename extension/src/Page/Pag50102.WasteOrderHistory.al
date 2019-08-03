@@ -37,6 +37,11 @@ page 50102 "Waste Order Tx History WC"
                     ApplicationArea = All;
                 }
 
+                field("Rejection Message"; "Rejection Message")
+                {
+                    ApplicationArea = All;
+                }
+
                 field("Last Changed"; "Last Changed")
                 {
                     ApplicationArea = All;
