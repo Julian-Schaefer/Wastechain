@@ -41,10 +41,10 @@ services:
       - USERNAME=Admin@third-party-organisation.com
       - WALLET_LOCATION=/wallet/third-party-organisation
       - CONNECTION_FILE=/connection-profiles/third-party-connection.yaml
-      - PORT=6000
+      - PORT=9000
       - FABRIC_NETWORK_URL=host.docker.internal
     ports:
-      - 6000:6000
+      - 9000:9000
     volumes:
         - ./wallet:/wallet
         - ./connection-profiles:/connection-profiles
