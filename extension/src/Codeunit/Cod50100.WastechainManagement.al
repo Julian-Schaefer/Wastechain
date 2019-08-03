@@ -124,6 +124,14 @@ codeunit 50100 "Wastechain Management"
         end;
     end;
 
+    procedure GetWasteOrder(WasteOrderKey: Text; var WasteOrder: Record "Waste Order WC")
+    var
+        WasteOrderText: Text;
+    begin
+        WasteOrderText := WastechainClientMgt.GetWasteOrderAsText(WasteOrderKey);
+        WastechainJSONMgt.GetWasteOrderFromText(WasteOrderText, WasteOrder);
+    end;
+
     procedure GetIncomingWasteOrdersWithStatus(var WasteOrder: Record "Waste Order WC"; status: enum "Waste Order Status WC")
     var
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";

@@ -203,8 +203,8 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
                 "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
 
-                WasteOrderJSONObject.Get('rejectionMessage', ValueJSONToken);
-                "Rejection Message" := ValueJSONToken.AsValue().AsText();
+                if WasteOrderJSONObject.Get('rejectionMessage', ValueJSONToken) then
+                    "Rejection Message" := ValueJSONToken.AsValue().AsText();
 
                 WasteOrderJSONObject.Get('lastChanged', ValueJSONToken);
                 "Last Changed" := ValueJSONToken.AsValue().AsText();
