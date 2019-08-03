@@ -14,29 +14,31 @@ async function main() {
     let args = process.argv.slice(2);
 
     const walletLocation = args[0];
-    const networkFolder = args[1];
-    const organisationURL = args[2];
-    const organisationMSP = args[3];
-    const username = args[4];
+    const organisationURL = args[1];
+    const organisationMSP = args[2];
+    const username = args[3];
 
     let wallet = new FileSystemWallet(walletLocation);
 
-    let keyName = await new Promise((resolve) => {
-        rl.question('Please enter the Key File Name: (under "/msp/keystore/")', (response) => {
-            keyName = response;
+    let networkFolder = await new Promise((resolve) => {
+        rl.question('Please enter the Path of the Network Folder: ', (response) => {
+            networkFolder = response;
             rl.close();
-            resolve(keyName)
+            resolve(networkFolder)
         });
     }).then((value) => {
         return value;
     });
-
     try {
         // Identity to credentials to be stored in the wallet
         const credPath = path.join(networkFolder, '/crypto-config/peerOrganizations/' + organisationURL + '/users/' + username);
         const cert = fs.readFileSync(path.join(credPath, '/msp/signcerts/' + username + '-cert.pem')).toString();
+        let key;
+
         //const key = fs.readFileSync(path.join(credPath, '/msp/keystore/cd96d5260ad4757551ed4a5a991e62130f8008a0bf996e4e4b84cd097a747fec_sk')).toString();
-        const key = fs.readFileSync(path.join(credPath, '/msp/keystore/' + keyName)).toString();
+        fs.readdirSync(path.join(credPath, '/msp/keystore/')).forEach((file) => {
+            key = fs.readFileSync(path.join(credPath, '/msp/keystore/' + file)).toString();
+        })
 
         // Load credentials into wallet
         const identityLabel = username;

@@ -1,0 +1,38 @@
+name: wastechain-third-party-org
+version: 1.0.0
+client:
+  organization: ThirdPartyOrg
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+channels:
+    wastechain:
+        orderers:
+        - orderer.wastechain.org
+        peers:
+          peer0.third-party-organisation.com:
+            endorsingPeer: true
+            chaincodeQuery: true
+            ledgerQuery: true
+            eventSource: true
+organizations:
+  ThirdPartyOrg:
+    mspid: ThirdPartyOrgMSP
+    peers:
+    - peer0.third-party-organisation.com
+peers:
+  peer0.third-party-organisation.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+    url: grpc://${FABRIC_NETWORK_URL}:8051
+orderers:
+  orderer.wastechain.org:
+    url: grpc://${FABRIC_NETWORK_URL}:7050
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer.wastechain.org
