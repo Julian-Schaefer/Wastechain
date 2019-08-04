@@ -175,12 +175,10 @@ page 50101 "Incoming Waste Orders WC"
 
                 trigger OnAction()
                 var
-                    ConfirmRejectionLbl: Label 'Do you really want to reject the selected Waste Order?';
+                    RejectWasteOrderWizard: Page "Reject Waste Order Wizard WC";
                 begin
-                    if not Confirm(ConfirmRejectionLbl) then
-                        exit;
-
-                    WastechainMgt.RejectWasteOrder(Rec, 'Rejected because of Test.');
+                    RejectWasteOrderWizard.SetWasteOrder(Rec);
+                    RejectWasteOrderWizard.RunModal();
                     RefreshPage();
                 end;
             }

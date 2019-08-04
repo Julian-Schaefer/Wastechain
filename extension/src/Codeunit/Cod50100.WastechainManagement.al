@@ -78,7 +78,7 @@ codeunit 50100 "Wastechain Management"
         UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
     end;
 
-    local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line"; Purchase: boolean)
+    local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line"; Purchase: Boolean)
     var
         BusinessPartner: Record "Business Partner";
     begin
