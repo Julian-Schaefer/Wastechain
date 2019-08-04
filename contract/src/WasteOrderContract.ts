@@ -153,7 +153,7 @@ export class WasteOrderContract extends Contract {
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!((wasteOrder.status === WasteOrderStatus.REJECTED || wasteOrder.status === WasteOrderStatus.COMMISSIONED) && wasteOrder.originatorMSPID === MSPID)) {
-            throw new Error('The Waste Order can only be recomissioned by the Originator and needs to have the Status "Rejected".');
+            throw new Error('The Waste Order can only be recomissioned by the Originator and needs to have the Status "Rejected" or "Commissioned".');
         }
 
         const newWasteOrder: WasteOrder = {
