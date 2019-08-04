@@ -2,20 +2,11 @@ codeunit 50100 "Wastechain Management"
 {
 
     procedure CommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
-    var
-        BusinessPartner: Record "Business Partner";
     begin
         if WasteMgtLine."Waste Order Key WC" <> '' then
             Error('Waste Order %1 has already been commissioned.', WasteMgtLine."Waste Order Key WC");
 
-        WasteMgtLine.TestField("Unit Price");
-        WasteMgtLine.TestField("Unit of Measure");
-        WasteMgtLine.TestField("Posting Type", WasteMgtLine."Posting Type"::Purchase);
-        BusinessPartner.Get(WasteMgtLine."Post-with No.");
-        BusinessPartner.TestField("Wastechain MSP ID");
-        WasteMgtLine.TestField("Bal. Acc. Post-with No.");
-        WasteMgtLine.TestField("Bal. Acc. Task-at Code");
-
+        CheckWasteMgtLine(WasteMgtLine, true);
         WastechainClientMgt.PostWasteOrder(WasteMgtLine);
     end;
 
@@ -71,6 +62,8 @@ codeunit 50100 "Wastechain Management"
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
+        CheckWasteMgtLine(WasteMgtLine, false);
+
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCompleteSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
         UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
     end;
@@ -79,8 +72,27 @@ codeunit 50100 "Wastechain Management"
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
+        CheckWasteMgtLine(WasteMgtLine, true);
+
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
         UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
+    end;
+
+    local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line"; Purchase: boolean)
+    var
+        BusinessPartner: Record "Business Partner";
+    begin
+
+        WasteMgtLine.TestField("Unit Price");
+        WasteMgtLine.TestField("Unit of Measure");
+        if Purchase then
+            WasteMgtLine.TestField("Posting Type", WasteMgtLine."Posting Type"::Purchase)
+        else
+            WasteMgtLine.TestField("Posting Type", WasteMgtLine."Posting Type"::Sales);
+        BusinessPartner.Get(WasteMgtLine."Post-with No.");
+        BusinessPartner.TestField("Wastechain MSP ID");
+        WasteMgtLine.TestField("Bal. Acc. Post-with No.");
+        WasteMgtLine.TestField("Bal. Acc. Task-at Code");
     end;
 
     local procedure UpdateWasteOrder(WasteOrderKey: Text; WasteOrderUpdateJSON: JsonObject)
