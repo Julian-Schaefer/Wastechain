@@ -18,7 +18,7 @@ pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                         ConfirmCommisionLbl: Label 'Do you want to commission the selected Line as Waste Order?';
                         RejectionCommissionLbl: Label 'This Waste Order has been rejected by the Subcontractor. Do you want to recommission it?';
                         PublishChangesLbl: Label 'This Waste Order has not been accepted or rejected by the Subcontractor yet. Do you want to publish the Changes?';
-                        CantMakeChangesErr: Label 'You cannot make changes to a Waste Order with Status: %1';
+                        CantMakeChangesErr: Label 'You recommission a Waste Order with Status: %1';
                     begin
                         if "Waste Order Key WC" = '' then begin
                             if not Confirm(ConfirmCommisionLbl) then

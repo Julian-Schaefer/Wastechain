@@ -35,7 +35,6 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
     local procedure OnAfterOrderReleasedCheckWastechain(OriginalWasteHeader: Record "Waste Management Header"; var ReleasedWasteHeader: Record "Waste Management Header")
     var
         WasteMgtLine: Record "Waste Management Line";
-        WasteOrder: Record "Waste Order WC";
     begin
         with WasteMgtLine do begin
             SetRange("Document Type", ReleasedWasteHeader."Document Type");
@@ -43,8 +42,6 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
             if FindSet(false, false) then
                 repeat
                     if "Waste Order Key WC" <> '' then begin
-                        WastechainMgt.GetWasteOrder("Waste Order Key WC", WasteOrder);
-
                         case "Posting Type" of
                             "Posting Type"::Sales:
                                 begin

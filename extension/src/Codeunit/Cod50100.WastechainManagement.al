@@ -54,7 +54,7 @@ codeunit 50100 "Wastechain Management"
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
-        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRejectionSchemaJSON(WasteOrderStatus::Rejected, RejectionMessage);
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRejectionSchemaJSON(RejectionMessage);
         UpdateWasteOrder(WasteOrder."Key", WasteOrderUpdateJSON);
     end;
 
@@ -64,7 +64,7 @@ codeunit 50100 "Wastechain Management"
     begin
         CheckWasteMgtLine(WasteMgtLine, false);
 
-        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCompleteSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCompleteSchemaJSON(WasteMgtLine);
         UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
     end;
 
@@ -74,7 +74,7 @@ codeunit 50100 "Wastechain Management"
     begin
         CheckWasteMgtLine(WasteMgtLine, true);
 
-        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine, WasteOrderStatus::Commissioned);
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine);
         UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
     end;
 
@@ -91,8 +91,11 @@ codeunit 50100 "Wastechain Management"
             WasteMgtLine.TestField("Posting Type", WasteMgtLine."Posting Type"::Sales);
         BusinessPartner.Get(WasteMgtLine."Post-with No.");
         BusinessPartner.TestField("Wastechain MSP ID");
-        WasteMgtLine.TestField("Bal. Acc. Post-with No.");
-        WasteMgtLine.TestField("Bal. Acc. Task-at Code");
+
+        if Purchase then begin
+            WasteMgtLine.TestField("Bal. Acc. Post-with No.");
+            WasteMgtLine.TestField("Bal. Acc. Task-at Code");
+        end;
     end;
 
     local procedure UpdateWasteOrder(WasteOrderKey: Text; WasteOrderUpdateJSON: JsonObject)
