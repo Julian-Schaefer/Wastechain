@@ -11,6 +11,7 @@ services:
       - CONNECTION_FILE=/connection-profiles/ordering-connection.yaml
       - PORT=3000
       - FABRIC_NETWORK_URL=host.docker.internal
+      - ALLOW_CORS=true
     ports:
       - 3000:3000
     volumes:
@@ -27,6 +28,7 @@ services:
       - CONNECTION_FILE=/connection-profiles/subcontractor-connection.yaml
       - PORT=6000
       - FABRIC_NETWORK_URL=host.docker.internal
+      - ALLOW_CORS=true
     ports:
       - 6000:6000
     volumes:
@@ -43,6 +45,7 @@ services:
       - CONNECTION_FILE=/connection-profiles/third-party-connection.yaml
       - PORT=9000
       - FABRIC_NETWORK_URL=host.docker.internal
+      - ALLOW_CORS=true
     ports:
       - 9000:9000
     volumes:

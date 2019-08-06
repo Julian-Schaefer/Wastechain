@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as cors from 'cors';
 import * as bodyparser from 'body-parser';
 import { ValidationError } from '@hapi/joi';
 import { WasteOrderController } from './controller/WasteOrderController';
@@ -10,6 +11,10 @@ export class WastechainServer {
     private _orderController: WasteOrderController;
 
     constructor(fabricConnection: FabricConnection) {
+        if (process.env.ALLOW_CORS === 'true') {
+            console.log(process.env.ALLOW_CORS);
+            this.app.use(cors());
+        }
         this.app.use(bodyparser.json());
         this.app.listen(process.env.PORT, function () {
             console.log('Wastechain-Server listening on port ' + process.env.PORT + '!');
