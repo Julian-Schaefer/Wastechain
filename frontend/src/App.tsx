@@ -91,7 +91,9 @@ class App extends React.Component<any, AppState> {
                   })
                 }
 
-                <MyModal wasteOrder={this.state.selectedWasteOrder} onClosed={() => this.setState({ selectedWasteOrder: undefined })} />
+                <MyModal visible={this.state.selectedWasteOrder !== undefined} onClose={() => this.setState({ selectedWasteOrder: undefined })}>
+                  {this.state.selectedWasteOrder && <p>{this.state.selectedWasteOrder!.key}</p>}
+                </MyModal>
               </div>
             )
           )

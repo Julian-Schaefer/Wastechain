@@ -51,34 +51,26 @@ const cardTransitionStyles: any = {
     },
 };
 
-export class MyModal extends React.Component<{ wasteOrder?: WasteOrder, onClosed: () => void }, { wasteOrder?: WasteOrder }> {
+export class MyModal extends React.Component<{ visible: boolean, onClose: () => void }, {}> {
 
-    constructor(props: { wasteOrder?: WasteOrder, onClosed: () => void }) {
+    constructor(props: { visible: boolean, onClose: () => void }) {
         super(props);
-        this.state = {
-            wasteOrder: this.props.wasteOrder
-        }
-    }
-
-    static getDerivedStateFromProps(props: { wasteOrder?: WasteOrder, onClosed: () => void }, state: { wasteOrder?: WasteOrder }) {
-        return {
-            wasteOrder: props.wasteOrder ? props.wasteOrder : state.wasteOrder
-        };
     }
 
     render() {
         return (
-            <Transition in={this.props.wasteOrder !== undefined} timeout={duration} unmountOnExit>
+            <Transition in={this.props.visible} timeout={duration} unmountOnExit>
                 {state => (
-                    <div> <div style={{
-                        ...backgroundDefaultStyle,
-                        ...backgroundTransitionStyles[state],
-                    }}
-
-                        onClick={this.props.onClosed}>
-                    </div >
-                        <Card style={{ ...cardDefaultStyle, ...cardTransitionStyles[state], backgroundColor: "blue" }} onClick={() => console.log('hallo')}>
-                            <p>{this.state.wasteOrder!!.key}</p>
+                    <div>
+                        <div
+                            style={{
+                                ...backgroundDefaultStyle,
+                                ...backgroundTransitionStyles[state],
+                            }}
+                            onClick={this.props.onClose}>
+                        </div >
+                        <Card style={{ ...cardDefaultStyle, ...cardTransitionStyles[state] }}>
+                            {this.props.children}
                         </Card>
                     </div>
                 )}
