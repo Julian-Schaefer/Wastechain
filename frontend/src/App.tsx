@@ -2,50 +2,15 @@ import React from 'react';
 import './App.css';
 import { get } from './HttpClient';
 import { WasteOrder } from './model/WasteOrder';
-import { Card, Spin, Icon } from 'antd';
-import { MyModal } from './util/Modal';
-
-
-const WasteOrderComponentStyle = {
-  margin: "20px",
-  border: "2px solid lightgray"
-};
-
-const WasteOrderComponentHoverStyle = {
-  borderColor: "lightblue"
-};
+import { Spin, Icon, Button } from 'antd';
+import { Modal } from './util/Modal';
+import { WasteOrderListComponent } from './waste-order/WasteOrderListComponent';
+import { WasteOrderDetailComponent } from './waste-order/WasteOrderDetailComponent';
 
 interface AppState {
   wasteOrders?: WasteOrder[];
   selectedWasteOrder?: WasteOrder;
-}
-
-class WasteOrderComponent extends React.Component<{ wasteOrder: WasteOrder, onClick: () => void }, { hovered: boolean }> {
-
-  constructor(props: { wasteOrder: WasteOrder, onClick: () => void }) {
-    super(props);
-    this.state = {
-      hovered: false
-    };
-  }
-
-  private toggleHover = () => {
-    this.setState({ hovered: !this.state.hovered });
-  }
-
-  render() {
-    let { key, customerName } = this.props.wasteOrder;
-
-    let style = WasteOrderComponentStyle;
-    if (this.state.hovered) {
-      style = {
-        ...WasteOrderComponentStyle,
-        ...WasteOrderComponentHoverStyle
-      }
-    }
-
-    return <Card onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} onClick={this.props.onClick} style={style}>{key + ', ' + customerName}</Card>;
-  }
+  showWasteOrderDetails: boolean;
 }
 
 class App extends React.Component<any, AppState> {
@@ -54,7 +19,8 @@ class App extends React.Component<any, AppState> {
     super(props);
     this.state = {
       wasteOrders: undefined,
-      selectedWasteOrder: undefined
+      selectedWasteOrder: undefined,
+      showWasteOrderDetails: false
     };
   }
 
@@ -70,30 +36,33 @@ class App extends React.Component<any, AppState> {
   }
 
   private onSelectWasteOrder = (selectedWasteOrder: WasteOrder) => {
-    this.setState({ selectedWasteOrder });
+    this.setState({ selectedWasteOrder, showWasteOrderDetails: true });
   }
 
   render() {
+    const { wasteOrders, selectedWasteOrder, showWasteOrderDetails } = this.state;
 
     return (
       <div>
-        {!this.state.wasteOrders ?
+        {!wasteOrders ?
           (<Spin tip="loading" indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />)
           :
-          (this.state.wasteOrders.length === 0 ?
+          (wasteOrders.length === 0 ?
             (<p>No Waste Orders</p>)
             :
             (
-              <div>
+              <div style={{ padding: "20px" }}>
+                <Button type="primary">New Waste Order</Button>
+
                 {
-                  this.state.wasteOrders.map((wasteOrder) => {
-                    return <WasteOrderComponent key={wasteOrder.key} wasteOrder={wasteOrder} onClick={() => this.onSelectWasteOrder(wasteOrder)} />;
+                  wasteOrders.map((wasteOrder) => {
+                    return <WasteOrderListComponent key={wasteOrder.key} wasteOrder={wasteOrder} onClick={() => this.onSelectWasteOrder(wasteOrder)} />;
                   })
                 }
 
-                <MyModal visible={this.state.selectedWasteOrder !== undefined} onClose={() => this.setState({ selectedWasteOrder: undefined })}>
-                  {this.state.selectedWasteOrder && <p>{this.state.selectedWasteOrder!.key}</p>}
-                </MyModal>
+                <Modal visible={showWasteOrderDetails} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={() => this.setState({ selectedWasteOrder: undefined })}>
+                  {selectedWasteOrder && <WasteOrderDetailComponent wasteOrder={selectedWasteOrder} />}
+                </Modal>
               </div>
             )
           )

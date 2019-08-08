@@ -1,12 +1,11 @@
 import React from 'react';
 import { Card } from 'antd';
-import { WasteOrder } from '../model/WasteOrder';
 import { Transition } from 'react-transition-group';
 
 const duration = 300;
 
 const backgroundDefaultStyle = {
-    transition: `all ${duration}ms ease-in-out`,
+    transition: `opacity ${duration}ms ease-in-out`,
     position: "fixed",
     backgroundColor: "lightgray",
     top: "0",
@@ -18,11 +17,11 @@ const backgroundDefaultStyle = {
 
 const backgroundTransitionStyles: any = {
     entered: {
-        opacity: 0.5
+        opacity: 0.6
     },
     exited: {
         opacity: 0
-    },
+    }
 };
 
 const cardDefaultStyle = {
@@ -31,18 +30,18 @@ const cardDefaultStyle = {
     top: "100%",
     left: "40%",
     width: "20%",
-    height: "20%"
+    height: "20%",
+    border: "lightblue 2px solid",
+    borderRadius: "8px"
 }
 
 const cardTransitionStyles: any = {
-    //   entering: { width: "10%", height: "10%" },
     entered: {
         top: "10%",
         left: "10%",
         width: "80%",
         height: "80%"
     },
-    //  exiting: { opacity: 1, width: "80%", height: "80%" },
     exited: {
         top: "100%",
         left: "40%",
@@ -51,15 +50,18 @@ const cardTransitionStyles: any = {
     },
 };
 
-export class MyModal extends React.Component<{ visible: boolean, onClose: () => void }, {}> {
+export class Modal extends React.Component<{ visible: boolean, onClose: () => void, onClosed: () => void }, { visible: boolean }> {
 
-    constructor(props: { visible: boolean, onClose: () => void }) {
+    constructor(props: { visible: boolean, onClose: () => void, onClosed: () => void }) {
         super(props);
+        this.state = {
+            visible: this.props.visible
+        };
     }
 
     render() {
         return (
-            <Transition in={this.props.visible} timeout={duration} unmountOnExit>
+            <Transition in={this.props.visible} timeout={duration} onExited={this.props.onClosed} unmountOnExit>
                 {state => (
                     <div>
                         <div
@@ -69,7 +71,10 @@ export class MyModal extends React.Component<{ visible: boolean, onClose: () => 
                             }}
                             onClick={this.props.onClose}>
                         </div >
-                        <Card style={{ ...cardDefaultStyle, ...cardTransitionStyles[state] }}>
+                        <Card style={{
+                            ...cardDefaultStyle,
+                            ...cardTransitionStyles[state]
+                        }}>
                             {this.props.children}
                         </Card>
                     </div>
