@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from 'antd';
 import { Transition } from 'react-transition-group';
+import { Button } from 'antd';
 
 const duration = 300;
 
@@ -32,7 +33,8 @@ const cardDefaultStyle = {
     width: "20%",
     height: "20%",
     border: "lightblue 2px solid",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    overflow: "scroll"
 }
 
 const cardTransitionStyles: any = {
@@ -75,6 +77,16 @@ export class Modal extends React.Component<{ visible: boolean, onClose: () => vo
                             ...cardDefaultStyle,
                             ...cardTransitionStyles[state]
                         }}>
+                            <Button
+                                style={{
+                                    position: "absolute",
+                                    top: "20px",
+                                    right: "20px",
+                                    zIndex: 1
+                                }}
+                                onClick={this.props.onClose}>
+                                Close
+                            </Button>
                             {this.props.children}
                         </Card>
                     </div>
