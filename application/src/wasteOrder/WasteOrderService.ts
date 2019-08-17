@@ -24,11 +24,11 @@ async function createWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): P
     }
 
     const contract = FabricConnection.wasteOrderContract;
-    const submittedWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
-    const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
+    const createdWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
+    const createdWasteOrder: WasteOrder = JSON.parse(createdWasteOrderBuffer.toString('utf-8'));
 
-    console.log('Submitted Waste Order with ID: ' + submittedWasteOrder.key);
-    return submittedWasteOrder;
+    console.log('Submitted Waste Order with ID: ' + createdWasteOrder.key);
+    return createdWasteOrder;
 }
 
 async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOrder): Promise<void> {

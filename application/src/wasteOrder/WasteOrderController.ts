@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import * as service from './WasteOrderService';
 import { WasteOrder } from './WasteOrder';
-import { stat } from 'fs';
 
 async function getWasteOrder(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
