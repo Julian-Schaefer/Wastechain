@@ -1,5 +1,5 @@
 import { Express, Request, Response } from 'express';
-import { Settings, SettingsSchema } from '../model/Settings';
+import { Settings, SettingsSchema } from './Settings';
 import * as Joi from '@hapi/joi';
 import * as fs from 'fs';
 
@@ -27,7 +27,7 @@ export class SettingsController {
     private postSettings(request: Request, response: Response) {
         let settings = request.body as Settings;
         const validationResult = Joi.validate(settings, SettingsSchema);
-        if(validationResult.error !== null) {
+        if (validationResult.error !== null) {
             throw validationResult.error;
         }
 

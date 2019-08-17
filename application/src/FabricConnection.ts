@@ -1,7 +1,7 @@
 import { FileSystemWallet, Gateway, GatewayOptions, Network, Contract } from 'fabric-network';
 import * as FabricClient from 'fabric-client';
 
-export class FabricConnection {
+class FabricConnection {
     private gateway = new Gateway();
 
     private username: string;
@@ -69,4 +69,12 @@ export class FabricConnection {
     get wasteOrderContract(): Contract {
         return this.network.getContract('Wastechain', 'WasteOrderContract');
     }
+}
+
+let connection: FabricConnection;
+export default connection;
+
+export async function connectToFabric(username: string, channelName: string, walletLocation: string, connectionProfile: any) {
+    connection = new FabricConnection(username, channelName, walletLocation, connectionProfile);
+    await connection.connect();
 }

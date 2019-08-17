@@ -2,44 +2,37 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyparser from 'body-parser';
 import { ValidationError } from '@hapi/joi';
-import { WasteOrderController } from './controller/WasteOrderController';
-import { FabricConnection } from './fabric';
 import { SettingsController } from './controller/SettingsController';
+import WasteOrderRouter from './wasteOrder/WasteOrderRouter';
 
-export class WastechainServer {
-    private app = express();
-    private _orderController: WasteOrderController;
+const app = express();
 
-    constructor(fabricConnection: FabricConnection) {
-        if (process.env.ALLOW_CORS === 'true') {
-            console.log(process.env.ALLOW_CORS);
-            this.app.use(cors());
-        }
-        this.app.use(bodyparser.json());
-        this.app.listen(process.env.PORT, function () {
-            console.log('Wastechain-Server listening on port ' + process.env.PORT + '!');
-        });
+if (process.env.ALLOW_CORS === 'true') {
+    app.use(cors());
+}
 
-        this.app.use((req, _, next) => {
-            console.log('Logger:' + JSON.stringify(req.body));
-            next();
-        })
+app.use(bodyparser.json());
 
-        this._orderController = new WasteOrderController(this.app, fabricConnection);
-        new SettingsController(this.app);
+app.use((req: express.Request, _, next) => {
+    console.log('Logger:' + JSON.stringify(req.body));
+    next();
+});
 
-        this.app.use(function (error: Error, _: any, response: any, next: any) {
-            if ((error as ValidationError).isJoi) {
-                response.status(400).send('Invalid Format of the Request Body.');
-                next();
-            }
-            else {
-                next(error); // pass error on if not a validation error
-            }
-        });
+app.use(function (error: Error, _: any, response: any, next: any) {
+    if ((error as ValidationError).isJoi) {
+        response.status(400).send('Invalid Format of the Request Body.');
+        next();
     }
-
-    get getOrderController(): WasteOrderController {
-        return this._orderController;
+    else {
+        next(error); // pass error on if not a validation error
     }
+});
+
+app.use('/order', WasteOrderRouter);
+new SettingsController(app);
+
+export function startServer() {
+    app.listen(process.env.PORT, function () {
+        console.log('Wastechain-Server listening on port ' + process.env.PORT + '!');
+    });
 }
