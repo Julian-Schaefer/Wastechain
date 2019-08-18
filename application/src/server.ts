@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyparser from 'body-parser';
 import { ValidationError } from '@hapi/joi';
-import { SettingsController } from './controller/SettingsController';
+import SettingsRouter from './controller/SettingsRouter';
 import WasteOrderRouter from './wasteOrder/WasteOrderRouter';
 
 const app = express();
@@ -28,8 +28,8 @@ app.use(function (error: Error, _: any, response: any, next: any) {
     }
 });
 
+app.use('/settings', SettingsRouter);
 app.use('/order', WasteOrderRouter);
-new SettingsController(app);
 
 export function startServer() {
     app.listen(process.env.PORT, function () {
