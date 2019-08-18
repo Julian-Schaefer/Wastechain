@@ -7,23 +7,18 @@ page 50106 "Reject Waste Order Wizard WC"
     {
         area(Content)
         {
-            group(Rejection)
+            field("Rejection Message"; RejectionMessage)
             {
-                ShowCaption = false;
+                Caption = 'Rejection Message';
+                ApplicationArea = All;
 
-                field("Rejection Message"; RejectionMessage)
-                {
-                    Caption = 'Rejection Message';
-                    ApplicationArea = All;
-
-                    trigger OnValidate()
-                    begin
-                        if RejectionMessage <> '' then
-                            RejectEnabled := true
-                        else
-                            RejectEnabled := false;
-                    end;
-                }
+                trigger OnValidate()
+                begin
+                    if RejectionMessage <> '' then
+                        RejectEnabled := true
+                    else
+                        RejectEnabled := false;
+                end;
             }
         }
     }
