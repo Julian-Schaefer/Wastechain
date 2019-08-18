@@ -72,7 +72,10 @@ class FabricConnection {
 }
 
 let connection: FabricConnection;
-export default connection;
+
+export function getFabricConnection(): FabricConnection {
+    return connection;
+}
 
 export async function connectToFabric(username: string, channelName: string, walletLocation: string, connectionProfile: any) {
     connection = new FabricConnection(username, channelName, walletLocation, connectionProfile);

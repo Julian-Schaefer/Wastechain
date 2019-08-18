@@ -1,16 +1,16 @@
 import * as Joi from '@hapi/joi';
-import FabricConnection from "../FabricConnection";
+import { getFabricConnection } from "../FabricConnection";
 import { WasteOrderCommissionSchema, WasteOrderRecommissionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
 
 async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
-    const contract = FabricConnection.wasteOrderContract;
+    const contract = getFabricConnection().wasteOrderContract;
     const wasteOrderBuffer = await contract.evaluateTransaction('getWasteOrder', wasteOrderId);
     const wasteOrder: WasteOrder = JSON.parse(wasteOrderBuffer.toString('utf-8'));
     return wasteOrder;
 }
 
 async function getWasteOrderHistory(wasteOrderId: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
-    let contract = await FabricConnection.wasteOrderContract;
+    let contract = await getFabricConnection().wasteOrderContract;
     let result = await contract.evaluateTransaction('getWasteOrderHistory', wasteOrderId);
 
     let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = JSON.parse(result.toString('utf-8'));
@@ -23,7 +23,7 @@ async function createWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): P
         throw validationResult.error;
     }
 
-    const contract = FabricConnection.wasteOrderContract;
+    const contract = getFabricConnection().wasteOrderContract;
     const createdWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
     const createdWasteOrder: WasteOrder = JSON.parse(createdWasteOrderBuffer.toString('utf-8'));
 
@@ -78,7 +78,7 @@ async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOr
 
     delete updatedWasteOrder.status;
 
-    const contract = await FabricConnection.wasteOrderContract;
+    const contract = await getFabricConnection().wasteOrderContract;
     if (sendBody) {
         await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
     } else {
@@ -89,8 +89,8 @@ async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOr
 }
 
 async function getWasteOrdersForSubcontractorWithStatus(status: string): Promise<Buffer> {
-    let MSPID = FabricConnection.client.getMspid();
-    let contract = await FabricConnection.wasteOrderContract;
+    let MSPID = getFabricConnection().client.getMspid();
+    let contract = await getFabricConnection().wasteOrderContract;
     let wasteOrdersBuffer = await contract.evaluateTransaction('getWasteOrdersForSubcontractorWithStatus', MSPID, status);
 
     console.log('Retrieved Waste Orders with status ' + status + ' for Subcontractor: ' + MSPID);
@@ -98,8 +98,8 @@ async function getWasteOrdersForSubcontractorWithStatus(status: string): Promise
 }
 
 async function getWasteOrdersForOriginatorWithStatus(status: string): Promise<Buffer> {
-    let MSPID = FabricConnection.client.getMspid();
-    let contract = await FabricConnection.wasteOrderContract;
+    let MSPID = getFabricConnection().client.getMspid();
+    let contract = await getFabricConnection().wasteOrderContract;
     let wasteOrdersBuffer = await contract.evaluateTransaction('getWasteOrdersForOriginatorWithStatus', MSPID, status);
 
     console.log('Retrieved Waste Orders with status ' + status + ' for Originator: ' + MSPID);
