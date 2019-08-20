@@ -34,7 +34,7 @@ const cardDefaultStyle = {
     height: "20%",
     border: "lightblue 2px solid",
     borderRadius: "8px",
-    overflow: "scroll"
+    overflowY: "scroll"
 }
 
 const cardTransitionStyles: any = {
@@ -84,8 +84,9 @@ export class Modal extends React.Component<{ visible: boolean, onClose: () => vo
                                     right: "20px",
                                     zIndex: 1
                                 }}
-                                onClick={this.props.onClose}>
-                                Close
+                                onClick={this.props.onClose}
+
+                                icon="close">
                             </Button>
                             {this.props.children}
                         </Card>
