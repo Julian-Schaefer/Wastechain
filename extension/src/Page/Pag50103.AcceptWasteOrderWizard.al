@@ -58,7 +58,7 @@ page 50103 "Accept Waste Order Wizard WC"
 
                 field("Business Partner No Overview"; BusinessPartnerNo)
                 {
-                    Caption = 'Business Parner No.';
+                    Caption = 'Business Partner No.';
                     TableRelation = "Business Partner";
                     ApplicationArea = All;
 
