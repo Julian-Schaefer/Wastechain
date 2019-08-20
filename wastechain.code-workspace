@@ -21,6 +21,9 @@
 		},
 		{
 			"path": "test-network"
+		},
+		{
+			"path": "mobile"
 		}
 	],
 	"settings": {}
