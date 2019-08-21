@@ -8,7 +8,7 @@ const FILE_NAME = 'wastechain.json';
 function getSettings(_: Request, response: Response) {
     fs.readFile(FILE_NAME, (error, data: Buffer) => {
         if (error) {
-            response.send('Error reading Settings.');
+            response.status(500).send('Error reading Settings.');
             console.log('Error reading Settings: ' + error);
         } else {
             let settings = JSON.parse(data.toString('utf8')) as Settings;
@@ -27,7 +27,7 @@ function postSettings(request: Request, response: Response) {
 
     fs.writeFile(FILE_NAME, JSON.stringify(settings), 'utf8', (error) => {
         if (error) {
-            response.send('Error writing Settings.');
+            response.status(500).send('Error writing Settings.');
             console.log('Error writing Settings: ' + error);
         } else {
             response.setHeader('Content-Type', 'application/json');
