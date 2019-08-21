@@ -3,11 +3,13 @@ import { getWasteOrder, createWasteOrder, updateWasteOrder, getWasteOrderHistory
 
 const router = Router();
 
-router.get('/:id', getWasteOrder)
-    .post('/:id', createWasteOrder)
-    .put('/:id', updateWasteOrder);
+router.route('/:id')
+    .get(getWasteOrder)
+    .post(createWasteOrder)
+    .put(updateWasteOrder);
 
-router.get('/:id/history', getWasteOrderHistory);
+router.route('/:id/history')
+    .get(getWasteOrderHistory);
 
 router.get('/incoming/status/:status', getWasteOrdersForSubcontractorWithStatus);
 router.get('/outgoing/status/:status', getWasteOrdersForOriginatorWithStatus);

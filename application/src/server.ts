@@ -2,7 +2,9 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyparser from 'body-parser';
 import { ValidationError } from '@hapi/joi';
-import SettingsRouter from './controller/SettingsRouter';
+import * as SwaggerUI from 'swagger-ui-express';
+import * as SwaggerJSDoc from 'swagger-jsdoc';
+import SettingsRouter from './settings/SettingsRouter';
 import WasteOrderRouter from './wasteOrder/WasteOrderRouter';
 
 const app = express();
@@ -12,6 +14,26 @@ if (process.env.ALLOW_CORS === 'true') {
 }
 
 app.use(bodyparser.json());
+
+const options: SwaggerJSDoc.Options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Wastechain-API',
+            version: '1.0.0'
+        },
+    },
+    host: 'localhost:3000',
+    basePath: '/',
+    // Path to the API docs
+    apis: ['**/*.ts'],
+};
+
+// Initialize swagger-jsdoc -> returns validated swagger spec in json format
+const swaggerSpec = SwaggerJSDoc(options);
+
+app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(swaggerSpec));
+
 
 app.use((req: express.Request, _, next) => {
     console.log('Logger:' + JSON.stringify(req.body));

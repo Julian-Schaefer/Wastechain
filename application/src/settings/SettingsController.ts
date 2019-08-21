@@ -6,7 +6,7 @@ import * as fs from 'fs';
 const FILE_NAME = 'wastechain.json';
 
 function getSettings(_: Request, response: Response) {
-    fs.readFile(this.FILE_NAME, (error, data: Buffer) => {
+    fs.readFile(FILE_NAME, (error, data: Buffer) => {
         if (error) {
             response.send('Error reading Settings.');
             console.log('Error reading Settings: ' + error);
@@ -25,7 +25,7 @@ function postSettings(request: Request, response: Response) {
         throw validationResult.error;
     }
 
-    fs.writeFile(this.FILE_NAME, JSON.stringify(settings), 'utf8', (error) => {
+    fs.writeFile(FILE_NAME, JSON.stringify(settings), 'utf8', (error) => {
         if (error) {
             response.send('Error writing Settings.');
             console.log('Error writing Settings: ' + error);
