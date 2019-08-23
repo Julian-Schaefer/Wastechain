@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'package:wastechain_mobile/wasteOrder/WasteOrder.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,7 +49,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  Future<WasteOrder> fetchPost() async {
+    final response =
+        await http.get('http://localhost:3000/order/OrderingOrgMSP-test');
+
+    if (response.statusCode == 200) {
+      // If server returns an OK response, parse the JSON.
+      return WasteOrder.fromJSON(convert.jsonDecode(response.body));
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+  }
+
   void _incrementCounter() {
+    fetchPost().then((value) => print(value.customerName));
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
