@@ -23,7 +23,6 @@ const options: SwaggerJSDoc.Options = {
             version: '1.0.0'
         },
     },
-    host: 'localhost:3000',
     basePath: '/',
     // Path to the API docs
     apis: ['**/*.ts'],

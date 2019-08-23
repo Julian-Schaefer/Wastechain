@@ -11,6 +11,38 @@ export interface TaskSite {
     areaCode: string;
 }
 
+/**
+ *  @swagger
+ *  definitions:
+ *      TaskSiteSchema:
+ *          type: object
+ *          required:
+ *              - name
+ *              - name2
+ *              - address
+ *              - address2
+ *              - postCode
+ *              - city
+ *              - countryCode
+ *              - areaCode
+ *          properties:
+ *              name:
+ *                  type: string
+ *              name2:
+ *                  type: string
+ *              address:
+ *                  type: string
+ *              address2:
+ *                  type: string
+ *              postCode:
+ *                  type: string
+ *              city:
+ *                  type: string
+ *              countryCode:
+ *                  type: string
+ *              areaCode:
+ *                  type: string
+ */
 export const TaskSiteSchema = Joi.object().keys({
     name: Joi.string().required(),
     name2: Joi.string().required(),

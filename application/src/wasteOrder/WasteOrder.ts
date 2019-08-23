@@ -34,6 +34,51 @@ export interface WasteOrder {
     lastChangedByMSPID: string;
 }
 
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderSchema:
+ *          type: object
+ *          properties:
+ *              key:
+ *                  type: string
+ *              status:
+ *                  type: integer
+ *              subcontractorMSPID:
+ *                  type: string
+ *              originatorMSPID:
+ *                  type: string
+ *              customerName:
+ *                  type: string
+ *              taskSite:
+ *                  type: object
+ *                  $ref: '#/definitions/TaskSiteSchema'
+ *              service:
+ *                  type: object
+ *                  $ref: '#/definitions/ServiceSchema'
+ *              description:
+ *                  type: string
+ *              quantity:
+ *                  type: number
+ *              unitPrice:
+ *                  type: number
+ *              unitOfMeasure:
+ *                  type: string
+ *              taskDate:
+ *                  type: string
+ *              startingTime:
+ *                  type: string
+ *              finishingTime:
+ *                  type: string
+ *              referenceNo:
+ *                  type: string
+ *              rejectionMessage:
+ *                  type: string
+ *              lastChanged:
+ *                  type: string
+ *              lastChangedByMSPID:
+ *                  type: string
+ */
 export const WasteOrderSchema = Joi.object().keys({
     key: ServiceSchema.required(),
     status: Joi.number().required(),
@@ -55,6 +100,41 @@ export const WasteOrderSchema = Joi.object().keys({
     lastChangedByMSPID: Joi.string().required()
 });
 
+
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderCommissionSchema:
+ *          type: object
+ *          properties:
+ *              subcontractorMSPID:
+ *                  type: string
+ *              customerName:
+ *                  type: string
+ *              taskSite:
+ *                  type: object
+ *                  $ref: '#/definitions/TaskSiteSchema'
+ *              service:
+ *                  type: object
+ *                  $ref: '#/definitions/ServiceSchema'
+ *              description:
+ *                  type: string
+ *              quantity:
+ *                  type: number
+ *              unitPrice:
+ *                  type: number
+ *              unitOfMeasure:
+ *                  type: string
+ *              taskDate:
+ *                  type: string
+ *              startingTime:
+ *                  type: string
+ *              finishingTime:
+ *                  type: string
+ *              referenceNo:
+ *                  type: string
+ */
+
 export const WasteOrderCommissionSchema = Joi.object().keys({
     subcontractorMSPID: Joi.string().required(),
     customerName: Joi.string().required(),
@@ -70,6 +150,39 @@ export const WasteOrderCommissionSchema = Joi.object().keys({
     referenceNo: Joi.string().required()
 });
 
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderRecommissionSchema:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: integer
+ *              subcontractorMSPID:
+ *                  type: string
+ *              customerName:
+ *                  type: string
+ *              taskSite:
+ *                  type: object
+ *                  $ref: '#/definitions/TaskSiteSchema'
+ *              service:
+ *                  type: object
+ *                  $ref: '#/definitions/ServiceSchema'
+ *              description:
+ *                  type: string
+ *              quantity:
+ *                  type: number
+ *              unitPrice:
+ *                  type: number
+ *              unitOfMeasure:
+ *                  type: string
+ *              taskDate:
+ *                  type: string
+ *              startingTime:
+ *                  type: string
+ *              finishingTime:
+ *                  type: string
+ */
 export const WasteOrderRecommissionSchema = Joi.object().keys({
     status: Joi.number().required(),
     subcontractorMSPID: Joi.string().required(),
@@ -85,6 +198,32 @@ export const WasteOrderRecommissionSchema = Joi.object().keys({
     finishingTime: Joi.string()
 });
 
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderCompleteSchema:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: integer
+ *              service:
+ *                  type: object
+ *                  $ref: '#/definitions/ServiceSchema'
+ *              description:
+ *                  type: string
+ *              quantity:
+ *                  type: number
+ *              unitPrice:
+ *                  type: number
+ *              unitOfMeasure:
+ *                  type: string
+ *              taskDate:
+ *                  type: string
+ *              startingTime:
+ *                  type: string
+ *              finishingTime:
+ *                  type: string
+ */
 export const WasteOrderCompleteSchema = Joi.object().keys({
     status: Joi.number().required(),
     service: ServiceSchema.required(),
@@ -97,11 +236,31 @@ export const WasteOrderCompleteSchema = Joi.object().keys({
     finishingTime: Joi.string()
 });
 
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderRejectSchema:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: integer
+ *              rejectionMessage:
+ *                  type: string
+ */
 export const WasteOrderRejectSchema = Joi.object().keys({
     status: Joi.number().required(),
     rejectionMessage: Joi.string().required()
 });
 
+/**
+ *  @swagger
+ *  definitions:
+ *      WasteOrderUpdateStatusSchema:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: integer
+ */
 export const WasteOrderUpdateStatusSchema = Joi.object().keys({
     status: Joi.number().required()
 });

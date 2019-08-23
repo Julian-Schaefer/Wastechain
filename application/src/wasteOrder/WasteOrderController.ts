@@ -31,8 +31,8 @@ async function createWasteOrder(request: Request, response: Response) {
     const wasteOrder = request.body;
 
     try {
-        const createWasteOrder: WasteOrder = await service.createWasteOrder(wasteOrderId, wasteOrder);
-        response.send(JSON.stringify(createWasteOrder));
+        const createdWasteOrder: WasteOrder = await service.createWasteOrder(wasteOrderId, wasteOrder);
+        response.send(JSON.stringify(createdWasteOrder));
     } catch (error) {
         console.log('Error submitting Transaction: ' + error);
         response.status(500).send('Error submitting Transaction: ' + error);
