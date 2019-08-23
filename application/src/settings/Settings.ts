@@ -2,11 +2,14 @@ import * as Joi from '@hapi/joi';
 
 /**
  * @swagger
- * definition:
- *   settings:
+ * definitions:
+ *   Settings:
+ *     type: object
+ *     required:
+ *       - postUrl
  *     properties:
- *       name:
- *         postUrl: string
+ *       postUrl:
+ *         type: string
  */
 export interface Settings {
     postUrl: string;

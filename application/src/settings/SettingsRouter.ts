@@ -16,8 +16,16 @@ const router = Router();
  *     responses:
  *       200:
  *         description: Settings
+ *         content:
+ *           application/json:
+ *              schema:
+ *                $ref: '#/definitions/Settings'
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *           text/plain:
+ *              schema:
+ *                  type: string
  */
 router.get('/', getSettings);
 
@@ -37,12 +45,20 @@ router.get('/', getSettings);
  *         in: body
  *         required: true
  *         schema:
- *           $ref: '#/definitions/settings'
+ *           $ref: '#/definitions/Settings'
  *     responses:
  *       200:
  *         description: Settings
+ *         content:
+ *           application/json:
+ *              schema:
+ *                $ref: '#/definitions/Settings'
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *           text/plain:
+ *              schema:
+ *                  type: string
  */
 router.post('/', postSettings)
 
