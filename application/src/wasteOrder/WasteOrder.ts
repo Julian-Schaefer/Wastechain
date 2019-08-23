@@ -206,17 +206,8 @@ export const WasteOrderRecommissionSchema = Joi.object().keys({
  *          properties:
  *              status:
  *                  type: integer
- *              service:
- *                  type: object
- *                  $ref: '#/definitions/ServiceSchema'
- *              description:
- *                  type: string
  *              quantity:
  *                  type: number
- *              unitPrice:
- *                  type: number
- *              unitOfMeasure:
- *                  type: string
  *              taskDate:
  *                  type: string
  *              startingTime:
@@ -226,11 +217,7 @@ export const WasteOrderRecommissionSchema = Joi.object().keys({
  */
 export const WasteOrderCompleteSchema = Joi.object().keys({
     status: Joi.number().required(),
-    service: ServiceSchema.required(),
-    description: Joi.string().required(),
     quantity: Joi.number().required(),
-    unitPrice: Joi.number().required(),
-    unitOfMeasure: Joi.string().required(),
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string()

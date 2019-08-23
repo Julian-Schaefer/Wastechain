@@ -73,18 +73,12 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
     begin
         with WasteMgtLine do begin
             WasteOrderJSON.Add('status', WasteOrderStatus::Completed);
-            WasteOrderJSON.Add('description', Description);
             WasteOrderJSON.Add('quantity', Quantity);
-            WasteOrderJSON.Add('unitPrice', "Unit Price");
-            WasteOrderJSON.Add('unitOfMeasure', "Unit of Measure");
             WasteOrderJSON.Add('taskDate', Format("Task Date", 0, '<Day,2>/<Month,2>/<Year4>'));
             if "Starting Time" <> 0T then
                 WasteOrderJSON.Add('startingTime', Format("Starting Time"));
             if "Finishing Time" <> 0T then
                 WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
-
-            // Service
-            WasteOrderJSON.Add('service', CreateServiceJSON(WasteMgtLine));
         end;
 
         exit(WasteOrderJSON);
