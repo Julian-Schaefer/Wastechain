@@ -11,8 +11,8 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
             SetRange("Document No.", WasteHeader."No.");
             if FindSet(false, false) then
                 repeat
-                    if "Waste Order Key WC" <> '' then begin
-                        WastechainMgt.GetWasteOrder("Waste Order Key WC", WasteOrder);
+                    if "Waste Order ID WC" <> '' then begin
+                        WastechainMgt.GetWasteOrder("Waste Order ID WC", WasteOrder);
 
                         case "Posting Type" of
                             "Posting Type"::Purchase:
@@ -41,7 +41,7 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
             SetRange("Document No.", ReleasedWasteHeader."No.");
             if FindSet(false, false) then
                 repeat
-                    if "Waste Order Key WC" <> '' then begin
+                    if "Waste Order ID WC" <> '' then begin
                         case "Posting Type" of
                             "Posting Type"::Sales:
                                 begin

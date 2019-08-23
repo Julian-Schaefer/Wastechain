@@ -2,9 +2,9 @@ tableextension 50101 "Waste Management Line Ext WC" extends "Waste Management Li
 {
     fields
     {
-        field(50100; "Waste Order Key WC"; Text[250])
+        field(50100; "Waste Order ID WC"; Text[250])
         {
-            Caption = 'Waste Order Key';
+            Caption = 'Waste Order ID';
             DataClassification = CustomerContent;
         }
     }

@@ -14,7 +14,7 @@ export enum WasteOrderStatus {
 }
 
 export interface WasteOrder {
-    key: string;
+    id: string;
     status: WasteOrderStatus;
     subcontractorMSPID: string;
     originatorMSPID: string;
@@ -40,7 +40,7 @@ export interface WasteOrder {
  *      WasteOrderSchema:
  *          type: object
  *          properties:
- *              key:
+ *              id:
  *                  type: string
  *              status:
  *                  type: integer
@@ -80,7 +80,7 @@ export interface WasteOrder {
  *                  type: string
  */
 export const WasteOrderSchema = Joi.object().keys({
-    key: ServiceSchema.required(),
+    id: ServiceSchema.required(),
     status: Joi.number().required(),
     subcontractorMSPID: Joi.string().required(),
     originatorMSPID: Joi.string().required(),

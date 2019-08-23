@@ -3,8 +3,8 @@ codeunit 50100 "Wastechain Management"
 
     procedure CommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
     begin
-        if WasteMgtLine."Waste Order Key WC" <> '' then
-            Error('Waste Order %1 has already been commissioned.', WasteMgtLine."Waste Order Key WC");
+        if WasteMgtLine."Waste Order ID WC" <> '' then
+            Error('Waste Order %1 has already been commissioned.', WasteMgtLine."Waste Order ID WC");
 
         CheckWasteMgtLine(WasteMgtLine, true);
         WastechainClientMgt.PostWasteOrder(WasteMgtLine);
@@ -34,20 +34,20 @@ codeunit 50100 "Wastechain Management"
             WasteMgtLine.Validate("Post-with No.", BusinessPartnerNo);
             WasteMgtLine.Validate("Invoice-with No.", BusinessPartnerNo);
             WasteMgtLine.Validate("Task-at Code", BusinessPartnerSiteCode);
-            WasteMgtLine.Validate("Waste Order Key WC", "Key");
+            WasteMgtLine.Validate("Waste Order ID WC", "ID");
             WasteMgtLine.Insert(true);
         end;
 
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderStatusUpdateSchemaJSON(WasteOrderStatus::Accepted);
-        UpdateWasteOrder(WasteOrder."Key", WasteOrderUpdateJSON);
+        UpdateWasteOrder(WasteOrder."ID", WasteOrderUpdateJSON);
     end;
 
-    procedure CancelWasteOrder(WasteOrderKey: Text)
+    procedure CancelWasteOrder(WasteOrderID: Text)
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderStatusUpdateSchemaJSON(WasteOrderStatus::Cancelled);
-        UpdateWasteOrder(WasteOrderKey, WasteOrderUpdateJSON);
+        UpdateWasteOrder(WasteOrderID, WasteOrderUpdateJSON);
     end;
 
     procedure RejectWasteOrder(WasteOrder: Record "Waste Order WC"; RejectionMessage: Text[250])
@@ -55,7 +55,7 @@ codeunit 50100 "Wastechain Management"
         WasteOrderUpdateJSON: JsonObject;
     begin
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRejectionSchemaJSON(RejectionMessage);
-        UpdateWasteOrder(WasteOrder."Key", WasteOrderUpdateJSON);
+        UpdateWasteOrder(WasteOrder."ID", WasteOrderUpdateJSON);
     end;
 
     procedure CompleteWasteOrder(WasteMgtLine: Record "Waste Management Line")
@@ -65,7 +65,7 @@ codeunit 50100 "Wastechain Management"
         CheckWasteMgtLine(WasteMgtLine, false);
 
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCompleteSchemaJSON(WasteMgtLine);
-        UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
+        UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 
     procedure RecommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
@@ -75,7 +75,7 @@ codeunit 50100 "Wastechain Management"
         CheckWasteMgtLine(WasteMgtLine, true);
 
         WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine);
-        UpdateWasteOrder(WasteMgtLine."Waste Order Key WC", WasteOrderUpdateJSON);
+        UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 
     local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line"; Purchase: Boolean)
@@ -98,12 +98,12 @@ codeunit 50100 "Wastechain Management"
         end;
     end;
 
-    local procedure UpdateWasteOrder(WasteOrderKey: Text; WasteOrderUpdateJSON: JsonObject)
+    local procedure UpdateWasteOrder(WasteOrderID: Text; WasteOrderUpdateJSON: JsonObject)
     begin
-        if WasteOrderKey = '' then
+        if WasteOrderID = '' then
             Error('Waste Order has not yet been commissioned. Please commission the Waste Order first. ');
 
-        WastechainClientMgt.UpdateWasteOrder(WasteOrderKey, WasteOrderUpdateJSON);
+        WastechainClientMgt.UpdateWasteOrder(WasteOrderID, WasteOrderUpdateJSON);
     end;
 
     procedure FindOrCreateBusinessPartnerSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[10]
@@ -139,11 +139,11 @@ codeunit 50100 "Wastechain Management"
         end;
     end;
 
-    procedure GetWasteOrder(WasteOrderKey: Text; var WasteOrder: Record "Waste Order WC")
+    procedure GetWasteOrder(WasteOrderID: Text; var WasteOrder: Record "Waste Order WC")
     var
         WasteOrderText: Text;
     begin
-        WasteOrderText := WastechainClientMgt.GetWasteOrderAsText(WasteOrderKey);
+        WasteOrderText := WastechainClientMgt.GetWasteOrderAsText(WasteOrderID);
         WastechainJSONMgt.GetWasteOrderFromText(WasteOrderText, WasteOrder);
     end;
 

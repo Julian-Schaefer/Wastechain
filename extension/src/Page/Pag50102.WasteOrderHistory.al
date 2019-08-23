@@ -59,20 +59,20 @@ page 50102 "Waste Order Tx History WC"
     var
         TransactionHistoryText: Text;
     begin
-        if WasteOrderKey = '' then
-            Error('Please specify a Waste Order Key.');
+        if WasteOrderID = '' then
+            Error('Please specify a Waste Order ID.');
 
-        TransactionHistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WasteOrderKey);
+        TransactionHistoryText := WastechainClientMgt.GetWasteOrderHistoryAsText(WasteOrderID);
         WastechainJSONMgt.GetWasteOrderTransactionHistoryFromText(TransactionHistoryText, Rec);
     end;
 
     var
         WastechainClientMgt: Codeunit "Wastechain Client Mgt. WC";
         WastechainJSONMgt: Codeunit "Wastechain JSON Mgt. WC";
-        WasteOrderKey: Text[250];
+        WasteOrderID: Text[250];
 
-    procedure SetWasteOrderKey(WasteOrderKey2: Text)
+    procedure SetWasteOrderID(WasteOrderID2: Text)
     begin
-        WasteOrderKey := WasteOrderKey2;
+        WasteOrderID := WasteOrderID2;
     end;
 }

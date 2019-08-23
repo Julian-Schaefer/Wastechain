@@ -15,18 +15,18 @@ codeunit 50102 "Wastechain Client Mgt. WC"
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
-        Post('/order/' + WastechainJSONMgt.GetWasteOrderKey(WasteLine), Content, Response);
+        Post('/order/' + WastechainJSONMgt.GetWasteOrderID(WasteLine), Content, Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then begin
-            WasteLine."Waste Order Key WC" := WastechainJSONMgt.GetWasteOrderKeyFromJSONText(ResponseText);
+            WasteLine."Waste Order ID WC" := WastechainJSONMgt.GetWasteOrderIDFromJSONText(ResponseText);
             WasteLine.Modify();
             Message('Successfully commissioned Waste Order to Wastechain.');
         end else
             Error(ResponseText);
     end;
 
-    procedure UpdateWasteOrder(WasteOrderKey: Text; WasteOrderUpdateJSON: JSONObject)
+    procedure UpdateWasteOrder(WasteOrderID: Text; WasteOrderUpdateJSON: JSONObject)
     var
         Response: HttpResponseMessage;
         Content: HttpContent;
@@ -39,24 +39,24 @@ codeunit 50102 "Wastechain Client Mgt. WC"
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
-        Put('/order/' + WasteOrderKey, Content, Response);
+        Put('/order/' + WasteOrderID, Content, Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then begin
-            Message('Successfully updated Waste Order "%1" on the Wastechain.', WasteOrderKey);
+            Message('Successfully updated Waste Order "%1" on the Wastechain.', WasteOrderID);
         end else
             Error(ResponseText);
     end;
 
-    procedure GetWasteOrderAsText(WasteOrderKey: Text): Text
+    procedure GetWasteOrderAsText(WasteOrderID: Text): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;
     begin
-        if WasteOrderKey = '' then
-            Error('Please provide a Waste Order Key.');
+        if WasteOrderID = '' then
+            Error('Please provide a Waste Order ID.');
 
-        Get(StrSubstNo('/order/%1', WasteOrderKey), Response);
+        Get(StrSubstNo('/order/%1', WasteOrderID), Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then
@@ -65,15 +65,15 @@ codeunit 50102 "Wastechain Client Mgt. WC"
             Error(ResponseText);
     end;
 
-    procedure GetWasteOrderHistoryAsText(WasteOrderKey: Text): Text
+    procedure GetWasteOrderHistoryAsText(WasteOrderID: Text): Text
     var
         Response: HttpResponseMessage;
         ResponseText: Text;
     begin
-        if WasteOrderKey = '' then
-            Error('Please provide a Waste Order Key.');
+        if WasteOrderID = '' then
+            Error('Please provide a Waste Order ID.');
 
-        Get(StrSubstNo('/order/%1/history', WasteOrderKey), Response);
+        Get(StrSubstNo('/order/%1/history', WasteOrderID), Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then

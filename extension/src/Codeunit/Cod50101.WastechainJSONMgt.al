@@ -154,14 +154,14 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         end;
     end;
 
-    procedure GetWasteOrderKeyFromJSONText(JSONText: Text): Text
+    procedure GetWasteOrderIDFromJSONText(JSONText: Text): Text
     var
         JSON: JsonObject;
         Token: JsonToken;
         TokenText: Text;
     begin
         JSON.ReadFrom(JSONText);
-        JSON.Get('key', Token);
+        JSON.Get('id', Token);
         exit(Token.AsValue().AsText());
     end;
 
@@ -239,8 +239,8 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
 
         with WasteOrder do begin
             Init();
-            WasteOrderJSONObject.Get('key', ValueJSONToken);
-            "Key" := ValueJSONToken.AsValue().AsText();
+            WasteOrderJSONObject.Get('id', ValueJSONToken);
+            "ID" := ValueJSONToken.AsValue().AsText();
 
             WasteOrderJSONObject.Get('status', ValueJSONToken);
             Status := ValueJSONToken.AsValue().AsOption();
@@ -333,7 +333,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         end;
     end;
 
-    procedure GetWasteOrderKey(WasteMgtLine: Record "Waste Management Line"): Text
+    procedure GetWasteOrderID(WasteMgtLine: Record "Waste Management Line"): Text
     begin
         exit(WasteMgtLine."Document No." + '-' + Format(WasteMgtLine."Line No."));
     end;

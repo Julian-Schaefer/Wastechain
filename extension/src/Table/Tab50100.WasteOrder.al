@@ -34,9 +34,9 @@ table 50100 "Waste Order WC"
 
     fields
     {
-        field(1; "Key"; Text[250])
+        field(1; "ID"; Text[250])
         {
-            Caption = 'Key';
+            Caption = 'ID';
             DataClassification = ToBeClassified;
         }
 
@@ -213,7 +213,7 @@ table 50100 "Waste Order WC"
 
     keys
     {
-        key(PK; "Key")
+        key(PK; "ID")
         {
             Clustered = true;
         }

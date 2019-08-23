@@ -20,13 +20,13 @@ pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                         PublishChangesLbl: Label 'This Waste Order has not been accepted or rejected by the Subcontractor yet. Do you want to publish the Changes?';
                         CantMakeChangesErr: Label 'You cannot recommission a Waste Order with Status: %1';
                     begin
-                        if "Waste Order Key WC" = '' then begin
+                        if "Waste Order ID WC" = '' then begin
                             if not Confirm(ConfirmCommisionLbl) then
                                 exit;
 
                             WastechainMgt.CommissionWasteOrder(Rec);
                         end else begin
-                            WastechainMgt.GetWasteOrder("Waste Order Key WC", WasteOrder);
+                            WastechainMgt.GetWasteOrder("Waste Order ID WC", WasteOrder);
                             if WasteOrder.Status = WasteOrder.Status::Rejected then begin
                                 if not Confirm(RejectionCommissionLbl) then
                                     exit;
@@ -51,10 +51,10 @@ pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                     var
                         WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                     begin
-                        if "Waste Order Key WC" = '' then
+                        if "Waste Order ID WC" = '' then
                             Error('This line has not been commissioned.');
 
-                        WasteOrderHistoryPage.SetWasteOrderKey("Waste Order Key WC");
+                        WasteOrderHistoryPage.SetWasteOrderID("Waste Order ID WC");
                         WasteOrderHistoryPage.RunModal();
                     end;
                 }
@@ -69,13 +69,13 @@ pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Su
                         WastechainMgt: Codeunit "Wastechain Management";
                         ConfirmCancelLbl: Label 'Do you really want to cancel the commissioned Waste Order?';
                     begin
-                        if "Waste Order Key WC" = '' then
+                        if "Waste Order ID WC" = '' then
                             Error('This line has not been commissioned.');
 
                         if not Confirm(ConfirmCancelLbl) then
                             exit;
 
-                        WastechainMgt.CancelWasteOrder("Waste Order Key WC");
+                        WastechainMgt.CancelWasteOrder("Waste Order ID WC");
                     end;
                 }
             }

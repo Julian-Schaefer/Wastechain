@@ -2,9 +2,9 @@ tableextension 50103 "Waste Mgt. Line Archive Ext WC" extends "Waste Mgt. Line A
 {
     fields
     {
-        field(50100; "Waste Order Key WC"; Text[250])
+        field(50100; "Waste Order ID WC"; Text[250])
         {
-            Caption = 'Waste Order Key';
+            Caption = 'Waste Order ID';
             DataClassification = CustomerContent;
         }
     }

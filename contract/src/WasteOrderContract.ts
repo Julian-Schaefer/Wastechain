@@ -26,10 +26,10 @@ export class WasteOrderContract extends Contract {
             throw "Invalid Waste Order Schema: " + validationResult.error.message;
         }
 
-        wasteOrder.key = ctx.clientIdentity.getMSPID() + '-' + orderId;
-        const exists = await this.checkWasteOrderExists(ctx, wasteOrder.key);
+        wasteOrder.id = ctx.clientIdentity.getMSPID() + '-' + orderId;
+        const exists = await this.checkWasteOrderExists(ctx, wasteOrder.id);
         if (exists) {
-            throw new Error(`The order ${wasteOrder.key} already exists`);
+            throw new Error(`The order ${wasteOrder.id} already exists`);
         }
 
         if (wasteOrder.subcontractorMSPID === ctx.clientIdentity.getMSPID()) {
@@ -42,7 +42,7 @@ export class WasteOrderContract extends Contract {
         wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
-        await ctx.stub.putState(wasteOrder.key, buffer);
+        await ctx.stub.putState(wasteOrder.id, buffer);
         ctx.stub.setEvent("COMMISSION_WASTE_ORDER", buffer);
 
         return wasteOrder;
@@ -254,7 +254,7 @@ export class WasteOrderContract extends Contract {
         wasteOrder.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
 
         const buffer = Buffer.from(JSON.stringify(wasteOrder));
-        await ctx.stub.putState(wasteOrder.key, buffer);
+        await ctx.stub.putState(wasteOrder.id, buffer);
     }
 
     private async getWasteOrdersFromIterator(iterator: Iterators.StateQueryIterator): Promise<WasteOrder[]> {

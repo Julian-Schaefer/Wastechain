@@ -34,7 +34,7 @@ page 50105 "Outgoing Waste Orders WC"
             {
                 Editable = false;
 
-                field("Key"; "Key")
+                field("ID"; "ID")
                 {
                     ApplicationArea = All;
                 }
@@ -150,7 +150,7 @@ page 50105 "Outgoing Waste Orders WC"
                 PromotedIsBig = true;
                 PromotedOnly = true;
                 Visible = (StatusFilter = StatusFilter::Commissioned) OR (StatusFilter = StatusFilter::Accepted);
-                Enabled = "Key" <> '';
+                Enabled = ID <> '';
                 ApplicationArea = All;
 
                 trigger OnAction()
@@ -160,7 +160,7 @@ page 50105 "Outgoing Waste Orders WC"
                     if not Confirm(ConfirmRejectionLbl) then
                         exit;
 
-                    WastechainMgt.CancelWasteOrder("Key");
+                    WastechainMgt.CancelWasteOrder("ID");
                     RefreshPage();
                 end;
             }
@@ -175,14 +175,14 @@ page 50105 "Outgoing Waste Orders WC"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedOnly = true;
-                Enabled = "Key" <> '';
+                Enabled = "ID" <> '';
                 ApplicationArea = All;
 
                 trigger OnAction()
                 var
                     WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                 begin
-                    WasteOrderHistoryPage.SetWasteOrderKey("Key");
+                    WasteOrderHistoryPage.SetWasteOrderID("ID");
                     WasteOrderHistoryPage.RunModal();
                 end;
             }
@@ -194,7 +194,7 @@ page 50105 "Outgoing Waste Orders WC"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedOnly = true;
-                Enabled = "Key" <> '';
+                Enabled = "ID" <> '';
                 ApplicationArea = All;
 
                 trigger OnAction()
@@ -204,7 +204,7 @@ page 50105 "Outgoing Waste Orders WC"
                     MultipleWasteOrdersFoundErr: Label 'Multiple Waste Management Orders have been found.';
                     NoWasteOrderFoundErr: Label 'No corresponding Waste Management Order has been found.';
                 begin
-                    WasteMgtLine.SetRange("Waste Order Key WC", "Key");
+                    WasteMgtLine.SetRange("Waste Order ID WC", "ID");
                     if WasteMgtLine.Count() = 1 then begin
                         WasteMgtLine.FindFirst();
                         WasteMgtHeader.SetRange("No.", WasteMgtLine."Document No.");

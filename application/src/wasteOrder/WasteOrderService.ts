@@ -27,7 +27,7 @@ async function createWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): P
     const createdWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
     const createdWasteOrder: WasteOrder = JSON.parse(createdWasteOrderBuffer.toString('utf-8'));
 
-    console.log('Submitted Waste Order with ID: ' + createdWasteOrder.key);
+    console.log('Submitted Waste Order with ID: ' + createdWasteOrder.id);
     return createdWasteOrder;
 }
 

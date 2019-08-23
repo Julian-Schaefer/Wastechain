@@ -16,10 +16,10 @@ pageextension 50102 "Completed Order Subform Ext WC" extends "Completed Orders S
                     var
                         WasteOrderHistoryPage: Page "Waste Order Tx History WC";
                     begin
-                        if "Waste Order Key WC" = '' then
+                        if "Waste Order ID WC" = '' then
                             Error('This line has not been commissioned.');
 
-                        WasteOrderHistoryPage.SetWasteOrderKey("Waste Order Key WC");
+                        WasteOrderHistoryPage.SetWasteOrderID("Waste Order ID WC");
                         WasteOrderHistoryPage.RunModal();
                     end;
                 }
