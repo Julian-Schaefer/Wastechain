@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as service from './WasteOrderService';
 import { WasteOrder } from './WasteOrder';
+import { WasteOrderTransaction } from './WasteOrderTransaction';
 
 async function getWasteOrder(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
@@ -18,7 +19,7 @@ async function getWasteOrderHistory(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
 
     try {
-        let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = await service.getWasteOrderHistory(wasteOrderId)
+        let history: WasteOrderTransaction[] = await service.getWasteOrderHistory(wasteOrderId)
         response.send(JSON.stringify(history));
     } catch (error) {
         console.log('Error getting Transaction History: ' + error);

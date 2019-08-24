@@ -1,6 +1,7 @@
 import * as Joi from '@hapi/joi';
 import { getFabricConnection } from "../FabricConnection";
 import { WasteOrderCommissionSchema, WasteOrderRecommissionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
+import { WasteOrderTransaction } from './WasteOrderTransaction';
 
 async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
     const contract = getFabricConnection().wasteOrderContract;
@@ -9,11 +10,11 @@ async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
     return wasteOrder;
 }
 
-async function getWasteOrderHistory(wasteOrderId: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
+async function getWasteOrderHistory(wasteOrderId: string): Promise<WasteOrderTransaction[]> {
     let contract = await getFabricConnection().wasteOrderContract;
     let result = await contract.evaluateTransaction('getWasteOrderHistory', wasteOrderId);
 
-    let history: { txId: string, timestamp: string, isDelete: string, value: string }[] = JSON.parse(result.toString('utf-8'));
+    let history: WasteOrderTransaction[] = JSON.parse(result.toString('utf-8'));
     return history;
 }
 

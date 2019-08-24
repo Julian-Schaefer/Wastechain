@@ -5,6 +5,7 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
 import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrderRecommissionSchema } from './model/WasteOrder';
+import { WasteOrderTransaction } from './model/WasteOrderTransaction';
 import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'WasteOrderContract', description: 'Contract to commission Waste Orders to Subcontractors' })
@@ -178,14 +179,14 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction(false)
-    public async getWasteOrderHistory(ctx: Context, orderId: string): Promise<{ txId: string, timestamp: string, isDelete: string, value: string }[]> {
+    public async getWasteOrderHistory(ctx: Context, orderId: string): Promise<WasteOrderTransaction[]> {
         const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
 
         let iterator = await ctx.stub.getHistoryForKey(orderId);
-        let transactionHistory: { txId: string, timestamp: string, isDelete: string, value: string }[] = [];
+        let transactionHistory: WasteOrderTransaction[] = [];
 
         while (true) {
             let result = await iterator.next();
@@ -193,18 +194,18 @@ export class WasteOrderContract extends Contract {
             if (result.value && result.value.value.toString()) {
                 console.log(result.value.value.toString('utf8'));
 
-                let value: string;
+                let value: WasteOrder;
                 try {
                     value = JSON.parse(result.value.value.toString('utf8'));
-                } catch (err) {
-                    console.log(err);
-                    value = result.value.value.toString('utf8');
+                } catch (error) {
+                    console.log(error);
+                    throw (error);
                 }
 
                 let date = new Date(0);
                 date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
 
-                let transaction: { txId: string, timestamp: string, isDelete: string, value: string } = {
+                let transaction: WasteOrderTransaction = {
                     txId: result.value.tx_id,
                     timestamp: date.toString(),
                     isDelete: result.value.is_delete.toString(),
