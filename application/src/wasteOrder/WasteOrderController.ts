@@ -23,7 +23,7 @@ async function getWasteOrderHistory(request: Request, response: Response) {
         response.send(JSON.stringify(history));
     } catch (error) {
         console.log('Error getting Transaction History: ' + error);
-        response.send('Error getting Transaction History: ' + error);
+        response.status(500).send('Error getting Transaction History: ' + error);
     }
 }
 

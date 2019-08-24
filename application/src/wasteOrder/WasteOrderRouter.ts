@@ -118,10 +118,109 @@ router.post('/:id', commissionWasteOrder);
  */
 router.put('/:id', updateWasteOrder);
 
-router.route('/:id/history')
-    .get(getWasteOrderHistory);
+/**
+ * @swagger
+ *
+ *  /order/{id}/history:
+ *      get:
+ *          tags:
+ *              - Waste Order
+ *          description: Retrieve Transaction History of a Waste Order
+ *          produces:
+ *              - application/json
+ *          parameters:
+ *              - name: id
+ *                description: Waste Order ID
+ *                in: path
+ *                required: true
+ *                schema:
+ *                  type: string
+ *          responses:
+ *              200:
+ *                  description: List of Transactions for the Waste Order
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              type: array
+ *                              items:
+ *                                  $ref: '#/definitions/WasteOrderTransaction'
+ *              500:
+ *                  description: Internal Server Error
+ *                  content:
+ *                      text/plain:
+ *                          schema:
+ *                              type: string
+ */
+router.get('/:id/history', getWasteOrderHistory);
 
+/**
+ * @swagger
+ *
+ *  /order/incoming/status/{status}:
+ *      get:
+ *          tags:
+ *              - Waste Order
+ *          description: Retrieve a list of Waste Orders for the Subcontractor with a specific status
+ *          produces:
+ *              - application/json
+ *          parameters:
+ *              - name: status
+ *                description: Waste Order Status
+ *                in: path
+ *                required: true
+ *                schema:
+ *                  type: integer
+ *          responses:
+ *              200:
+ *                  description: List of Waste Orders
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              type: array
+ *                              items:
+ *                                  $ref: '#/definitions/WasteOrderSchema'
+ *              500:
+ *                  description: Internal Server Error
+ *                  content:
+ *                      text/plain:
+ *                          schema:
+ *                              type: string
+ */
 router.get('/incoming/status/:status', getWasteOrdersForSubcontractorWithStatus);
+
+/**
+ * @swagger
+ *
+ *  /order/outgoing/status/{status}:
+ *      get:
+ *          tags:
+ *              - Waste Order
+ *          description: Retrieve a list of Waste Orders for the Originator with a specific status
+ *          produces:
+ *              - application/json
+ *          parameters:
+ *              - name: status
+ *                description: Waste Order Status
+ *                in: path
+ *                required: true
+ *                schema:
+ *                  type: integer
+ *          responses:
+ *              200:
+ *                  description: List of Waste Orders
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              type: array
+ *                              items:
+ *                                  $ref: '#/definitions/WasteOrderSchema'
+ *              500:
+ *                  description: Internal Server Error
+ *                  content:
+ *                      text/plain:
+ *                          schema:
+ *                              type: string
+ */
 router.get('/outgoing/status/:status', getWasteOrdersForOriginatorWithStatus);
 
 export default router;
