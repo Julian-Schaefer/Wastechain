@@ -7,7 +7,7 @@ import * as Joi from '@hapi/joi';
 import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrderRecommissionSchema } from './model/WasteOrder';
 import { Iterators } from 'fabric-shim';
 
-@Info({ title: 'WasteOrderContract', description: 'Contract to exchange Waste Orders' })
+@Info({ title: 'WasteOrderContract', description: 'Contract to commission Waste Orders to Subcontractors' })
 export class WasteOrderContract extends Contract {
 
     @Transaction(false)
@@ -167,7 +167,6 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction(false)
-    @Returns('Order')
     public async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const exists = await this.checkWasteOrderExists(ctx, orderId);
         if (!exists) {
