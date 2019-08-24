@@ -4,19 +4,12 @@
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import * as Joi from '@hapi/joi';
-import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrderRecommissionSchema } from './model/WasteOrder';
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrderCorrectionSchema } from './model/WasteOrder';
 import { WasteOrderTransaction } from './model/WasteOrderTransaction';
 import { Iterators } from 'fabric-shim';
 
 @Info({ title: 'WasteOrderContract', description: 'Contract to commission Waste Orders to Subcontractors' })
 export class WasteOrderContract extends Contract {
-
-    @Transaction(false)
-    @Returns('boolean')
-    public async checkWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
-        const buffer = await ctx.stub.getState(orderId);
-        return (!!buffer && buffer.length > 0);
-    }
 
     @Transaction()
     public async commissionWasteOrder(ctx: Context, orderId: string, wasteOrderValue: string): Promise<WasteOrder> {
@@ -28,7 +21,7 @@ export class WasteOrderContract extends Contract {
         }
 
         wasteOrder.id = ctx.clientIdentity.getMSPID() + '-' + orderId;
-        const exists = await this.checkWasteOrderExists(ctx, wasteOrder.id);
+        const exists = await this.checkIfWasteOrderExists(ctx, wasteOrder.id);
         if (exists) {
             throw new Error(`The order ${wasteOrder.id} already exists`);
         }
@@ -146,10 +139,10 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction()
-    public async recommissionWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<WasteOrder> {
+    public async correctWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<WasteOrder> {
         let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
 
-        let validationResult = Joi.validate(updatedWasteOrder, WasteOrderRecommissionSchema);
+        let validationResult = Joi.validate(updatedWasteOrder, WasteOrderCorrectionSchema);
         if (validationResult.error !== null) {
             throw 'Invalid Schema: ' + validationResult.error.message;
         }
@@ -158,7 +151,7 @@ export class WasteOrderContract extends Contract {
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!((wasteOrder.status === WasteOrderStatus.REJECTED || wasteOrder.status === WasteOrderStatus.COMMISSIONED) && wasteOrder.originatorMSPID === MSPID)) {
-            throw new Error('The Waste Order can only be recomissioned by the Originator and needs to have the Status "Rejected" or "Commissioned".');
+            throw new Error('The Waste Order can only be corrected by the Originator and needs to have the Status "Rejected" or "Commissioned".');
         }
 
         const newWasteOrder: WasteOrder = {
@@ -174,7 +167,7 @@ export class WasteOrderContract extends Contract {
 
     @Transaction(false)
     public async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
+        const exists = await this.checkIfWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
@@ -185,7 +178,7 @@ export class WasteOrderContract extends Contract {
 
     @Transaction(false)
     public async getWasteOrderHistory(ctx: Context, orderId: string): Promise<WasteOrderTransaction[]> {
-        const exists = await this.checkWasteOrderExists(ctx, orderId);
+        const exists = await this.checkIfWasteOrderExists(ctx, orderId);
         if (!exists) {
             throw new Error(`The order ${orderId} does not exist`);
         }
@@ -252,6 +245,11 @@ export class WasteOrderContract extends Contract {
 
         let iterator: Iterators.StateQueryIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
         return this.getWasteOrdersFromIterator(iterator);
+    }
+
+    private async checkIfWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
+        const buffer = await ctx.stub.getState(orderId);
+        return (!!buffer && buffer.length > 0);
     }
 
     private async saveWasteOrder(ctx: Context, wasteOrder: WasteOrder) {

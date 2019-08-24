@@ -68,13 +68,13 @@ codeunit 50100 "Wastechain Management"
         UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 
-    procedure RecommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    procedure CorrectWasteOrder(WasteMgtLine: Record "Waste Management Line")
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
         CheckWasteMgtLine(WasteMgtLine, true);
 
-        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine);
+        WasteOrderUpdateJSON := WastechainJSONMgt.CreateWasteOrderCorrectionSchemaJSON(WasteMgtLine);
         UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 

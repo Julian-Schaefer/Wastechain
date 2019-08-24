@@ -33,7 +33,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(WasteOrderJSON);
     end;
 
-    procedure CreateWasteOrderRecommissionSchemaJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    procedure CreateWasteOrderCorrectionSchemaJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
     var
         BusinessPartner: Record "Business Partner";
         WasteOrderJSON: JsonObject;

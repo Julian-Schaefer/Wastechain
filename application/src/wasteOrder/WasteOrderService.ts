@@ -1,6 +1,6 @@
 import * as Joi from '@hapi/joi';
 import { getFabricConnection } from "../FabricConnection";
-import { WasteOrderCommissionSchema, WasteOrderRecommissionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
+import { WasteOrderCommissionSchema, WasteOrderCorrectionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
 import { WasteOrderTransaction } from './WasteOrderTransaction';
 
 async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
@@ -39,8 +39,8 @@ async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOr
 
     switch (updatedWasteOrder.status) {
         case WasteOrderStatus.COMMISSIONED:
-            validationSchema = WasteOrderRecommissionSchema;
-            procedure = 'recommissionWasteOrder';
+            validationSchema = WasteOrderCorrectionSchema;
+            procedure = 'correctWasteOrder';
             sendBody = true;
             break;
 

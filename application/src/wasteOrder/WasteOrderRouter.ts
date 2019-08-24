@@ -98,7 +98,7 @@ router.post('/:id', commissionWasteOrder);
  *                required: true
  *                schema:
  *                  oneOf:
- *                  - $ref: '#/definitions/WasteOrderRecommissionSchema'
+ *                  - $ref: '#/definitions/WasteOrderCorrectionSchema'
  *                  - $ref: '#/definitions/WasteOrderUpdateStatusSchema'
  *                  - $ref: '#/definitions/WasteOrderRejectSchema'
  *                  - $ref: '#/definitions/WasteOrderCompleteSchema'

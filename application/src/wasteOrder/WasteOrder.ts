@@ -153,7 +153,7 @@ export const WasteOrderCommissionSchema = Joi.object().keys({
 /**
  *  @swagger
  *  definitions:
- *      WasteOrderRecommissionSchema:
+ *      WasteOrderCorrectionSchema:
  *          type: object
  *          properties:
  *              status:
@@ -183,7 +183,7 @@ export const WasteOrderCommissionSchema = Joi.object().keys({
  *              finishingTime:
  *                  type: string
  */
-export const WasteOrderRecommissionSchema = Joi.object().keys({
+export const WasteOrderCorrectionSchema = Joi.object().keys({
     status: Joi.number().required(),
     subcontractorMSPID: Joi.string().required(),
     customerName: Joi.string().required(),

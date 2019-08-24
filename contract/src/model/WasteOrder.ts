@@ -70,7 +70,7 @@ export const WasteOrderCommissionSchema = Joi.object().keys({
     referenceNo: Joi.string().required()
 });
 
-export const WasteOrderRecommissionSchema = Joi.object().keys({
+export const WasteOrderCorrectionSchema = Joi.object().keys({
     subcontractorMSPID: Joi.string().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
