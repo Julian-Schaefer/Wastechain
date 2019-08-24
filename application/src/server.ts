@@ -9,10 +9,6 @@ import WasteOrderRouter from './wasteOrder/WasteOrderRouter';
 
 const app = express();
 
-if (process.env.ALLOW_CORS === 'true') {
-    app.use(cors());
-}
-
 app.use(bodyparser.json());
 
 const options: SwaggerJSDoc.Options = {
@@ -53,6 +49,10 @@ app.use('/settings', SettingsRouter);
 app.use('/order', WasteOrderRouter);
 
 export function startServer() {
+    if (process.env.ALLOW_CORS === 'true') {
+        app.use(cors());
+    }
+
     app.listen(process.env.PORT, function () {
         console.log('Wastechain-Server listening on port ' + process.env.PORT + '!');
     });
