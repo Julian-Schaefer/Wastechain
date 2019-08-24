@@ -27,12 +27,12 @@ async function getWasteOrderHistory(request: Request, response: Response) {
     }
 }
 
-async function createWasteOrder(request: Request, response: Response) {
+async function commissionWasteOrder(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
     const wasteOrder = request.body;
 
     try {
-        const createdWasteOrder: WasteOrder = await service.createWasteOrder(wasteOrderId, wasteOrder);
+        const createdWasteOrder: WasteOrder = await service.commissionWasteOrder(wasteOrderId, wasteOrder);
         response.send(JSON.stringify(createdWasteOrder));
     } catch (error) {
         console.log('Error submitting Transaction: ' + error);
@@ -45,8 +45,8 @@ async function updateWasteOrder(request: Request, response: Response) {
     const updatedWasteOrder: WasteOrder = request.body;
 
     try {
-        await service.updateWasteOrder(wasteOrderId, updatedWasteOrder);
-        response.send('Updated Contract with ID: ' + wasteOrderId);
+        let submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, updatedWasteOrder);
+        response.send(JSON.stringify(submittedWasteOrder));
     } catch (error) {
         console.log('Error evaluating Transaction: ' + error);
         response.status(500).send('Error evaluating Transaction: ' + error);
@@ -80,7 +80,7 @@ async function getWasteOrdersForOriginatorWithStatus(request: Request, response:
 export {
     getWasteOrder,
     getWasteOrderHistory,
-    createWasteOrder,
+    commissionWasteOrder,
     updateWasteOrder,
     getWasteOrdersForSubcontractorWithStatus,
     getWasteOrdersForOriginatorWithStatus

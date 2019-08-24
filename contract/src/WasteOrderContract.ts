@@ -50,7 +50,7 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction()
-    public async acceptWasteOrder(ctx: Context, orderId: string): Promise<void> {
+    public async acceptWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         let wasteOrder = await this.getWasteOrder(ctx, orderId);
         const MSPID = ctx.clientIdentity.getMSPID();
 
@@ -64,10 +64,11 @@ export class WasteOrderContract extends Contract {
         }
 
         await this.saveWasteOrder(ctx, newWasteOrder);
+        return newWasteOrder;
     }
 
     @Transaction()
-    public async rejectWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+    public async rejectWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<WasteOrder> {
         let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
 
         let validationResult = Joi.validate(updatedWasteOrder, WasteOrderRejectSchema);
@@ -89,10 +90,11 @@ export class WasteOrderContract extends Contract {
         }
 
         await this.saveWasteOrder(ctx, newWasteOrder);
+        return newWasteOrder;
     }
 
     @Transaction()
-    public async cancelWasteOrder(ctx: Context, orderId: string): Promise<void> {
+    public async cancelWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         let wasteOrder = await this.getWasteOrder(ctx, orderId);
         const MSPID = ctx.clientIdentity.getMSPID();
 
@@ -114,10 +116,11 @@ export class WasteOrderContract extends Contract {
         }
 
         await this.saveWasteOrder(ctx, newWasteOrder);
+        return newWasteOrder;
     }
 
     @Transaction()
-    public async completeWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+    public async completeWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<WasteOrder> {
         let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
 
         let validationResult = Joi.validate(updatedWasteOrder, WasteOrderCompleteSchema);
@@ -139,10 +142,11 @@ export class WasteOrderContract extends Contract {
         }
 
         await this.saveWasteOrder(ctx, newWasteOrder);
+        return newWasteOrder;
     }
 
     @Transaction()
-    public async recommissionWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<void> {
+    public async recommissionWasteOrder(ctx: Context, orderId: string, updatedWasteOrderValue: string): Promise<WasteOrder> {
         let updatedWasteOrder: WasteOrder = JSON.parse(updatedWasteOrderValue);
 
         let validationResult = Joi.validate(updatedWasteOrder, WasteOrderRecommissionSchema);
@@ -165,6 +169,7 @@ export class WasteOrderContract extends Contract {
         }
 
         await this.saveWasteOrder(ctx, newWasteOrder);
+        return newWasteOrder;
     }
 
     @Transaction(false)

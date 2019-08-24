@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getWasteOrder, createWasteOrder, updateWasteOrder, getWasteOrderHistory, getWasteOrdersForSubcontractorWithStatus, getWasteOrdersForOriginatorWithStatus } from "./WasteOrderController";
+import { getWasteOrder, commissionWasteOrder, updateWasteOrder, getWasteOrderHistory, getWasteOrdersForSubcontractorWithStatus, getWasteOrdersForOriginatorWithStatus } from "./WasteOrderController";
 
 const router = Router();
 
@@ -73,7 +73,7 @@ router.get('/:id', getWasteOrder);
  *                          schema:
  *                              type: string
  */
-router.post('/:id', createWasteOrder);
+router.post('/:id', commissionWasteOrder);
 
 /**
  * @swagger
@@ -104,11 +104,11 @@ router.post('/:id', createWasteOrder);
  *                  - $ref: '#/definitions/WasteOrderCompleteSchema'
  *          responses:
  *              200:
- *                  description: Waste Order has been updated
+ *                  description: Waste Order that has been updated
  *                  content:
- *                      text/plain:
+ *                      application/json:
  *                          schema:
- *                              type: string
+ *                              $ref: '#/definitions/WasteOrderSchema'
  *              500:
  *                  description: Internal Server Error
  *                  content:

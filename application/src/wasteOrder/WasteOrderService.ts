@@ -18,21 +18,21 @@ async function getWasteOrderHistory(wasteOrderId: string): Promise<WasteOrderTra
     return history;
 }
 
-async function createWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
+async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
     const validationResult = Joi.validate(wasteOrder, WasteOrderCommissionSchema);
     if (validationResult.error !== null) {
         throw validationResult.error;
     }
 
     const contract = getFabricConnection().wasteOrderContract;
-    const createdWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
-    const createdWasteOrder: WasteOrder = JSON.parse(createdWasteOrderBuffer.toString('utf-8'));
+    const commissionedWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
+    const commissionedWasteOrder: WasteOrder = JSON.parse(commissionedWasteOrderBuffer.toString('utf-8'));
 
-    console.log('Submitted Waste Order with ID: ' + createdWasteOrder.id);
-    return createdWasteOrder;
+    console.log('Commissioned Waste Order with ID: ' + commissionedWasteOrder.id);
+    return commissionedWasteOrder;
 }
 
-async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOrder): Promise<void> {
+async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOrder): Promise<WasteOrder> {
     let validationSchema: Joi.ObjectSchema;
     let procedure: string;
     let sendBody = false;
@@ -80,13 +80,16 @@ async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOr
     delete updatedWasteOrder.status;
 
     const contract = await getFabricConnection().wasteOrderContract;
+    let submittedWasteOrder: WasteOrder;
     if (sendBody) {
-        await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
+        const submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
+        submittedWasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     } else {
         await contract.submitTransaction(procedure, wasteOrderId);
     }
 
     console.log('Updated Contract with ID: ' + wasteOrderId);
+    return submittedWasteOrder;
 }
 
 async function getWasteOrdersForSubcontractorWithStatus(status: string): Promise<Buffer> {
@@ -110,7 +113,7 @@ async function getWasteOrdersForOriginatorWithStatus(status: string): Promise<Bu
 export {
     getWasteOrder,
     getWasteOrderHistory,
-    createWasteOrder,
+    commissionWasteOrder,
     updateWasteOrder,
     getWasteOrdersForSubcontractorWithStatus,
     getWasteOrdersForOriginatorWithStatus
