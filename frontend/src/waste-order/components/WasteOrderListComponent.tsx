@@ -32,7 +32,6 @@ class WasteOrderListComponent extends React.Component<{}, WasteOrderListComponen
     }
 
     private getOrders() {
-        this.setState({ wasteOrders: undefined });
         getOutgoingWasteOrdersWithStatus(0).then((orders: WasteOrder[]) => {
             this.setState({ wasteOrders: orders });
         });
@@ -44,6 +43,11 @@ class WasteOrderListComponent extends React.Component<{}, WasteOrderListComponen
 
     private commissionWasteOrder = () => {
         this.setState({ showWasteOrderCommission: true })
+    }
+
+    private reload = () => {
+        this.setState({ selectedWasteOrder: undefined });
+        this.getOrders();
     }
 
     render() {
@@ -59,19 +63,20 @@ class WasteOrderListComponent extends React.Component<{}, WasteOrderListComponen
                         (<p>No Waste Orders</p>)
                         :
                         (
-                            <div style={{ padding: "20px" }}>
+                            <div>
+                                <div style={{ padding: "20px" }}>
+                                    {
+                                        wasteOrders.map((wasteOrder) => {
+                                            return <WasteOrderListItemComponent key={wasteOrder.id} wasteOrder={wasteOrder} onClick={() => this.onSelectWasteOrder(wasteOrder)} />;
+                                        })
+                                    }
+                                </div>
 
-                                {
-                                    wasteOrders.map((wasteOrder) => {
-                                        return <WasteOrderListItemComponent key={wasteOrder.id} wasteOrder={wasteOrder} onClick={() => this.onSelectWasteOrder(wasteOrder)} />;
-                                    })
-                                }
-
-                                <Modal visible={showWasteOrderDetails} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={() => this.setState({ selectedWasteOrder: undefined })}>
+                                <Modal visible={showWasteOrderDetails} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={this.reload}>
                                     <WasteOrderDetailComponent wasteOrder={selectedWasteOrder!!} />
                                 </Modal>
 
-                                <Modal visible={showWasteOrderCommission} onClose={() => this.setState({ showWasteOrderCommission: false })} onClosed={() => this.getOrders}>
+                                <Modal visible={showWasteOrderCommission} onClose={() => this.setState({ showWasteOrderCommission: false })} onClosed={this.reload}>
                                     <WasteOrderCommissionComponent onCommissioned={() => this.setState({ showWasteOrderCommission: false })} />
                                 </Modal>
                             </div>

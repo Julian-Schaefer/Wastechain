@@ -1,10 +1,11 @@
 import React from 'react';
-import { Input, Row, Col, Button } from 'antd';
+import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker } from 'antd';
 import styled from 'styled-components';
 import { TaskSite } from '../TaskSite';
 import { Service, EquipmentType } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
 import { WasteOrder } from '../WasteOrder';
+import moment from 'moment';
 
 interface WasteOrderCommissionSchema {
     subcontractorMSPID?: string;
@@ -29,6 +30,7 @@ interface WasteOrderCommissionComponentState {
     wasteOrderId?: string;
     wasteOrder: WasteOrderCommissionSchema;
     errorMessage?: string;
+    isLoading: boolean;
 }
 
 export class WasteOrderCommissionComponent extends React.Component<WasteOrderCommissionComponentProps, WasteOrderCommissionComponentState>{
@@ -55,33 +57,35 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     equipmentType: EquipmentType.CLEARANCE,
                     materialDescription: ''
                 }
-            }
+            },
+            isLoading: false
         };
+    }
+
+    private updateWasteOrder = (wasteOrder: WasteOrderCommissionSchema) => {
+        this.setState({
+            ...this.state,
+            wasteOrder: wasteOrder
+        });
     }
 
     private handleWasteOrderChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         let change: any = {};
         change[name] = e.target.value;
-        this.setState({
-            ...this.state,
-            wasteOrder: {
-                ...this.state.wasteOrder,
-                ...change
-            }
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            ...change
         });
     }
 
     private handleTaskSiteChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         let change: any = {};
         change[name] = e.target.value;
-        this.setState({
-            ...this.state,
-            wasteOrder: {
-                ...this.state.wasteOrder,
-                taskSite: {
-                    ...this.state.wasteOrder.taskSite,
-                    ...change
-                }
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            taskSite: {
+                ...this.state.wasteOrder.taskSite,
+                ...change
             }
         });
     }
@@ -89,23 +93,48 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
     private handleServiceChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         let change: any = {};
         change[name] = e.target.value;
-        this.setState({
-            ...this.state,
-            wasteOrder: {
-                ...this.state.wasteOrder,
-                service: {
-                    ...this.state.wasteOrder.service,
-                    ...change
-                }
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            service: {
+                ...this.state.wasteOrder.service,
+                ...change
             }
         });
     }
 
+    private handleEquipmentTypeChange = (type: number) => {
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            service: {
+                ...this.state.wasteOrder.service,
+                equipmentType: type
+            }
+        })
+    }
+
+    private handleTaskDateChange = (date: moment.Moment | null) => {
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            taskDate: date ? date.format('DD/MM/YYYY') : undefined
+        });
+    }
+
+    private handleTimeChange = (name: string, timeString: string) => {
+        let change: any = {};
+        change[name] = timeString;
+        this.updateWasteOrder({
+            ...this.state.wasteOrder,
+            ...change
+        })
+    }
+
     private commission = () => {
+        this.setState({ isLoading: true });
+
         commissionWasteOrder(this.state.wasteOrderId!!, this.state.wasteOrder as WasteOrder).then((wasteOrder) => {
             this.props.onCommissioned(wasteOrder);
         }).catch((error: Error) => {
-            this.setState({ errorMessage: error.message });
+            this.setState({ errorMessage: error.message, isLoading: false });
         });
     }
 
@@ -170,6 +199,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     </Col>
                     <Col span={8}>
                         <Input
+                            type="number"
                             value={wasteOrder.quantity}
                             onChange={(e) => this.handleWasteOrderChange(e, 'quantity')}
                             allowClear />
@@ -179,10 +209,9 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Label>Task Date:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input
-                            value={wasteOrder.taskDate}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'taskDate')}
-                            allowClear />
+                        <DatePicker
+                            onChange={this.handleTaskDateChange}
+                            style={{ width: "100%" }} />
                     </Col>
                 </Row>
 
@@ -192,6 +221,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     </Col>
                     <Col span={8}>
                         <Input
+                            type="number"
                             value={wasteOrder.unitPrice}
                             onChange={(e) => this.handleWasteOrderChange(e, 'unitPrice')}
                             allowClear />
@@ -213,20 +243,20 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Label>Starting Time:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input
-                            value={wasteOrder.startingTime}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'startingTime')}
-                            allowClear />
+                        <TimePicker
+                            onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('startingTime', timeString)}
+                            style={{ width: "100%" }}
+                        />
                     </Col>
 
                     <Col span={4}>
                         <Label>Finishing Time:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input
-                            value={wasteOrder.finishingTime}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'finishingTime')}
-                            allowClear />
+                        <TimePicker
+                            onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('finishingTime', timeString)}
+                            style={{ width: "100%" }}
+                        />
                     </Col>
                 </Row>
 
@@ -371,10 +401,12 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Label>Equipment Type:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input
-                            value={service.equipmentType}
-                            onChange={(e) => this.handleServiceChange(e, 'equipmentType')}
-                            allowClear />
+                        <Select defaultValue={0} style={{ width: "100%" }} onChange={this.handleEquipmentTypeChange}>
+                            <Select.Option value={0}>Submission</Select.Option>
+                            <Select.Option value={1}>Pick-Up</Select.Option>
+                            <Select.Option value={2}>Exchange</Select.Option>
+                            <Select.Option value={3}>Clearance</Select.Option>
+                        </Select>
                     </Col>
 
                     <Col span={4}>
@@ -388,12 +420,18 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     </Col>
                 </Row>
 
+                <Divider />
+
                 <Row>
                     <Col span={4}>
-                        <Button type="primary" onClick={this.commission}>Commission</Button>
+                        <Button
+                            type="primary"
+                            onClick={this.commission}
+                            loading={this.state.isLoading}
+                            disabled={!this.state.wasteOrderId}>Commission</Button>
                     </Col>
                     <Col span={20}>
-                        {this.state.errorMessage && <p>{this.state.errorMessage!!}</p>}
+                        {this.state.errorMessage && <ErrorLabel>{this.state.errorMessage!!}</ErrorLabel>}
                     </Col>
                 </Row>
             </div >
@@ -403,4 +441,9 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
 
 const Label = styled.p`
     line-height: 32px;
+`;
+
+const ErrorLabel = styled.p`
+    font-size: 12pt;
+    color: red;
 `;

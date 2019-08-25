@@ -83,7 +83,7 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                             id="success"
                             value={wasteOrder.customerName}
                             onChange={(e) => this.handleWasteOrderChange(e, 'customerName')}
-                            disabled={!this.state.editable && status === WasteOrderStatus.ACCEPTED}
+                            disabled={!this.state.editable}
                             allowClear={this.state.editable} />
                     </Col>
 

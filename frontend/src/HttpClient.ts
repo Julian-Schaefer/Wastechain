@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { WasteOrder } from './waste-order/WasteOrder';
 
 let config: AxiosRequestConfig = {
     baseURL: 'http://localhost:3000'
@@ -11,8 +10,7 @@ async function get(path: string): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        console.log(error);
-        throw error;
+        throw new Error(error.response.data);
     }
 }
 
@@ -22,8 +20,7 @@ async function post(path: string, body: any): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        console.log(error);
-        throw error;
+        throw new Error(error.response.data);
     }
 }
 
