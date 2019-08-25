@@ -11,24 +11,24 @@ export enum WasteOrderStatus {
 }
 
 export interface WasteOrder {
-    key: string;
-    status: WasteOrderStatus;
-    subcontractorMSPID: string;
-    originatorMSPID: string;
-    customerName: string;
+    id?: string;
+    status?: WasteOrderStatus;
+    subcontractorMSPID?: string;
+    originatorMSPID?: string;
+    customerName?: string;
     taskSite: TaskSite;
     service: Service;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    unitOfMeasure: string;
-    taskDate: Date
-    startingTime: string;
-    finishingTime: string;
-    referenceNo: string;
-    rejectionMessage: string;
-    lastChanged: Date;
-    lastChangedByMSPID: string;
+    description?: string;
+    quantity?: number;
+    unitPrice?: number;
+    unitOfMeasure?: string;
+    taskDate?: Date
+    startingTime?: string;
+    finishingTime?: string;
+    referenceNo?: string;
+    rejectionMessage?: string;
+    lastChanged?: Date;
+    lastChangedByMSPID?: string;
 }
 
 export const WasteOrderSchema = Joi.object().keys({
@@ -67,7 +67,7 @@ export const WasteOrderCommissionSchema = Joi.object().keys({
     referenceNo: Joi.string().required()
 });
 
-export const WasteOrderRecommissionSchema = Joi.object().keys({
+export const WasteOrderCorrectionSchema = Joi.object().keys({
     subcontractorMSPID: Joi.string().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),

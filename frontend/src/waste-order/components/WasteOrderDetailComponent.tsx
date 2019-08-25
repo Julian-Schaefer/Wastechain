@@ -1,14 +1,30 @@
 import React from 'react';
-import { WasteOrder } from '../model/WasteOrder';
+import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
 import { Input, Row, Col, Button } from 'antd';
 import styled from 'styled-components';
+import { EquipmentType } from '../Service';
 
 export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: WasteOrder }, { wasteOrder: WasteOrder, editable: boolean }>{
 
     constructor(props: { wasteOrder: WasteOrder }) {
         super(props);
+
+        let wasteOrder = props.wasteOrder;
+
+        // if (!wasteOrder) {
+        //     wasteOrder = {
+        //         service: {
+        //             description: '',
+        //             description2: '',
+        //             equipmentDescription: '',
+        //             equipmentType: EquipmentType.CLEARANCE,
+        //             materialDescription: ''
+        //         }
+        //     };
+        // }
+
         this.state = {
-            wasteOrder: props.wasteOrder,
+            wasteOrder: wasteOrder!,
             editable: false
         };
     }
@@ -17,8 +33,20 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
         this.setState({ editable: !this.state.editable });
     }
 
+    private handleWasteOrderChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+        let change: any = {};
+        change[name] = e.target.value;
+        this.setState({
+            ...this.state,
+            wasteOrder: {
+                ...change
+            }
+        });
+    }
+
     render() {
         const { wasteOrder } = this.state;
+        const { status } = wasteOrder;
         const { taskSite } = wasteOrder;
         const { service } = wasteOrder;
 
@@ -26,8 +54,7 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
             <div>
                 <Row>
                     <Col span={12}>
-
-                        <h1>{wasteOrder.key}</h1>
+                        <h1>{wasteOrder.id}</h1>
                     </Col>
                     <Col span={6}>
                         <Button type="primary" onClick={this.toggle}>Edit</Button>
@@ -42,7 +69,7 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                         <Label>Status:</Label>
                     </Col>
                     <Col span={8}>
-                        <Label>{wasteOrder.status}</Label>
+                        <Label>{status}</Label>
                     </Col>
                 </Row>
 
@@ -52,14 +79,23 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                         <Label>Customer Name:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input value={wasteOrder.customerName} disabled={!this.state.editable} allowClear={this.state.editable} />
+                        <Input
+                            id="success"
+                            value={wasteOrder.customerName}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'customerName')}
+                            disabled={!this.state.editable && status === WasteOrderStatus.ACCEPTED}
+                            allowClear={this.state.editable} />
                     </Col>
 
                     <Col span={4}>
                         <Label>Description:</Label>
                     </Col>
                     <Col span={8}>
-                        <Input value={wasteOrder.description} disabled={!this.state.editable} allowClear={this.state.editable} />
+                        <Input
+                            value={wasteOrder.description}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'description')}
+                            disabled={!this.state.editable}
+                            allowClear={this.state.editable} />
                     </Col>
                 </Row>
 

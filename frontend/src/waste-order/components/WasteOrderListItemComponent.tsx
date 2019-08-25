@@ -1,5 +1,5 @@
 import React from 'react';
-import { WasteOrder } from '../model/WasteOrder';
+import { WasteOrder } from '../WasteOrder';
 import { Card } from 'antd';
 
 let wasteOrderListComponentStyle: any = {};
@@ -13,7 +13,7 @@ wasteOrderListComponentStyle.hovered = {
   borderColor: "lightblue"
 };
 
-export class WasteOrderListComponent extends React.Component<{ wasteOrder: WasteOrder, onClick: () => void }, { hovered: boolean }> {
+export class WasteOrderListItemComponent extends React.Component<{ wasteOrder: WasteOrder, onClick: () => void }, { hovered: boolean }> {
 
   constructor(props: { wasteOrder: WasteOrder, onClick: () => void }) {
     super(props);
@@ -31,7 +31,7 @@ export class WasteOrderListComponent extends React.Component<{ wasteOrder: Waste
   }
 
   render() {
-    let { key, customerName } = this.props.wasteOrder;
+    let { id: key, customerName } = this.props.wasteOrder;
 
     let style = wasteOrderListComponentStyle.normal;
     if (this.state.hovered) {
