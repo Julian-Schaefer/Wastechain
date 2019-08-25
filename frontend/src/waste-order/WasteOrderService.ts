@@ -7,18 +7,16 @@ async function getOutgoingWasteOrdersWithStatus(status: number): Promise<WasteOr
         console.log(wasteOrders);
         return wasteOrders as WasteOrder[];
     } catch (error) {
-        console.log(error);
         throw error;
     }
 }
 
-async function commissionWasteOrder(wasteOrder: WasteOrder): Promise<WasteOrder> {
+async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
     try {
-        let commissionWasteOrder = await post('/order/' + wasteOrder.id, wasteOrder);
+        let commissionWasteOrder = await post('/order/' + wasteOrderId, wasteOrder);
         console.log(commissionWasteOrder);
         return commissionWasteOrder as WasteOrder;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 }

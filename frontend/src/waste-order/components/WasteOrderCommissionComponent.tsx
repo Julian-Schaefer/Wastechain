@@ -6,9 +6,7 @@ import { Service, EquipmentType } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
 import { WasteOrder } from '../WasteOrder';
 
-
 interface WasteOrderCommissionSchema {
-    id?: string;
     subcontractorMSPID?: string;
     customerName?: string;
     taskSite: TaskSite;
@@ -23,10 +21,19 @@ interface WasteOrderCommissionSchema {
     referenceNo?: string;
 }
 
+interface WasteOrderCommissionComponentProps {
+    onCommissioned: (wasteOrder: WasteOrder) => void;
+}
 
-export class WasteOrderCommissionComponent extends React.Component<{}, { wasteOrder: WasteOrderCommissionSchema }>{
+interface WasteOrderCommissionComponentState {
+    wasteOrderId?: string;
+    wasteOrder: WasteOrderCommissionSchema;
+    errorMessage?: string;
+}
 
-    constructor(props: {}) {
+export class WasteOrderCommissionComponent extends React.Component<WasteOrderCommissionComponentProps, WasteOrderCommissionComponentState>{
+
+    constructor(props: WasteOrderCommissionComponentProps) {
         super(props);
 
         this.state = {
@@ -95,11 +102,15 @@ export class WasteOrderCommissionComponent extends React.Component<{}, { wasteOr
     }
 
     private commission = () => {
-        commissionWasteOrder(this.state.wasteOrder as WasteOrder);
+        commissionWasteOrder(this.state.wasteOrderId!!, this.state.wasteOrder as WasteOrder).then((wasteOrder) => {
+            this.props.onCommissioned(wasteOrder);
+        }).catch((error: Error) => {
+            this.setState({ errorMessage: error.message });
+        });
     }
 
     render() {
-        const { wasteOrder } = this.state;
+        const { wasteOrderId, wasteOrder } = this.state;
         const { taskSite } = wasteOrder;
         const { service } = wasteOrder;
 
@@ -113,8 +124,8 @@ export class WasteOrderCommissionComponent extends React.Component<{}, { wasteOr
                     </Col>
                     <Col span={8}>
                         <Input
-                            value={wasteOrder.id}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'id')}
+                            value={wasteOrderId}
+                            onChange={(e) => this.setState({ wasteOrderId: e.target.value })}
                             allowClear />
                     </Col>
 
@@ -147,6 +158,86 @@ export class WasteOrderCommissionComponent extends React.Component<{}, { wasteOr
                         <Input
                             value={wasteOrder.subcontractorMSPID}
                             onChange={(e) => this.handleWasteOrderChange(e, 'subcontractorMSPID')}
+                            allowClear />
+                    </Col>
+                </Row>
+
+                <h2>Details</h2>
+
+                <Row gutter={40} style={{ marginBottom: "20px" }}>
+                    <Col span={4}>
+                        <Label>Quantity:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.quantity}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'quantity')}
+                            allowClear />
+                    </Col>
+
+                    <Col span={4}>
+                        <Label>Task Date:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.taskDate}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'taskDate')}
+                            allowClear />
+                    </Col>
+                </Row>
+
+                <Row gutter={40} style={{ marginBottom: "20px" }}>
+                    <Col span={4}>
+                        <Label>Unit Price:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.unitPrice}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'unitPrice')}
+                            allowClear />
+                    </Col>
+
+                    <Col span={4}>
+                        <Label>Unit of Measure:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.unitOfMeasure}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'unitOfMeasure')}
+                            allowClear />
+                    </Col>
+                </Row>
+
+                <Row gutter={40} style={{ marginBottom: "20px" }}>
+                    <Col span={4}>
+                        <Label>Starting Time:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.startingTime}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'startingTime')}
+                            allowClear />
+                    </Col>
+
+                    <Col span={4}>
+                        <Label>Finishing Time:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.finishingTime}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'finishingTime')}
+                            allowClear />
+                    </Col>
+                </Row>
+
+                <Row gutter={40} style={{ marginBottom: "20px" }}>
+                    <Col span={4}>
+                        <Label>Reference No.:</Label>
+                    </Col>
+                    <Col span={8}>
+                        <Input
+                            value={wasteOrder.referenceNo}
+                            onChange={(e) => this.handleWasteOrderChange(e, 'referenceNo')}
                             allowClear />
                     </Col>
                 </Row>
@@ -298,7 +389,12 @@ export class WasteOrderCommissionComponent extends React.Component<{}, { wasteOr
                 </Row>
 
                 <Row>
-                    <Button type="primary" onClick={this.commission}>Commission</Button>
+                    <Col span={4}>
+                        <Button type="primary" onClick={this.commission}>Commission</Button>
+                    </Col>
+                    <Col span={20}>
+                        {this.state.errorMessage && <p>{this.state.errorMessage!!}</p>}
+                    </Col>
                 </Row>
             </div >
         );

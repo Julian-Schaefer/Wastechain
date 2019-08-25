@@ -72,7 +72,7 @@ class WasteOrderListComponent extends React.Component<{}, WasteOrderListComponen
                                 </Modal>
 
                                 <Modal visible={showWasteOrderCommission} onClose={() => this.setState({ showWasteOrderCommission: false })} onClosed={() => this.getOrders}>
-                                    <WasteOrderCommissionComponent />
+                                    <WasteOrderCommissionComponent onCommissioned={() => this.setState({ showWasteOrderCommission: false })} />
                                 </Modal>
                             </div>
                         )
