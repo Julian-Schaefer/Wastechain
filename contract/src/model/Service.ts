@@ -1,12 +1,10 @@
 import * as Joi from '@hapi/joi';
 
 export enum EquipmentType {
-    SUBMISSIONS,
+    SUBMISSION,
     PICK_UP,
     EXCHANGE,
-    CLEARANCE,
-    PURCHASE,
-    SALES
+    CLEARANCE
 }
 
 export interface Service {
