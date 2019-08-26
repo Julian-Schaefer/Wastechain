@@ -21,7 +21,7 @@ export interface WasteOrder {
     quantity: number;
     unitPrice: number;
     unitOfMeasure: string;
-    taskDate: Date
+    taskDate: string;
     startingTime: string;
     finishingTime: string;
     referenceNo: string;
@@ -43,4 +43,29 @@ export interface WasteOrderCommissionSchema {
     startingTime?: string;
     finishingTime?: string;
     referenceNo?: string;
+}
+
+export interface WasteOrderCorrectionSchema {
+    subcontractorMSPID: string;
+    customerName: string;
+    taskSite: TaskSite;
+    service: Service;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    unitOfMeasure: string;
+    taskDate: string;
+    startingTime: string;
+    finishingTime: string;
+}
+
+export interface WasteOrderCompleteSchema {
+    quantity: number;
+    taskDate: string;
+    startingTime: string;
+    finishingTime: string;
+}
+
+export interface WasteOrderRejectSchema {
+    rejectionMessage: string;
 }

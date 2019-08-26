@@ -1,27 +1,39 @@
-import { WasteOrder, WasteOrderCommissionSchema } from "./WasteOrder";
-import { get, post } from "../HttpClient";
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema } from "./WasteOrder";
+import { get, post, put } from "../HttpClient";
 
 async function getWasteOrdersWithTypeAndStatus(type: string, status: number): Promise<WasteOrder[]> {
-    try {
-        let wasteOrders = await get('/order/' + type + '/status/' + status);
-        console.log(wasteOrders);
-        return wasteOrders as WasteOrder[];
-    } catch (error) {
-        throw error;
-    }
+    let wasteOrders = await get('/order/' + type + '/status/' + status);
+    console.log(wasteOrders);
+    return wasteOrders as WasteOrder[];
 }
 
 async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrderCommissionSchema): Promise<WasteOrder> {
-    try {
-        let commissionWasteOrder = await post('/order/' + wasteOrderId, wasteOrder);
-        console.log(commissionWasteOrder);
-        return commissionWasteOrder as WasteOrder;
-    } catch (error) {
-        throw error;
-    }
+    let commissionWasteOrder = await post('/order/' + wasteOrderId, wasteOrder);
+    console.log(commissionWasteOrder);
+    return commissionWasteOrder as WasteOrder;
+}
+
+async function correctWasteOrder(wasteOrderId: string, wasteOrder: WasteOrderCorrectionSchema) {
+    let commissionWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.COMMISSIONED, ...wasteOrder });
+    console.log(commissionWasteOrder);
+    return commissionWasteOrder as WasteOrder;
+}
+
+async function cancelWasteOrder(wasteOrderId: string) {
+    let commissionWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.CANCELLED });
+    console.log(commissionWasteOrder);
+    return commissionWasteOrder as WasteOrder;
+}
+
+async function acceptWasteOrder(wasteOrderId: string) {
+    let commissionWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.ACCEPTED });
+    console.log(commissionWasteOrder);
+    return commissionWasteOrder as WasteOrder;
 }
 
 export {
     getWasteOrdersWithTypeAndStatus,
-    commissionWasteOrder
+    commissionWasteOrder,
+    cancelWasteOrder,
+    acceptWasteOrder
 };

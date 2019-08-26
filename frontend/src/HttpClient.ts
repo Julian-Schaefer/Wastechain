@@ -32,7 +32,22 @@ async function post(path: string, body: any): Promise<any> {
     }
 }
 
+async function put(path: string, body: any): Promise<any> {
+    try {
+        let response = await axios.put(path, body, config);
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data);
+        }
+
+        throw error;
+    }
+}
+
 export {
     get,
-    post
+    post,
+    put
 };
