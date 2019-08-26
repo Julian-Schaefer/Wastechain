@@ -1,9 +1,9 @@
 import { WasteOrder } from "./WasteOrder";
 import { get, post } from "../HttpClient";
 
-async function getOutgoingWasteOrdersWithStatus(status: number): Promise<WasteOrder[]> {
+async function getWasteOrdersWithTypeAndStatus(type: string, status: number): Promise<WasteOrder[]> {
     try {
-        let wasteOrders = await get('/order/outgoing/status/' + status);
+        let wasteOrders = await get('/order/' + type + '/status/' + status);
         console.log(wasteOrders);
         return wasteOrders as WasteOrder[];
     } catch (error) {
@@ -22,6 +22,6 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder
 }
 
 export {
-    getOutgoingWasteOrdersWithStatus,
+    getWasteOrdersWithTypeAndStatus,
     commissionWasteOrder
 };

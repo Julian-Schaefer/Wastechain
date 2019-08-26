@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker } from 'antd';
+import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker, Card } from 'antd';
 import styled from 'styled-components';
 import { TaskSite } from '../TaskSite';
 import { Service, EquipmentType } from '../Service';
@@ -146,279 +146,289 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
         return (
             <div>
                 <h1>Commission new Waste Order</h1>
-                <h2>General</h2>
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>ID:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrderId}
-                            onChange={(e) => this.setState({ wasteOrderId: e.target.value })}
-                            allowClear />
-                    </Col>
+                
+                <Divider />
 
-                    <Col span={4}>
-                        <Label>Description:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrder.description}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'description')}
-                            allowClear />
-                    </Col>
-                </Row>
+                <Tab>
+                    <h2>General</h2>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>ID:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrderId}
+                                onChange={(e) => this.setState({ wasteOrderId: e.target.value })}
+                                allowClear />
+                        </Col>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Customer Name:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrder.customerName}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'customerName')}
-                            allowClear />
-                    </Col>
+                        <Col span={4}>
+                            <Label>Description:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrder.description}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'description')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                    <Col span={4}>
-                        <Label>Subcontractor MSP:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrder.subcontractorMSPID}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'subcontractorMSPID')}
-                            allowClear />
-                    </Col>
-                </Row>
+                    <Row gutter={40}>
+                        <Col span={4}>
+                            <Label>Customer Name:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrder.customerName}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'customerName')}
+                                allowClear />
+                        </Col>
 
-                <h2>Details</h2>
+                        <Col span={4}>
+                            <Label>Subcontractor MSP:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrder.subcontractorMSPID}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'subcontractorMSPID')}
+                                allowClear />
+                        </Col>
+                    </Row>
+                </Tab>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Quantity:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            type="number"
-                            value={wasteOrder.quantity}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'quantity')}
-                            allowClear />
-                    </Col>
+                <Tab>
+                    <h2>Details</h2>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Quantity:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                type="number"
+                                value={wasteOrder.quantity}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'quantity')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Task Date:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <DatePicker
-                            onChange={this.handleTaskDateChange}
-                            style={{ width: "100%" }} />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Task Date:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <DatePicker
+                                onChange={this.handleTaskDateChange}
+                                style={{ width: "100%" }} />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Unit Price:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            type="number"
-                            value={wasteOrder.unitPrice}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'unitPrice')}
-                            allowClear />
-                    </Col>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Unit Price:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                type="number"
+                                value={wasteOrder.unitPrice}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'unitPrice')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Unit of Measure:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrder.unitOfMeasure}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'unitOfMeasure')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Unit of Measure:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrder.unitOfMeasure}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'unitOfMeasure')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Starting Time:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <TimePicker
-                            onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('startingTime', timeString)}
-                            style={{ width: "100%" }}
-                        />
-                    </Col>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Starting Time:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <TimePicker
+                                onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('startingTime', timeString)}
+                                style={{ width: "100%" }}
+                            />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Finishing Time:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <TimePicker
-                            onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('finishingTime', timeString)}
-                            style={{ width: "100%" }}
-                        />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Finishing Time:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <TimePicker
+                                onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('finishingTime', timeString)}
+                                style={{ width: "100%" }}
+                            />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Reference No.:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={wasteOrder.referenceNo}
-                            onChange={(e) => this.handleWasteOrderChange(e, 'referenceNo')}
-                            allowClear />
-                    </Col>
-                </Row>
+                    <Row gutter={40}>
+                        <Col span={4}>
+                            <Label>Reference No.:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={wasteOrder.referenceNo}
+                                onChange={(e) => this.handleWasteOrderChange(e, 'referenceNo')}
+                                allowClear />
+                        </Col>
+                    </Row>
+                </Tab>
 
-                <h2>Task Site</h2>
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Name:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.name}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'name')}
-                            allowClear />
-                    </Col>
+                <Tab>
+                    <h2>Task Site</h2>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Name:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.name}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'name')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Name 2:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.name2}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'name2')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Name 2:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.name2}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'name2')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Address:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.address}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'address')}
-                            allowClear />
-                    </Col>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Address:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.address}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'address')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Address 2:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.address2}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'address2')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Address 2:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.address2}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'address2')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Post Code:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.postCode}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'postCode')}
-                            allowClear />
-                    </Col>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Post Code:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.postCode}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'postCode')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>City:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.city}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'city')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>City:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.city}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'city')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Country Code:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.countryCode}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'countryCode')}
-                            allowClear />
-                    </Col>
+                    <Row gutter={40}>
+                        <Col span={4}>
+                            <Label>Country Code:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.countryCode}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'countryCode')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Area Code:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={taskSite.areaCode}
-                            onChange={(e) => this.handleTaskSiteChange(e, 'areaCode')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Area Code:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={taskSite.areaCode}
+                                onChange={(e) => this.handleTaskSiteChange(e, 'areaCode')}
+                                allowClear />
+                        </Col>
+                    </Row>
+                </Tab>
 
-                <h2>Service</h2>
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Description:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={service.description}
-                            onChange={(e) => this.handleServiceChange(e, 'description')}
-                            allowClear />
-                    </Col>
+                <Tab>
+                    <h2>Service</h2>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Description:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={service.description}
+                                onChange={(e) => this.handleServiceChange(e, 'description')}
+                                allowClear />
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Description 2:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={service.description2}
-                            onChange={(e) => this.handleServiceChange(e, 'description2')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Description 2:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={service.description2}
+                                onChange={(e) => this.handleServiceChange(e, 'description2')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Material Description:</Label>
-                    </Col>
-                    <Col span={20}>
-                        <Input
-                            value={service.materialDescription}
-                            onChange={(e) => this.handleServiceChange(e, 'materialDescription')}
-                            allowClear />
-                    </Col>
-                </Row>
+                    <Row gutter={40} style={{ marginBottom: "20px" }}>
+                        <Col span={4}>
+                            <Label>Material Description:</Label>
+                        </Col>
+                        <Col span={20}>
+                            <Input
+                                value={service.materialDescription}
+                                onChange={(e) => this.handleServiceChange(e, 'materialDescription')}
+                                allowClear />
+                        </Col>
+                    </Row>
 
-                <Row gutter={40} style={{ marginBottom: "20px" }}>
-                    <Col span={4}>
-                        <Label>Equipment Type:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Select defaultValue={0} style={{ width: "100%" }} onChange={this.handleEquipmentTypeChange}>
-                            <Select.Option value={0}>Submission</Select.Option>
-                            <Select.Option value={1}>Pick-Up</Select.Option>
-                            <Select.Option value={2}>Exchange</Select.Option>
-                            <Select.Option value={3}>Clearance</Select.Option>
-                        </Select>
-                    </Col>
+                    <Row gutter={40}>
+                        <Col span={4}>
+                            <Label>Equipment Type:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Select defaultValue={0} style={{ width: "100%" }} onChange={this.handleEquipmentTypeChange}>
+                                <Select.Option value={0}>Submission</Select.Option>
+                                <Select.Option value={1}>Pick-Up</Select.Option>
+                                <Select.Option value={2}>Exchange</Select.Option>
+                                <Select.Option value={3}>Clearance</Select.Option>
+                            </Select>
+                        </Col>
 
-                    <Col span={4}>
-                        <Label>Equipment Description:</Label>
-                    </Col>
-                    <Col span={8}>
-                        <Input
-                            value={service.equipmentDescription}
-                            onChange={(e) => this.handleServiceChange(e, 'equipmentDescription')}
-                            allowClear />
-                    </Col>
-                </Row>
+                        <Col span={4}>
+                            <Label>Equipment Description:</Label>
+                        </Col>
+                        <Col span={8}>
+                            <Input
+                                value={service.equipmentDescription}
+                                onChange={(e) => this.handleServiceChange(e, 'equipmentDescription')}
+                                allowClear />
+                        </Col>
+                    </Row>
+                </Tab>
 
                 <Divider />
 
@@ -446,4 +456,12 @@ const Label = styled.p`
 const ErrorLabel = styled.p`
     font-size: 12pt;
     color: red;
+`;
+
+const Tab = styled.div`
+    border: rgb(217, 217, 217) 1px solid;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.19), 0 1px 1px rgba(0,0,0,0.23);
 `;

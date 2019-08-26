@@ -1,5 +1,5 @@
 import React from 'react';
-import WasteOrderListComponent from './waste-order/components/WasteOrderListComponent';
+import { WasteOrderListComponent } from './waste-order/components/WasteOrderListComponent';
 
 class App extends React.Component<{}, {}> {
 
