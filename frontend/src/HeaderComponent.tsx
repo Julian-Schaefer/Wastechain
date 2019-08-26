@@ -1,33 +1,48 @@
 import React from "react";
 import styled from "styled-components";
-import { Row, Col } from "antd";
+import { get } from "./HttpClient";
 
-interface HeaderComponentState {
+interface Information {
     organisationMSPID: string;
     username: string;
 }
 
+interface HeaderComponentState {
+    organisationMSPID?: string;
+    username?: string;
+}
+
 export class HeaderComponent extends React.Component<{}, HeaderComponentState> {
+
     constructor(props: {}) {
         super(props);
         this.state = {
-            organisationMSPID: 'OrderingOrgMSP',
-            username: 'Admin@ordering-org.com'
+            organisationMSPID: undefined,
+            username: undefined
         };
+    }
+
+    componentDidMount() {
+        get('/settings/info').then((info: Information) => {
+            this.setState({
+                organisationMSPID: info.organisationMSPID,
+                username: info.username
+            })
+        });
     }
 
     render() {
         return (
             <Container style={{ paddingLeft: "20px", paddingRight: "20px" }}>
-                    <div style={{float: "left"}}>
-                        <Label>{this.state.organisationMSPID}</Label>
-                    </div>
-                    
-                    <div style={{float: "right"}}>
-                        <p>Logged in as: <Label>{this.state.username}</Label></p>
-                    </div>
+                <div style={{ float: "left" }}>
+                    <Label>{this.state.organisationMSPID}</Label>
+                </div>
 
-                    <div style={{clear: "both"}} />
+                <div style={{ float: "right" }}>
+                    <p>Logged in as: <Label>{this.state.username}</Label></p>
+                </div>
+
+                <div style={{ clear: "both" }} />
             </Container>
         )
     }

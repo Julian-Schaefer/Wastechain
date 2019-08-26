@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getSettings, postSettings } from "./SettingsController";
-import { getInformation } from "./SettingsService";
+import { getInformation } from "./SettingsController";
 
 const router = Router();
 
