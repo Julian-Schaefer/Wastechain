@@ -48,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  WasteOrder _wasteOrder;
 
   Future<WasteOrder> fetchPost() async {
     final response =
@@ -63,7 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter() {
-    fetchPost().then((value) => print(value.customerName));
+    fetchPost().then((value) => this.setState(() {
+          _wasteOrder = value;
+        }));
+
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -106,13 +110,26 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              '${_wasteOrder.status}',
+              style: Theme.of(context).textTheme.display1,
             ),
             Text(
-              '$_counter',
+              '${_wasteOrder.id}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+            Text(
+              '${_wasteOrder.customerName}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+            Text(
+              '${_wasteOrder.subcontractorMSPID}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+            Text(
+              '${_wasteOrder.originatorMSPID}',
               style: Theme.of(context).textTheme.display1,
             ),
           ],
