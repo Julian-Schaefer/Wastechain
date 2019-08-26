@@ -247,7 +247,8 @@ export class WasteOrderContract extends Contract {
         return this.getWasteOrdersFromIterator(iterator);
     }
 
-    private async checkIfWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
+    @Transaction(false)
+    public async checkIfWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
         const buffer = await ctx.stub.getState(orderId);
         return (!!buffer && buffer.length > 0);
     }

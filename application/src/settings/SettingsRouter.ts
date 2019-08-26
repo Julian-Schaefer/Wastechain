@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getSettings, postSettings } from "./SettingsController";
+import { getInformation } from "./SettingsService";
 
 const router = Router();
 
@@ -60,6 +61,8 @@ router.get('/', getSettings);
  *              schema:
  *                  type: string
  */
-router.post('/', postSettings)
+router.post('/', postSettings);
+
+router.get('/info', getInformation);
 
 export default router;

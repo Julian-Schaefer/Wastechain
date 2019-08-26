@@ -1,5 +1,6 @@
 import { Express, Request, Response } from 'express';
 import { Settings, SettingsSchema } from './Settings';
+import * as Service from './SettingsService';
 import * as Joi from '@hapi/joi';
 import * as fs from 'fs';
 
@@ -36,7 +37,18 @@ function postSettings(request: Request, response: Response) {
     });
 }
 
+function getInformation(_: Request, response: Response) {
+    Service.getInformation().then((information) => {
+        response.setHeader('Content-Type', 'application/json');
+        response.send(JSON.stringify(information));
+    }).catch((error: Error) => {
+        response.status(500).send('Error while retrieving Information: ' + error.message);
+        console.log('Error writing Settings: ' + error);
+    });
+}
+
 export {
     getSettings,
-    postSettings
+    postSettings,
+    getInformation
 };

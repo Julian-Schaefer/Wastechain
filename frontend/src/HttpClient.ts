@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 let config: AxiosRequestConfig = {
-    baseURL: 'http://localhost:3000'
+    baseURL: process.env.REACT_APP_API_URL
 };
 
 async function get(path: string): Promise<any> {
@@ -10,7 +10,11 @@ async function get(path: string): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        throw new Error(error.response.data);
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data);
+        }
+
+        throw error;
     }
 }
 
@@ -20,7 +24,11 @@ async function post(path: string, body: any): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        throw new Error(error.response.data);
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data);
+        }
+
+        throw error;
     }
 }
 
