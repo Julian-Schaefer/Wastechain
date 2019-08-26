@@ -10,7 +10,7 @@ async function get(path: string): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        if (error.response.data) {
+        if (error.response && error.response.data) {
             throw new Error(error.response.data);
         }
 
@@ -24,7 +24,7 @@ async function post(path: string, body: any): Promise<any> {
         console.log(response);
         return response.data;
     } catch (error) {
-        if (error.response.data) {
+        if (error.response && error.response.data) {
             throw new Error(error.response.data);
         }
 
