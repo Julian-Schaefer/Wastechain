@@ -1,5 +1,3 @@
-import * as Joi from '@hapi/joi';
-
 export enum EquipmentType {
     SUBMISSION,
     PICK_UP,
@@ -14,11 +12,3 @@ export interface Service {
     equipmentType: EquipmentType;
     equipmentDescription: string;
 }
-
-export const ServiceSchema = Joi.object().keys({
-    description: Joi.string().required(),
-    description2: Joi.string().required(),
-    materialDescription: Joi.string().required(),
-    equipmentType: Joi.number().required(),
-    equipmentDescription: Joi.string().required()
-});

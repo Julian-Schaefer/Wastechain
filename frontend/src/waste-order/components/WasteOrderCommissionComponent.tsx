@@ -1,26 +1,10 @@
 import React from 'react';
-import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker, Card } from 'antd';
+import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker } from 'antd';
 import styled from 'styled-components';
-import { TaskSite } from '../TaskSite';
-import { Service, EquipmentType } from '../Service';
+import { EquipmentType } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
-import { WasteOrder } from '../WasteOrder';
+import { WasteOrder, WasteOrderCommissionSchema } from '../WasteOrder';
 import moment from 'moment';
-
-interface WasteOrderCommissionSchema {
-    subcontractorMSPID?: string;
-    customerName?: string;
-    taskSite: TaskSite;
-    service: Service;
-    description?: string;
-    quantity?: number;
-    unitPrice?: number;
-    unitOfMeasure?: string;
-    taskDate?: string;
-    startingTime?: string;
-    finishingTime?: string;
-    referenceNo?: string;
-}
 
 interface WasteOrderCommissionComponentProps {
     onCommissioned: (wasteOrder: WasteOrder) => void;
@@ -131,7 +115,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
     private commission = () => {
         this.setState({ isLoading: true });
 
-        commissionWasteOrder(this.state.wasteOrderId!!, this.state.wasteOrder as WasteOrder).then((wasteOrder) => {
+        commissionWasteOrder(this.state.wasteOrderId!!, this.state.wasteOrder).then((wasteOrder) => {
             this.props.onCommissioned(wasteOrder);
         }).catch((error: Error) => {
             this.setState({ errorMessage: error.message, isLoading: false });
@@ -146,7 +130,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
         return (
             <div>
                 <h1>Commission new Waste Order</h1>
-                
+
                 <Divider />
 
                 <Tab>

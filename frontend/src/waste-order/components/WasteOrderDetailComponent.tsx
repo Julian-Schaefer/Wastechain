@@ -2,29 +2,14 @@ import React from 'react';
 import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
 import { Input, Row, Col, Button } from 'antd';
 import styled from 'styled-components';
-import { EquipmentType } from '../Service';
 
 export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: WasteOrder }, { wasteOrder: WasteOrder, editable: boolean }>{
 
     constructor(props: { wasteOrder: WasteOrder }) {
         super(props);
 
-        let wasteOrder = props.wasteOrder;
-
-        // if (!wasteOrder) {
-        //     wasteOrder = {
-        //         service: {
-        //             description: '',
-        //             description2: '',
-        //             equipmentDescription: '',
-        //             equipmentType: EquipmentType.CLEARANCE,
-        //             materialDescription: ''
-        //         }
-        //     };
-        // }
-
         this.state = {
-            wasteOrder: wasteOrder!,
+            wasteOrder: props.wasteOrder,
             editable: false
         };
     }
@@ -69,7 +54,7 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                         <Label>Status:</Label>
                     </Col>
                     <Col span={8}>
-                        <Label>{status}</Label>
+                        <Label>{WasteOrderStatus[status!!]}</Label>
                     </Col>
                 </Row>
 

@@ -1,6 +1,5 @@
-import { Service, ServiceSchema } from "./Service";
-import { TaskSite, TaskSiteSchema } from "./TaskSite";
-import * as Joi from '@hapi/joi';
+import { Service } from "./Service";
+import { TaskSite } from "./TaskSite";
 
 export enum WasteOrderStatus {
     COMMISSIONED,
@@ -11,10 +10,28 @@ export enum WasteOrderStatus {
 }
 
 export interface WasteOrder {
-    id?: string;
-    status?: WasteOrderStatus;
+    id: string;
+    status: WasteOrderStatus;
+    subcontractorMSPID: string;
+    originatorMSPID: string;
+    customerName: string;
+    taskSite: TaskSite;
+    service: Service;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    unitOfMeasure: string;
+    taskDate: Date
+    startingTime: string;
+    finishingTime: string;
+    referenceNo: string;
+    rejectionMessage: string;
+    lastChanged: Date;
+    lastChangedByMSPID: string;
+}
+
+export interface WasteOrderCommissionSchema {
     subcontractorMSPID?: string;
-    originatorMSPID?: string;
     customerName?: string;
     taskSite: TaskSite;
     service: Service;
@@ -22,76 +39,8 @@ export interface WasteOrder {
     quantity?: number;
     unitPrice?: number;
     unitOfMeasure?: string;
-    taskDate?: Date
+    taskDate?: string;
     startingTime?: string;
     finishingTime?: string;
     referenceNo?: string;
-    rejectionMessage?: string;
-    lastChanged?: Date;
-    lastChangedByMSPID?: string;
 }
-
-export const WasteOrderSchema = Joi.object().keys({
-    key: ServiceSchema.required(),
-    status: Joi.number().required(),
-    subcontractorMSPID: Joi.string().required(),
-    originatorMSPID: Joi.string().required(),
-    customerName: Joi.string().required(),
-    taskSite: TaskSiteSchema.required(),
-    service: ServiceSchema.required(),
-    description: Joi.string().required(),
-    quantity: Joi.number().required(),
-    unitPrice: Joi.number().required(),
-    unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
-    startingTime: Joi.string(),
-    finishingTime: Joi.string(),
-    referenceNo: Joi.string().required(),
-    rejectionMessage: Joi.string(),
-    lastChanged: Joi.date().required(),
-    lastChangedByMSPID: Joi.string().required()
-});
-
-export const WasteOrderCommissionSchema = Joi.object().keys({
-    subcontractorMSPID: Joi.string().required(),
-    customerName: Joi.string().required(),
-    taskSite: TaskSiteSchema.required(),
-    service: ServiceSchema.required(),
-    description: Joi.string().required(),
-    quantity: Joi.number().required(),
-    unitPrice: Joi.number().required(),
-    unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
-    startingTime: Joi.string(),
-    finishingTime: Joi.string(),
-    referenceNo: Joi.string().required()
-});
-
-export const WasteOrderCorrectionSchema = Joi.object().keys({
-    subcontractorMSPID: Joi.string().required(),
-    customerName: Joi.string().required(),
-    taskSite: TaskSiteSchema.required(),
-    service: ServiceSchema.required(),
-    description: Joi.string().required(),
-    quantity: Joi.number().required(),
-    unitPrice: Joi.number().required(),
-    unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
-    startingTime: Joi.string(),
-    finishingTime: Joi.string()
-});
-
-export const WasteOrderCompleteSchema = Joi.object().keys({
-    service: ServiceSchema.required(),
-    description: Joi.string().required(),
-    quantity: Joi.number().required(),
-    unitPrice: Joi.number().required(),
-    unitOfMeasure: Joi.string().required(),
-    taskDate: Joi.date().required(),
-    startingTime: Joi.string(),
-    finishingTime: Joi.string()
-});
-
-export const WasteOrderRejectSchema = Joi.object().keys({
-    rejectionMessage: Joi.string().required()
-});

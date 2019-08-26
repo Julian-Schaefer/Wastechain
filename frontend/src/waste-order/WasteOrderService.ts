@@ -1,4 +1,4 @@
-import { WasteOrder } from "./WasteOrder";
+import { WasteOrder, WasteOrderCommissionSchema } from "./WasteOrder";
 import { get, post } from "../HttpClient";
 
 async function getWasteOrdersWithTypeAndStatus(type: string, status: number): Promise<WasteOrder[]> {
@@ -11,7 +11,7 @@ async function getWasteOrdersWithTypeAndStatus(type: string, status: number): Pr
     }
 }
 
-async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
+async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrderCommissionSchema): Promise<WasteOrder> {
     try {
         let commissionWasteOrder = await post('/order/' + wasteOrderId, wasteOrder);
         console.log(commissionWasteOrder);
