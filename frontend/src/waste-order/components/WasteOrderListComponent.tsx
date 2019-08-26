@@ -8,12 +8,14 @@ import { WasteOrderListItemComponent } from './WasteOrderListItemComponent';
 import { WasteOrderDetailComponent } from './WasteOrderDetailComponent';
 import { WasteOrderCommissionComponent } from './WasteOrderCommissionComponent';
 import { WasteOrderFilterComponent } from './WasteOrderFilterComponent';
+import styled from 'styled-components';
 
 interface WasteOrderListComponentState {
     wasteOrders?: WasteOrder[];
     selectedWasteOrder?: WasteOrder;
     showWasteOrderDetails: boolean;
     showWasteOrderCommission: boolean;
+    errorMessage?: string;
     filter: {
         type: string;
         status: WasteOrderStatus
@@ -44,6 +46,8 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
         const { filter } = this.state;
         getWasteOrdersWithTypeAndStatus(filter.type, filter.status).then((orders: WasteOrder[]) => {
             this.setState({ wasteOrders: orders });
+        }).catch((error: Error) => {
+            this.setState({ errorMessage: error.message })
         });
     }
 
@@ -56,7 +60,11 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
     }
 
     private reload = () => {
-        this.setState({ wasteOrders: undefined, selectedWasteOrder: undefined });
+        this.setState({
+            wasteOrders: undefined,
+            selectedWasteOrder: undefined,
+            errorMessage: undefined
+        });
         this.getOrders();
     }
 
@@ -79,7 +87,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
     }
 
     render() {
-        const { wasteOrders, selectedWasteOrder, showWasteOrderDetails, showWasteOrderCommission } = this.state;
+        const { wasteOrders, selectedWasteOrder, showWasteOrderDetails, showWasteOrderCommission, errorMessage } = this.state;
 
         return (
             <div style={{ padding: "20px" }}>
@@ -97,7 +105,13 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                 <Divider />
 
                 {!wasteOrders ?
-                    (<Spin tip="loading" indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />)
+                    (
+                        errorMessage ? (
+                            <ErrorLabel>{errorMessage}</ErrorLabel>
+                        ) : (
+                                <Spin tip="loading" indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
+                            )
+                    )
                     :
                     (wasteOrders.length === 0 ?
                         (<p>No Waste Orders</p>)
@@ -129,3 +143,8 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
         );
     }
 }
+
+const ErrorLabel = styled.p`
+    color: red;
+    font-size: 12pt;
+`;
