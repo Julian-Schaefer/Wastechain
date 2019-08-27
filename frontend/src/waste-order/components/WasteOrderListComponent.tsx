@@ -7,7 +7,7 @@ import { Modal } from '../../util/Modal';
 import { WasteOrderListItemComponent } from './WasteOrderListItemComponent';
 import { WasteOrderDetailComponent } from './WasteOrderDetailComponent';
 import { WasteOrderCommissionComponent } from './WasteOrderCommissionComponent';
-import { WasteOrderFilterComponent } from './WasteOrderFilterComponent';
+import { WasteOrderFilterComponent, WasteOrderFilterType } from './WasteOrderFilterComponent';
 import styled from 'styled-components';
 
 interface WasteOrderListComponentState {
@@ -17,7 +17,7 @@ interface WasteOrderListComponentState {
     showWasteOrderCommission: boolean;
     errorMessage?: string;
     filter: {
-        type: string;
+        type: WasteOrderFilterType;
         status: WasteOrderStatus
     };
 }
@@ -32,7 +32,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
             showWasteOrderDetails: false,
             showWasteOrderCommission: false,
             filter: {
-                type: "incoming",
+                type: WasteOrderFilterType.INCOMING,
                 status: WasteOrderStatus.COMMISSIONED
             }
         };
@@ -68,7 +68,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
         this.getOrders();
     }
 
-    private handleTypeSelected = (type: string) => {
+    private handleTypeSelected = (type: WasteOrderFilterType) => {
         this.setState({
             filter: {
                 ...this.state.filter,
@@ -109,7 +109,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                         errorMessage ? (
                             <ErrorLabel>{errorMessage}</ErrorLabel>
                         ) : (
-                                <Spin tip="loading" indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
+                                <Spin tip="Loading..." indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
                             )
                     )
                     :
@@ -127,7 +127,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                                 </div>
 
                                 <Modal visible={showWasteOrderDetails} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={this.reload}>
-                                    <WasteOrderDetailComponent wasteOrder={selectedWasteOrder!!} />
+                                    <WasteOrderDetailComponent wasteOrder={selectedWasteOrder!!} type={this.state.filter.type} />
                                 </Modal>
                             </div>
                         )

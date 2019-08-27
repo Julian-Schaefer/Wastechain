@@ -3,8 +3,13 @@ import { Row, Col, Select } from 'antd';
 import styled from 'styled-components';
 import { WasteOrderStatus } from '../WasteOrder';
 
+export enum WasteOrderFilterType {
+    INCOMING,
+    OUTGOING
+}
+
 interface WasteOrderFilterComponentProps {
-    onTypeSelected: (type: string) => void;
+    onTypeSelected: (type: WasteOrderFilterType) => void;
     onStatusSelected: (status: WasteOrderStatus) => void;
 }
 
@@ -18,12 +23,12 @@ export class WasteOrderFilterComponent extends React.Component<WasteOrderFilterC
                 </Col>
 
                 <Col span={10}>
-                    <Select 
-                        defaultValue="incoming"
+                    <Select
+                        defaultValue={WasteOrderFilterType.INCOMING}
                         style={{ width: "100%" }}
-                        onChange={(value: string) => this.props.onTypeSelected(value)}>
-                        <Select.Option value="incoming">Incoming</Select.Option>
-                        <Select.Option value="outgoing">Outgoing</Select.Option>
+                        onChange={(value: WasteOrderFilterType) => this.props.onTypeSelected(value)}>
+                        <Select.Option value={WasteOrderFilterType.INCOMING}>Incoming</Select.Option>
+                        <Select.Option value={WasteOrderFilterType.OUTGOING}>Outgoing</Select.Option>
                     </Select>
                 </Col>
 
@@ -32,7 +37,7 @@ export class WasteOrderFilterComponent extends React.Component<WasteOrderFilterC
                 </Col>
 
                 <Col span={10}>
-                    <Select 
+                    <Select
                         defaultValue={WasteOrderStatus.COMMISSIONED}
                         style={{ width: "100%" }}
                         onChange={(value: WasteOrderStatus) => this.props.onStatusSelected(value)}>

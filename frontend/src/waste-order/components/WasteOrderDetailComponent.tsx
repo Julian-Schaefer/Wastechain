@@ -1,6 +1,6 @@
 import React from 'react';
 import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
-import { Input, Row, Col, Button, Divider, TimePicker, DatePicker } from 'antd';
+import { Input, Row, Col, Button, Divider, TimePicker, DatePicker, Modal, Spin, Icon } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 import { cancelWasteOrder, acceptWasteOrder } from '../WasteOrderService';
@@ -8,21 +8,31 @@ import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
 import { ServiceDetailComponent } from './details/ServiceDetailComponent';
 import { TaskSite } from '../TaskSite';
 import { Service } from '../Service';
+import { WasteOrderFilterType } from './WasteOrderFilterComponent';
 
 interface WasteOrderDetailComponentState {
     wasteOrder: WasteOrder;
     editable: boolean;
     errorMessage?: string;
+    type: WasteOrderFilterType;
+    isLoading: boolean;
 }
 
-export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: WasteOrder }, WasteOrderDetailComponentState>{
+interface WasteOrderDetailComponentProps {
+    wasteOrder: WasteOrder;
+    type: WasteOrderFilterType;
+}
 
-    constructor(props: { wasteOrder: WasteOrder }) {
+export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailComponentProps, WasteOrderDetailComponentState>{
+
+    constructor(props: WasteOrderDetailComponentProps) {
         super(props);
 
         this.state = {
             wasteOrder: props.wasteOrder,
-            editable: false
+            editable: false,
+            type: props.type,
+            isLoading: false
         };
     }
 
@@ -76,24 +86,52 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
         })
     }
 
-    private handleCancelClick = () => {
-        cancelWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
-            this.setState({ wasteOrder });
-        }).catch((error: Error) => {
-            this.setState({ errorMessage: error.message });
+    private handleSuccess = (wasteOrder: WasteOrder) => {
+        this.setState({ wasteOrder, isLoading: false });
+        Modal.success({
+            title: 'Success',
+            content: 'Successfully updated Waste Order!'
         });
     }
 
-    private handleAcceptClick = () => {
+    private handleError = (error: Error) => {
+        this.setState({ errorMessage: error.message, isLoading: false });
+    }
+
+    private accept = () => {
         acceptWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
-            this.setState({ wasteOrder });
+            this.handleSuccess(wasteOrder);
         }).catch((error: Error) => {
-            this.setState({ errorMessage: error.message });
+            this.handleError(error);
+        });
+    }
+
+    private cancel = () => {
+        cancelWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
+            this.handleSuccess(wasteOrder);
+        }).catch((error: Error) => {
+            this.handleError(error);
+        });
+    }
+
+    private setLoading = () => {
+        this.setState({ isLoading: true, errorMessage: undefined });
+    }
+
+    private showConfirm(onConfirmation: () => void) {
+        const setLoading = this.setLoading;
+
+        Modal.confirm({
+            content: <Label>Are you sure?</Label>,
+            onOk() {
+                setLoading();
+                onConfirmation();
+            }
         });
     }
 
     render() {
-        const { wasteOrder } = this.state;
+        const { wasteOrder, type, isLoading } = this.state;
         const { status } = wasteOrder;
         const { taskSite } = wasteOrder;
         const { service } = wasteOrder;
@@ -122,6 +160,13 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                             </Col>
                             <Col span={8}>
                                 <Label>{WasteOrderStatus[status]}</Label>
+                            </Col>
+
+                            <Col span={4}>
+                                <Label>Type:</Label>
+                            </Col>
+                            <Col span={8}>
+                                <Label>{WasteOrderFilterType[type]}</Label>
                             </Col>
                         </Row>
 
@@ -273,21 +318,43 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
 
                 {status !== WasteOrderStatus.CANCELLED && <Divider />}
 
-                {status === WasteOrderStatus.COMMISSIONED &&
-                    <div>
-                        <Button type="primary">Correct</Button>
-                        <Button type="primary" onClick={this.handleAcceptClick} style={{ marginLeft: "20px" }}>Accept</Button>
-                        <Button type="primary" onClick={this.handleCancelClick} style={{ marginLeft: "20px" }}>Cancel</Button>
-                    </div>
-                }
+                {!isLoading ?
+                    (
+                        <div>
+                            {status === WasteOrderStatus.COMMISSIONED &&
+                                <div>
+                                    {type === WasteOrderFilterType.INCOMING ? (
+                                        <div>
+                                            <Button type="danger">Reject</Button>
+                                            <Button type="primary" onClick={() => this.showConfirm(this.accept)} style={{ marginLeft: "20px" }}>Accept</Button>
+                                        </div>
+                                    ) : (
+                                            < div >
+                                                <Button type="danger" onClick={() => this.showConfirm(this.cancel)}>Cancel</Button>
+                                                <Button type="primary" style={{ marginLeft: "20px" }}>Correct</Button>
+                                            </div>
+                                        )}
+                                </div>
+                            }
 
-                {status === WasteOrderStatus.REJECTED && <Button type="primary">Correct</Button>}
+                            {status === WasteOrderStatus.REJECTED &&
+                                type === WasteOrderFilterType.OUTGOING &&
+                                < Button type="primary">Correct</Button>}
 
-                {status === WasteOrderStatus.ACCEPTED &&
-                    <div>
-                        <Button type="primary">Complete</Button>
-                        <Button type="primary" onClick={this.handleCancelClick} style={{ marginLeft: "20px" }}>Cancel</Button>
-                    </div>
+                            {
+                                status === WasteOrderStatus.ACCEPTED &&
+                                <div>
+                                    <Button type="danger" onClick={() => this.showConfirm(this.cancel)}>Cancel</Button>
+
+                                    {type === WasteOrderFilterType.INCOMING &&
+                                        <Button type="primary" style={{ marginLeft: "20px" }}>Complete</Button>}
+                                </div>
+                            }
+                        </div>
+                    ) :
+                    (
+                        <Spin tip="Loading..." indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
+                    )
                 }
 
                 {this.state.errorMessage && <ErrorLabel>{this.state.errorMessage!!}</ErrorLabel>}
@@ -297,19 +364,19 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
 }
 
 const Label = styled.p`
-    line-height: 32px;
-`;
+            line-height: 32px;
+        `;
 
 const ErrorLabel = styled.p`
-    font-size: 12pt;
-    color: red;
-    margin-top: 10px;
-`;
+            font-size: 12pt;
+            color: red;
+            margin-top: 10px;
+        `;
 
 const Tab = styled.div`
-    border: rgb(217, 217, 217) 1px solid;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.19), 0 1px 1px rgba(0,0,0,0.23);
+            border: rgb(217, 217, 217) 1px solid;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.19), 0 1px 1px rgba(0,0,0,0.23);
 `;
