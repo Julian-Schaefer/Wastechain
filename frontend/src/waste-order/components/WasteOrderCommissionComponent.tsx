@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker } from 'antd';
+import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker, Modal } from 'antd';
 import styled from 'styled-components';
 import { EquipmentType, Service } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
@@ -41,7 +41,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     description: '',
                     description2: '',
                     equipmentDescription: '',
-                    equipmentType: EquipmentType.CLEARANCE,
+                    equipmentType: EquipmentType.SUBMISSION,
                     materialDescription: ''
                 }
             },
@@ -99,9 +99,22 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
         this.setState({ isLoading: true });
 
         commissionWasteOrder(this.state.wasteOrderId!!, this.state.wasteOrder).then((wasteOrder) => {
+            Modal.success({
+                title: 'Success',
+                content: 'Successfully commissioned Waste Order to the Wastechain!'
+            });
             this.props.onCommissioned(wasteOrder);
         }).catch((error: Error) => {
             this.setState({ errorMessage: error.message, isLoading: false });
+        });
+    }
+
+    private showConfirm(onConfirmation: () => void) {
+        Modal.confirm({
+            content: <Label>Are you sure?</Label>,
+            onOk() {
+                onConfirmation();
+            }
         });
     }
 
@@ -255,7 +268,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     <Col span={4}>
                         <Button
                             type="primary"
-                            onClick={this.commission}
+                            onClick={() => this.showConfirm(this.commission)}
                             loading={this.state.isLoading}
                             disabled={!this.state.wasteOrderId}>Commission</Button>
                     </Col>
