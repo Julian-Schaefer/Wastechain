@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker, Modal } from 'antd';
+import { Input, Row, Col, Button, DatePicker, Divider, TimePicker, Modal } from 'antd';
 import styled from 'styled-components';
 import { EquipmentType, Service } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';

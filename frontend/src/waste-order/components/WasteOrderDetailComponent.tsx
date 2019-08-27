@@ -3,7 +3,7 @@ import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
 import { Input, Row, Col, Button, Divider, TimePicker, DatePicker, Modal, Spin, Icon } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
-import { cancelWasteOrder, acceptWasteOrder } from '../WasteOrderService';
+import { cancelWasteOrder, acceptWasteOrder, correctWasteOrder, rejectWasteOrder, completeWasteOrder } from '../WasteOrderService';
 import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
 import { ServiceDetailComponent } from './details/ServiceDetailComponent';
 import { TaskSite } from '../TaskSite';
@@ -16,6 +16,7 @@ interface WasteOrderDetailComponentState {
     errorMessage?: string;
     type: WasteOrderFilterType;
     isLoading: boolean;
+    rejectionMessage?: string;
 }
 
 interface WasteOrderDetailComponentProps {
@@ -86,45 +87,83 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
         })
     }
 
-    private handleSuccess = (wasteOrder: WasteOrder) => {
-        this.setState({ wasteOrder, isLoading: false });
+    private onSuccess = (wasteOrder: WasteOrder) => {
+        this.setState({ wasteOrder, isLoading: false, editable: false });
         Modal.success({
             title: 'Success',
             content: 'Successfully updated Waste Order!'
         });
     }
 
-    private handleError = (error: Error) => {
+    private onError = (error: Error) => {
         this.setState({ errorMessage: error.message, isLoading: false });
-    }
-
-    private accept = () => {
-        acceptWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
-            this.handleSuccess(wasteOrder);
-        }).catch((error: Error) => {
-            this.handleError(error);
-        });
-    }
-
-    private cancel = () => {
-        cancelWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
-            this.handleSuccess(wasteOrder);
-        }).catch((error: Error) => {
-            this.handleError(error);
-        });
     }
 
     private setLoading = () => {
         this.setState({ isLoading: true, errorMessage: undefined });
     }
 
-    private showConfirm(onConfirmation: () => void) {
-        const setLoading = this.setLoading;
+    private accept = () => {
+        acceptWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
+            this.onSuccess(wasteOrder);
+        }).catch((error: Error) => {
+            this.onError(error);
+        });
+    }
 
+    private cancel = () => {
+        cancelWasteOrder(this.state.wasteOrder.id).then((wasteOrder: WasteOrder) => {
+            this.onSuccess(wasteOrder);
+        }).catch((error: Error) => {
+            this.onError(error);
+        });
+    }
+
+    private correct = () => {
+        correctWasteOrder(this.state.wasteOrder.id, this.state.wasteOrder).then((wasteOrder: WasteOrder) => {
+            this.onSuccess(wasteOrder);
+        }).catch((error: Error) => {
+            this.onError(error);
+        });
+    }
+
+    private complete = () => {
+        completeWasteOrder(this.state.wasteOrder.id, this.state.wasteOrder).then((wasteOrder: WasteOrder) => {
+            this.onSuccess(wasteOrder);
+        }).catch((error: Error) => {
+            this.onError(error);
+        });
+    }
+
+    private reject = () => {
+        const content = <div>
+            <Label>Rejection Message:</Label>
+            <Input
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ rejectionMessage: e.target.value })} />
+        </div>;
+
+        this.setState({
+            rejectionMessage: undefined
+        }, () => {
+            Modal.confirm({
+                content,
+                onOk: () => {
+                    this.setLoading();
+                    rejectWasteOrder(this.state.wasteOrder.id, this.state.rejectionMessage!!).then((wasteOrder: WasteOrder) => {
+                        this.onSuccess(wasteOrder);
+                    }).catch((error: Error) => {
+                        this.onError(error);
+                    });
+                }
+            });
+        });
+    }
+
+    private showConfirm(onConfirmation: () => void) {
         Modal.confirm({
             content: <Label>Are you sure?</Label>,
-            onOk() {
-                setLoading();
+            onOk: () => {
+                this.setLoading();
                 onConfirmation();
             }
         });
@@ -211,7 +250,40 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
                                 <Label>Originator MSP:</Label>
                             </Col>
                             <Col span={8}>
-                                <Input value={wasteOrder.originatorMSPID} disabled={true} />
+                                <Input
+                                    value={wasteOrder.originatorMSPID}
+                                    disabled={true} />
+                            </Col>
+                        </Row>
+
+                        <Row gutter={40} style={{ marginBottom: "20px" }}>
+                            <Col span={4}>
+                                <Label>Rejection Message:</Label>
+                            </Col>
+                            <Col span={20}>
+                                <Input
+                                    value={wasteOrder.rejectionMessage}
+                                    disabled={true} />
+                            </Col>
+                        </Row>
+
+                        <Row gutter={40} style={{ marginBottom: "20px" }}>
+                            <Col span={4}>
+                                <Label>Last Changed:</Label>
+                            </Col>
+                            <Col span={8}>
+                                <Input
+                                    value={wasteOrder.lastChanged.toString()}
+                                    disabled={true} />
+                            </Col>
+
+                            <Col span={4}>
+                                <Label>Last Changed by MSP:</Label>
+                            </Col>
+                            <Col span={8}>
+                                <Input
+                                    value={wasteOrder.lastChangedByMSPID}
+                                    disabled={true} />
                             </Col>
                         </Row>
                     </Tab>
@@ -325,13 +397,13 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
                                 <div>
                                     {type === WasteOrderFilterType.INCOMING ? (
                                         <div>
-                                            <Button type="danger">Reject</Button>
+                                            <Button type="danger" onClick={this.reject}>Reject</Button>
                                             <Button type="primary" onClick={() => this.showConfirm(this.accept)} style={{ marginLeft: "20px" }}>Accept</Button>
                                         </div>
                                     ) : (
                                             < div >
                                                 <Button type="danger" onClick={() => this.showConfirm(this.cancel)}>Cancel</Button>
-                                                <Button type="primary" style={{ marginLeft: "20px" }}>Correct</Button>
+                                                <Button type="primary" onClick={() => this.showConfirm(this.correct)} style={{ marginLeft: "20px" }}>Correct</Button>
                                             </div>
                                         )}
                                 </div>
@@ -339,7 +411,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
 
                             {status === WasteOrderStatus.REJECTED &&
                                 type === WasteOrderFilterType.OUTGOING &&
-                                < Button type="primary">Correct</Button>}
+                                < Button type="primary" onClick={() => this.showConfirm(this.correct)}>Correct</Button>}
 
                             {
                                 status === WasteOrderStatus.ACCEPTED &&
@@ -347,7 +419,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
                                     <Button type="danger" onClick={() => this.showConfirm(this.cancel)}>Cancel</Button>
 
                                     {type === WasteOrderFilterType.INCOMING &&
-                                        <Button type="primary" style={{ marginLeft: "20px" }}>Complete</Button>}
+                                        <Button type="primary" onClick={() => this.showConfirm(this.complete)} style={{ marginLeft: "20px" }}>Complete</Button>}
                                 </div>
                             }
                         </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Input, Row, Col, Select } from 'antd';
-import { Service, EquipmentType } from '../../Service';
+import { Service } from '../../Service';
 
 interface ServiceDetailComponentProps {
     service: Service;

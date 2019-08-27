@@ -1,4 +1,4 @@
-import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema } from "./WasteOrder";
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema, WasteOrderCompleteSchema } from "./WasteOrder";
 import { get, post, put } from "../HttpClient";
 import { WasteOrderFilterType } from "./components/WasteOrderFilterComponent";
 
@@ -16,8 +16,22 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder
     return commissionWasteOrder as WasteOrder;
 }
 
-async function correctWasteOrder(wasteOrderId: string, wasteOrder: WasteOrderCorrectionSchema): Promise<WasteOrder> {
-    let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.COMMISSIONED, ...wasteOrder });
+async function correctWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
+    let correctedWasteOrder: WasteOrderCorrectionSchema = {
+        customerName: wasteOrder.customerName,
+        subcontractorMSPID: wasteOrder.subcontractorMSPID,
+        description: wasteOrder.description,
+        taskSite: wasteOrder.taskSite,
+        service: wasteOrder.service,
+        quantity: wasteOrder.quantity,
+        unitPrice: wasteOrder.unitPrice,
+        unitOfMeasure: wasteOrder.unitOfMeasure,
+        taskDate: wasteOrder.taskDate,
+        startingTime: wasteOrder.startingTime,
+        finishingTime: wasteOrder.finishingTime
+    }
+
+    let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.COMMISSIONED, ...correctedWasteOrder });
     console.log(updatedWasteOrder);
     return updatedWasteOrder as WasteOrder;
 }
@@ -35,7 +49,20 @@ async function acceptWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
 }
 
 async function rejectWasteOrder(wasteOrderId: string, rejectionMessage: string): Promise<WasteOrder> {
-    let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.ACCEPTED, rejectionMessage });
+    let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.REJECTED, rejectionMessage });
+    console.log(updatedWasteOrder);
+    return updatedWasteOrder as WasteOrder;
+}
+
+async function completeWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
+    let correctedWasteOrder: WasteOrderCompleteSchema = {
+        quantity: wasteOrder.quantity,
+        taskDate: wasteOrder.taskDate,
+        startingTime: wasteOrder.startingTime,
+        finishingTime: wasteOrder.finishingTime
+    }
+
+    let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.COMPLETED, ...correctedWasteOrder });
     console.log(updatedWasteOrder);
     return updatedWasteOrder as WasteOrder;
 }
@@ -44,5 +71,8 @@ export {
     getWasteOrdersWithTypeAndStatus,
     commissionWasteOrder,
     cancelWasteOrder,
-    acceptWasteOrder
+    correctWasteOrder,
+    acceptWasteOrder,
+    rejectWasteOrder,
+    completeWasteOrder
 };
