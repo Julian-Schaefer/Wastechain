@@ -126,7 +126,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                                     }
                                 </div>
 
-                                <Modal visible={showWasteOrderDetails} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={this.reload}>
+                                <Modal visible={showWasteOrderDetails} zIndex={1} onClose={() => this.setState({ showWasteOrderDetails: false })} onClosed={this.reload}>
                                     <WasteOrderDetailComponent wasteOrder={selectedWasteOrder!!} type={this.state.filter.type} />
                                 </Modal>
                             </div>
@@ -136,7 +136,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                     )
                 }
 
-                <Modal visible={showWasteOrderCommission} onClose={() => this.setState({ showWasteOrderCommission: false })} onClosed={this.reload}>
+                <Modal visible={showWasteOrderCommission} zIndex={1} onClose={() => this.setState({ showWasteOrderCommission: false })} onClosed={this.reload}>
                     <WasteOrderCommissionComponent onCommissioned={() => this.setState({ showWasteOrderCommission: false })} />
                 </Modal>
             </div>

@@ -52,9 +52,9 @@ const cardTransitionStyles: any = {
     },
 };
 
-export class Modal extends React.Component<{ visible: boolean, onClose: () => void, onClosed: () => void }, { visible: boolean }> {
+export class Modal extends React.Component<{ visible: boolean, zIndex: number, onClose: () => void, onClosed?: () => void }, { visible: boolean }> {
 
-    constructor(props: { visible: boolean, onClose: () => void, onClosed: () => void }) {
+    constructor(props: { visible: boolean, zIndex: number, onClose: () => void, onClosed?: () => void }) {
         super(props);
         this.state = {
             visible: this.props.visible
@@ -75,14 +75,15 @@ export class Modal extends React.Component<{ visible: boolean, onClose: () => vo
                         </div >
                         <Card style={{
                             ...cardDefaultStyle,
-                            ...cardTransitionStyles[state]
+                            ...cardTransitionStyles[state],
+                            zIndex: this.props.zIndex
                         }}>
                             <Button
                                 style={{
                                     position: "absolute",
                                     top: "20px",
                                     right: "20px",
-                                    zIndex: 1
+                                    zIndex: this.props.zIndex + 1
                                 }}
                                 onClick={this.props.onClose}
 

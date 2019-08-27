@@ -1,6 +1,6 @@
 import React from 'react';
 import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
-import { Input, Row, Col, Button, Divider, Modal, Spin, Icon } from 'antd';
+import { Input, Row, Col, Button, Divider, Modal as ConfirmModal, Spin, Icon } from 'antd';
 import styled from 'styled-components';
 import { cancelWasteOrder, acceptWasteOrder, correctWasteOrder, rejectWasteOrder, completeWasteOrder } from '../WasteOrderService';
 import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
@@ -9,6 +9,8 @@ import { TaskSite } from '../TaskSite';
 import { Service } from '../Service';
 import { WasteOrderFilterType } from './WasteOrderFilterComponent';
 import { WasteOrderDetailsComponent } from './details/WasteOrderDetailsComponent';
+import { WasteOrderHistoryComponent } from './WasteOrderHistoryComponent';
+import { Modal } from '../../util/Modal';
 
 interface WasteOrderDetailComponentState {
     wasteOrder: WasteOrder;
@@ -17,6 +19,7 @@ interface WasteOrderDetailComponentState {
     type: WasteOrderFilterType;
     isLoading: boolean;
     rejectionMessage?: string;
+    showHistory: boolean;
 }
 
 interface WasteOrderDetailComponentProps {
@@ -33,7 +36,8 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
             wasteOrder: props.wasteOrder,
             editable: false,
             type: props.type,
-            isLoading: false
+            isLoading: false,
+            showHistory: false
         };
     }
 
@@ -73,7 +77,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
 
     private onSuccess = (wasteOrder: WasteOrder) => {
         this.setState({ wasteOrder, isLoading: false, editable: false });
-        Modal.success({
+        ConfirmModal.success({
             title: 'Success',
             content: 'Successfully updated Waste Order!'
         });
@@ -129,7 +133,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
         this.setState({
             rejectionMessage: undefined
         }, () => {
-            Modal.confirm({
+            ConfirmModal.confirm({
                 content,
                 onOk: () => {
                     this.setLoading();
@@ -144,7 +148,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
     }
 
     private showConfirm(onConfirmation: () => void) {
-        Modal.confirm({
+        ConfirmModal.confirm({
             content: <Label>Are you sure?</Label>,
             onOk: () => {
                 this.setLoading();
@@ -170,7 +174,7 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
                         <Button onClick={this.toggleEditable}>Edit</Button>
                     </Col>
                     <Col span={4}>
-                        <Button>Show History</Button>
+                        <Button onClick={() => this.setState({ showHistory: true })}>Show History</Button>
                     </Col>
                 </Row>
 
@@ -321,6 +325,10 @@ export class WasteOrderDetailComponent extends React.Component<WasteOrderDetailC
                 }
 
                 {this.state.errorMessage && <ErrorLabel>{this.state.errorMessage!!}</ErrorLabel>}
+
+                <Modal visible={this.state.showHistory} zIndex={10} onClose={() => this.setState({ showHistory: false })}>
+                    <WasteOrderHistoryComponent wasteOrder={wasteOrder} />
+                </Modal>
             </div >
         );
     }

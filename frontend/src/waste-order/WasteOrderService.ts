@@ -1,4 +1,5 @@
 import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema, WasteOrderCompleteSchema } from "./WasteOrder";
+import { WasteOrderTransaction } from "./WasteOrderTransaction";
 import { get, post, put } from "../HttpClient";
 import { WasteOrderFilterType } from "./components/WasteOrderFilterComponent";
 
@@ -8,6 +9,12 @@ async function getWasteOrdersWithTypeAndStatus(type: WasteOrderFilterType, statu
     let wasteOrders = await get('/order/' + typeString + '/status/' + status);
     console.log(wasteOrders);
     return wasteOrders as WasteOrder[];
+}
+
+async function getWasteOrderHistory(wasteOrder: WasteOrder): Promise<WasteOrderTransaction[]> {
+    let wasteOrderTransactions = await get('/order/' + wasteOrder.id + '/history');
+    console.log(wasteOrderTransactions);
+    return wasteOrderTransactions as WasteOrderTransaction[];
 }
 
 async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrderCommissionSchema): Promise<WasteOrder> {
@@ -69,6 +76,7 @@ async function completeWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder):
 
 export {
     getWasteOrdersWithTypeAndStatus,
+    getWasteOrderHistory,
     commissionWasteOrder,
     cancelWasteOrder,
     correctWasteOrder,
