@@ -39,7 +39,7 @@ export class HeaderComponent extends React.Component<{}, HeaderComponentState> {
                 </div>
 
                 <div style={{ float: "right" }}>
-                    <p>Logged in as: <Label>{this.state.username}</Label></p>
+                    <Label>Logged in as: <Bold>{this.state.username}</Bold></Label>
                 </div>
 
                 <div style={{ clear: "both" }} />
@@ -57,5 +57,8 @@ const Container = styled.div`
 
 const Label = styled.span`
     line-height: 40px;
+`;
+
+const Bold = styled.span`
     font-weight: bold;
 `;
