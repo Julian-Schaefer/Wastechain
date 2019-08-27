@@ -32,7 +32,7 @@ const cardDefaultStyle = {
     left: "40%",
     width: "20%",
     height: "20%",
-    border: "lightblue 2px solid",
+    border: "#63b4ff 2px solid",
     borderRadius: "8px",
     overflowY: "scroll"
 }

@@ -114,7 +114,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                     )
                     :
                     (wasteOrders.length === 0 ?
-                        (<p>No Waste Orders</p>)
+                        (<p>No Waste Orders have been found.</p>)
                         :
                         (
                             <div>
