@@ -51,3 +51,35 @@ services:
     volumes:
         - ./wallet:/wallet
         - ./connection-profiles:/connection-profiles
+
+### Frontend
+
+  frontend.ordering-organisation.com:
+    container_name: frontend.ordering-organisation.com
+    image: wastechain.azurecr.io/wastechain-frontend:master
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000
+    ports:
+      - 8080:3000
+    depends_on:
+      - api.ordering-organisation.com
+
+  frontend.subcontractor-organisation.com:
+    container_name: frontend.subcontractor-organisation.com
+    image: wastechain.azurecr.io/wastechain-frontend:master
+    environment:
+      - REACT_APP_API_URL=http://localhost:6000
+    ports:
+      - 10080:3000
+    depends_on:
+      - api.subcontractor-organisation.com
+
+  frontend.third-party-organisation.com:
+    container_name: frontend.third-party-organisation.com
+    image: wastechain.azurecr.io/wastechain-frontend:master
+    environment:
+      - REACT_APP_API_URL=http://localhost:9000
+    ports:
+      - 12080:3000
+    depends_on:
+      - api.third-party-organisation.com
