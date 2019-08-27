@@ -1,9 +1,13 @@
 import React from 'react';
 import { WasteOrder, WasteOrderStatus } from '../WasteOrder';
-import { Input, Row, Col, Button, Divider, TimePicker, DatePicker, Select } from 'antd';
+import { Input, Row, Col, Button, Divider, TimePicker, DatePicker } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 import { cancelWasteOrder, acceptWasteOrder } from '../WasteOrderService';
+import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
+import { ServiceDetailComponent } from './details/ServiceDetailComponent';
+import { TaskSite } from '../TaskSite';
+import { Service } from '../Service';
 
 interface WasteOrderDetailComponentState {
     wasteOrder: WasteOrder;
@@ -42,38 +46,18 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
         });
     }
 
-    private handleTaskSiteChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-        let change: any = {};
-        change[name] = e.target.value;
+    private handleTaskSiteChanged = (taskSite: TaskSite) => {
         this.updateWasteOrder({
             ...this.state.wasteOrder,
-            taskSite: {
-                ...this.state.wasteOrder.taskSite,
-                ...change
-            }
+            taskSite
         });
     }
 
-    private handleServiceChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-        let change: any = {};
-        change[name] = e.target.value;
+    private handleServiceChanged = (service: Service) => {
         this.updateWasteOrder({
             ...this.state.wasteOrder,
-            service: {
-                ...this.state.wasteOrder.service,
-                ...change
-            }
+            service
         });
-    }
-
-    private handleEquipmentTypeChange = (type: number) => {
-        this.updateWasteOrder({
-            ...this.state.wasteOrder,
-            service: {
-                ...this.state.wasteOrder.service,
-                equipmentType: type
-            }
-        })
     }
 
     private handleTaskDateChange = (date: moment.Moment | null) => {
@@ -282,173 +266,9 @@ export class WasteOrderDetailComponent extends React.Component<{ wasteOrder: Was
                         </Row>
                     </Tab>
 
-                    <Tab>
-                        <h2>Task Site</h2>
-                        <Row gutter={40} style={{ marginBottom: "20px" }}>
-                            <Col span={4}>
-                                <Label>Name:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.name}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'name')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
+                    <TaskSiteDetailComponent taskSite={taskSite} onTaskSiteChanged={this.handleTaskSiteChanged} editable={this.state.editable} />
 
-                            <Col span={4}>
-                                <Label>Name 2:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.name2}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'name2')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-
-                        <Row gutter={40} style={{ marginBottom: "20px" }}>
-                            <Col span={4}>
-                                <Label>Address:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.address}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'address')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-
-                            <Col span={4}>
-                                <Label>Address 2:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.address2}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'address2')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-
-                        <Row gutter={40} style={{ marginBottom: "20px" }}>
-                            <Col span={4}>
-                                <Label>Post Code:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.postCode}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'postCode')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-
-                            <Col span={4}>
-                                <Label>City:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.city}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'city')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-
-                        <Row gutter={40}>
-                            <Col span={4}>
-                                <Label>Country Code:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.countryCode}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'countryCode')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-
-                            <Col span={4}>
-                                <Label>Area Code:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={taskSite.areaCode}
-                                    onChange={(e) => this.handleTaskSiteChange(e, 'areaCode')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-                    </Tab>
-
-                    <Tab>
-                        <h2>Service</h2>
-                        <Row gutter={40} style={{ marginBottom: "20px" }}>
-                            <Col span={4}>
-                                <Label>Description:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={service.description}
-                                    onChange={(e) => this.handleServiceChange(e, 'description')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-
-                            <Col span={4}>
-                                <Label>Description 2:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={service.description2}
-                                    onChange={(e) => this.handleServiceChange(e, 'description2')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-
-                        <Row gutter={40} style={{ marginBottom: "20px" }}>
-                            <Col span={4}>
-                                <Label>Material Description:</Label>
-                            </Col>
-                            <Col span={20}>
-                                <Input
-                                    value={service.materialDescription}
-                                    onChange={(e) => this.handleServiceChange(e, 'materialDescription')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-
-                        <Row gutter={40}>
-                            <Col span={4}>
-                                <Label>Equipment Type:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Select
-                                    defaultValue={0} style={{ width: "100%" }}
-                                    onChange={this.handleEquipmentTypeChange}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable}>
-                                    <Select.Option value={0}>Submission</Select.Option>
-                                    <Select.Option value={1}>Pick-Up</Select.Option>
-                                    <Select.Option value={2}>Exchange</Select.Option>
-                                    <Select.Option value={3}>Clearance</Select.Option>
-                                </Select>
-                            </Col>
-
-                            <Col span={4}>
-                                <Label>Equipment Description:</Label>
-                            </Col>
-                            <Col span={8}>
-                                <Input
-                                    value={service.equipmentDescription}
-                                    onChange={(e) => this.handleServiceChange(e, 'equipmentDescription')}
-                                    disabled={!this.state.editable}
-                                    allowClear={this.state.editable} />
-                            </Col>
-                        </Row>
-                    </Tab>
+                    <ServiceDetailComponent service={service} onServiceChanged={this.handleServiceChanged} editable={this.state.editable} />
                 </div>
 
                 {status !== WasteOrderStatus.CANCELLED && <Divider />}

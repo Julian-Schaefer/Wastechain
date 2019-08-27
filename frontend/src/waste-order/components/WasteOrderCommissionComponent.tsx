@@ -1,10 +1,13 @@
 import React from 'react';
 import { Input, Row, Col, Button, Select, DatePicker, Divider, TimePicker } from 'antd';
 import styled from 'styled-components';
-import { EquipmentType } from '../Service';
+import { EquipmentType, Service } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
 import { WasteOrder, WasteOrderCommissionSchema } from '../WasteOrder';
 import moment from 'moment';
+import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
+import { TaskSite } from '../TaskSite';
+import { ServiceDetailComponent } from './details/ServiceDetailComponent';
 
 interface WasteOrderCommissionComponentProps {
     onCommissioned: (wasteOrder: WasteOrder) => void;
@@ -62,38 +65,18 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
         });
     }
 
-    private handleTaskSiteChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-        let change: any = {};
-        change[name] = e.target.value;
+    private handleTaskSiteChanged = (taskSite: TaskSite) => {
         this.updateWasteOrder({
             ...this.state.wasteOrder,
-            taskSite: {
-                ...this.state.wasteOrder.taskSite,
-                ...change
-            }
+            taskSite
         });
     }
 
-    private handleServiceChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-        let change: any = {};
-        change[name] = e.target.value;
+    private handleServiceChanged = (service: Service) => {
         this.updateWasteOrder({
             ...this.state.wasteOrder,
-            service: {
-                ...this.state.wasteOrder.service,
-                ...change
-            }
+            service
         });
-    }
-
-    private handleEquipmentTypeChange = (type: number) => {
-        this.updateWasteOrder({
-            ...this.state.wasteOrder,
-            service: {
-                ...this.state.wasteOrder.service,
-                equipmentType: type
-            }
-        })
     }
 
     private handleTaskDateChange = (date: moment.Moment | null) => {
@@ -262,157 +245,9 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                     </Row>
                 </Tab>
 
-                <Tab>
-                    <h2>Task Site</h2>
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Name:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.name}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'name')}
-                                allowClear />
-                        </Col>
+                <TaskSiteDetailComponent taskSite={taskSite} onTaskSiteChanged={this.handleTaskSiteChanged} editable={true} />
 
-                        <Col span={4}>
-                            <Label>Name 2:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.name2}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'name2')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Address:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.address}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'address')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Address 2:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.address2}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'address2')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Post Code:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.postCode}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'postCode')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>City:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.city}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'city')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40}>
-                        <Col span={4}>
-                            <Label>Country Code:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.countryCode}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'countryCode')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Area Code:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={taskSite.areaCode}
-                                onChange={(e) => this.handleTaskSiteChange(e, 'areaCode')}
-                                allowClear />
-                        </Col>
-                    </Row>
-                </Tab>
-
-                <Tab>
-                    <h2>Service</h2>
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Description:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={service.description}
-                                onChange={(e) => this.handleServiceChange(e, 'description')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Description 2:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={service.description2}
-                                onChange={(e) => this.handleServiceChange(e, 'description2')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Material Description:</Label>
-                        </Col>
-                        <Col span={20}>
-                            <Input
-                                value={service.materialDescription}
-                                onChange={(e) => this.handleServiceChange(e, 'materialDescription')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40}>
-                        <Col span={4}>
-                            <Label>Equipment Type:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Select defaultValue={0} style={{ width: "100%" }} onChange={this.handleEquipmentTypeChange}>
-                                <Select.Option value={0}>Submission</Select.Option>
-                                <Select.Option value={1}>Pick-Up</Select.Option>
-                                <Select.Option value={2}>Exchange</Select.Option>
-                                <Select.Option value={3}>Clearance</Select.Option>
-                            </Select>
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Equipment Description:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={service.equipmentDescription}
-                                onChange={(e) => this.handleServiceChange(e, 'equipmentDescription')}
-                                allowClear />
-                        </Col>
-                    </Row>
-                </Tab>
+                <ServiceDetailComponent service={service} onServiceChanged={this.handleServiceChanged} editable={true} />
 
                 <Divider />
 
