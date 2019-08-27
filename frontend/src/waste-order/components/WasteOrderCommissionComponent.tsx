@@ -1,13 +1,13 @@
 import React from 'react';
-import { Input, Row, Col, Button, DatePicker, Divider, TimePicker, Modal } from 'antd';
+import { Input, Row, Col, Button, Divider, Modal } from 'antd';
 import styled from 'styled-components';
 import { EquipmentType, Service } from '../Service';
 import { commissionWasteOrder } from '../WasteOrderService';
 import { WasteOrder, WasteOrderCommissionSchema } from '../WasteOrder';
-import moment from 'moment';
 import { TaskSiteDetailComponent } from './details/TaskSiteDetailComponent';
 import { TaskSite } from '../TaskSite';
 import { ServiceDetailComponent } from './details/ServiceDetailComponent';
+import { WasteOrderDetailsComponent } from './details/WasteOrderDetailsComponent';
 
 interface WasteOrderCommissionComponentProps {
     onCommissioned: (wasteOrder: WasteOrder) => void;
@@ -56,9 +56,9 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
         });
     }
 
-    private handleWasteOrderChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    private handleWasteOrderChanged = (property: string, value: string) => {
         let change: any = {};
-        change[name] = e.target.value;
+        change[property] = value;
         this.updateWasteOrder({
             ...this.state.wasteOrder,
             ...change
@@ -77,22 +77,6 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
             ...this.state.wasteOrder,
             service
         });
-    }
-
-    private handleTaskDateChange = (date: moment.Moment | null) => {
-        this.updateWasteOrder({
-            ...this.state.wasteOrder,
-            taskDate: date ? date.format('DD/MM/YYYY') : undefined
-        });
-    }
-
-    private handleTimeChange = (name: string, timeString: string) => {
-        let change: any = {};
-        change[name] = timeString;
-        this.updateWasteOrder({
-            ...this.state.wasteOrder,
-            ...change
-        })
     }
 
     private commission = () => {
@@ -148,7 +132,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Col span={8}>
                             <Input
                                 value={wasteOrder.description}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'description')}
+                                onChange={(e) => this.handleWasteOrderChanged('description', e.target.value)}
                                 allowClear />
                         </Col>
                     </Row>
@@ -160,7 +144,7 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Col span={8}>
                             <Input
                                 value={wasteOrder.customerName}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'customerName')}
+                                onChange={(e) => this.handleWasteOrderChanged('customerName', e.target.value)}
                                 allowClear />
                         </Col>
 
@@ -170,93 +154,13 @@ export class WasteOrderCommissionComponent extends React.Component<WasteOrderCom
                         <Col span={8}>
                             <Input
                                 value={wasteOrder.subcontractorMSPID}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'subcontractorMSPID')}
+                                onChange={(e) => this.handleWasteOrderChanged('subcontractorMSPID', e.target.value)}
                                 allowClear />
                         </Col>
                     </Row>
                 </Tab>
 
-                <Tab>
-                    <h2>Details</h2>
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Quantity:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                type="number"
-                                value={wasteOrder.quantity}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'quantity')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Task Date:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <DatePicker
-                                onChange={this.handleTaskDateChange}
-                                style={{ width: "100%" }} />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Unit Price:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                type="number"
-                                value={wasteOrder.unitPrice}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'unitPrice')}
-                                allowClear />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Unit of Measure:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={wasteOrder.unitOfMeasure}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'unitOfMeasure')}
-                                allowClear />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40} style={{ marginBottom: "20px" }}>
-                        <Col span={4}>
-                            <Label>Starting Time:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <TimePicker
-                                onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('startingTime', timeString)}
-                                style={{ width: "100%" }}
-                            />
-                        </Col>
-
-                        <Col span={4}>
-                            <Label>Finishing Time:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <TimePicker
-                                onChange={(_: moment.Moment, timeString: string) => this.handleTimeChange('finishingTime', timeString)}
-                                style={{ width: "100%" }}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Row gutter={40}>
-                        <Col span={4}>
-                            <Label>Reference No.:</Label>
-                        </Col>
-                        <Col span={8}>
-                            <Input
-                                value={wasteOrder.referenceNo}
-                                onChange={(e) => this.handleWasteOrderChange(e, 'referenceNo')}
-                                allowClear />
-                        </Col>
-                    </Row>
-                </Tab>
+                <WasteOrderDetailsComponent wasteOrder={wasteOrder as WasteOrder} onWasteOrderChanged={this.handleWasteOrderChanged} editable={true} />
 
                 <TaskSiteDetailComponent taskSite={taskSite} onTaskSiteChanged={this.handleTaskSiteChanged} editable={true} />
 
