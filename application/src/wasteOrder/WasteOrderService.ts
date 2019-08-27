@@ -80,14 +80,14 @@ async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOr
     delete updatedWasteOrder.status;
 
     const contract = await getFabricConnection().wasteOrderContract;
-    let submittedWasteOrder: WasteOrder;
+    let submittedWasteOrderBuffer: Buffer;
     if (sendBody) {
-        const submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
-        submittedWasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
+        submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
     } else {
-        await contract.submitTransaction(procedure, wasteOrderId);
+        submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId);
     }
 
+    let submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     console.log('Updated Contract with ID: ' + wasteOrderId);
     return submittedWasteOrder;
 }
