@@ -64,8 +64,7 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
             wasteOrders: undefined,
             selectedWasteOrder: undefined,
             errorMessage: undefined
-        });
-        this.getOrders();
+        }, () => this.getOrders());
     }
 
     private handleTypeSelected = (type: WasteOrderFilterType) => {
@@ -95,8 +94,9 @@ export class WasteOrderListComponent extends React.Component<{}, WasteOrderListC
                 <Row style={{ marginBottom: "20px" }}>
                     <Col span={12}>
                         <Button type="primary" onClick={this.commissionWasteOrder}>Commission new Waste Order</Button>
+                        <Button type="primary" onClick={this.reload} style={{ marginLeft: "20px" }}>Reload</Button>
                     </Col>
-
+                    
                     <Col span={12}>
                         <WasteOrderFilterComponent onTypeSelected={this.handleTypeSelected} onStatusSelected={this.handleStatusSelected} />
                     </Col>
