@@ -2,8 +2,72 @@ import React from "react";
 import { WasteOrder } from "../WasteOrder";
 import { getWasteOrderHistory } from "../WasteOrderService";
 import { WasteOrderTransaction } from "../WasteOrderTransaction";
-import { Row, Col, Spin, Icon, Divider } from "antd";
+import { Table, Spin, Icon } from "antd";
 import styled from "styled-components";
+import { ColumnProps } from "antd/lib/table";
+
+const columns: ColumnProps<any>[] = [
+    {
+        title: 'Transaction ID',
+        dataIndex: 'txId',
+        key: 'txId',
+    },
+    {
+        title: 'Timestamp',
+        dataIndex: 'timestamp',
+        key: 'timestamp',
+    },
+    {
+        title: 'Is Delete',
+        dataIndex: 'isDelete',
+        key: 'isDelete',
+    },
+    {
+        title: 'Status',
+        dataIndex: 'value.status',
+        key: 'status',
+    },
+    {
+        title: 'Subcontractor MSP ID',
+        dataIndex: 'value.subcontractorMSPID',
+        key: 'subcontractorMSPID',
+    },
+    {
+        title: 'Customer Name',
+        dataIndex: 'value.customerName',
+        key: 'customerName',
+    },
+    {
+        title: 'Quantity',
+        dataIndex: 'value.quantity',
+        key: 'quantity',
+    },
+    {
+        title: 'Unit Price',
+        dataIndex: 'value.unitPrice',
+        key: 'unitPrice',
+    },
+    {
+        title: 'Unit of Measure',
+        dataIndex: 'value.unitOfMeasure',
+        key: 'unitOfMeasure',
+    },
+    {
+        title: 'Task Date',
+        dataIndex: 'value.taskDate',
+        key: 'taskDate',
+    },
+    {
+        title: 'Starting Time',
+        dataIndex: 'value.startingTime',
+        key: 'startingTime',
+    },
+    {
+        title: 'Finishing Time',
+        dataIndex: 'value.finishingTime',
+        key: 'finishingTime',
+    }
+];
 
 export class WasteOrderHistoryComponent extends React.Component<{ wasteOrder: WasteOrder }, { wasteOrderTransactions?: WasteOrderTransaction[], errorMessage?: string }> {
 
@@ -30,106 +94,7 @@ export class WasteOrderHistoryComponent extends React.Component<{ wasteOrder: Wa
                 ) : (
                         <div>
                             {this.state.wasteOrderTransactions ? (
-                                <div>
-                                    <Row gutter={16}>
-                                        <Col span={2}>
-                                            <BoldLabel>Transaction ID</BoldLabel>
-                                        </Col>
-
-                                        <Col span={3}>
-                                            <BoldLabel>Timestamp</BoldLabel>
-                                        </Col>
-
-                                        <Col span={1}>
-                                            <BoldLabel>Is Delete</BoldLabel>
-                                        </Col>
-
-                                        <Col span={3}>
-                                            <BoldLabel>Subcontractor MSP</BoldLabel>
-                                        </Col>
-
-                                        <Col span={3}>
-                                            <BoldLabel>Customer Name</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Quantity</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Unit Price</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Unit of Measure</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Task Date</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Starting Time</BoldLabel>
-                                        </Col>
-
-                                        <Col span={2}>
-                                            <BoldLabel>Finishing Time</BoldLabel>
-                                        </Col>
-                                    </Row>
-
-                                    {this.state.wasteOrderTransactions.map((wasteOrderTransaction: WasteOrderTransaction) => {
-                                        return (
-                                            <div>
-                                                <Row gutter={16}>
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.txId}</Label>
-                                                    </Col>
-
-                                                    <Col span={3}>
-                                                        <Label>{wasteOrderTransaction.timestamp}</Label>
-                                                    </Col>
-
-                                                    <Col span={1}>
-                                                        <Label>{wasteOrderTransaction.isDelete}</Label>
-                                                    </Col>
-
-                                                    <Col span={3}>
-                                                        <Label>{wasteOrderTransaction.value.subcontractorMSPID}</Label>
-                                                    </Col>
-
-                                                    <Col span={3}>
-                                                        <Label>{wasteOrderTransaction.value.customerName}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.quantity}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.unitPrice}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.unitOfMeasure}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.taskDate}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.startingTime}</Label>
-                                                    </Col>
-
-                                                    <Col span={2}>
-                                                        <Label>{wasteOrderTransaction.value.finishingTime}</Label>
-                                                    </Col>
-                                                </Row>
-                                                <Divider />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <Table dataSource={this.state.wasteOrderTransactions} columns={columns} style={{ overflowX: "scroll" }} />
                             ) : (
                                     <Spin tip="Loading..." indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
                                 )}
@@ -140,14 +105,6 @@ export class WasteOrderHistoryComponent extends React.Component<{ wasteOrder: Wa
         );
     }
 }
-
-const Label = styled.p`
-    overflow: hidden;
-`;
-
-const BoldLabel = styled.p`
-    font-weight: bold;
-`;
 
 const ErrorLabel = styled.p`
     font-weight: bold;
