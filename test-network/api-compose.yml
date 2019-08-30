@@ -9,11 +9,11 @@ services:
       - USERNAME=Admin@ordering-organisation.com
       - WALLET_LOCATION=/wallet/ordering-organisation
       - CONNECTION_FILE=/connection-profiles/ordering-connection.yaml
-      - PORT=3000
+      - PORT=10000
       - FABRIC_NETWORK_URL=${FABRIC_NETWORK_URL}
       - ALLOW_CORS=true
     ports:
-      - 3000:3000
+      - 10000:10000
     volumes:
         - ./wallet:/wallet
         - ./connection-profiles:/connection-profiles
@@ -26,11 +26,11 @@ services:
       - USERNAME=Admin@subcontractor-organisation.com
       - WALLET_LOCATION=/wallet/subcontractor-organisation
       - CONNECTION_FILE=/connection-profiles/subcontractor-connection.yaml
-      - PORT=6000
+      - PORT=30000
       - FABRIC_NETWORK_URL=${FABRIC_NETWORK_URL}
       - ALLOW_CORS=true
     ports:
-      - 6000:6000
+      - 30000:30000
     volumes:
         - ./wallet:/wallet
         - ./connection-profiles:/connection-profiles
@@ -43,11 +43,11 @@ services:
       - USERNAME=Admin@third-party-organisation.com
       - WALLET_LOCATION=/wallet/third-party-organisation
       - CONNECTION_FILE=/connection-profiles/third-party-connection.yaml
-      - PORT=9000
+      - PORT=50000
       - FABRIC_NETWORK_URL=${FABRIC_NETWORK_URL}
       - ALLOW_CORS=true
     ports:
-      - 9000:9000
+      - 50000:50000
     volumes:
         - ./wallet:/wallet
         - ./connection-profiles:/connection-profiles
@@ -58,7 +58,7 @@ services:
     container_name: frontend.ordering-organisation.com
     image: wastechain.azurecr.io/wastechain-frontend:master
     environment:
-      - REACT_APP_API_URL=http://${API_URL}:3000
+      - REACT_APP_API_URL=http://${API_URL}:10000
     ports:
       - 8080:3000
     depends_on:
@@ -68,7 +68,7 @@ services:
     container_name: frontend.subcontractor-organisation.com
     image: wastechain.azurecr.io/wastechain-frontend:master
     environment:
-      - REACT_APP_API_URL=http://${API_URL}:6000
+      - REACT_APP_API_URL=http://${API_URL}:30000
     ports:
       - 10080:3000
     depends_on:
@@ -78,7 +78,7 @@ services:
     container_name: frontend.third-party-organisation.com
     image: wastechain.azurecr.io/wastechain-frontend:master
     environment:
-      - REACT_APP_API_URL=http://${API_URL}:9000
+      - REACT_APP_API_URL=http://${API_URL}:50000
     ports:
       - 12080:3000
     depends_on:
