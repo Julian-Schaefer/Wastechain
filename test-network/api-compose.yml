@@ -68,7 +68,7 @@ services:
     container_name: frontend.subcontractor-organisation.com
     image: wastechain.azurecr.io/wastechain-frontend:master
     environment:
-      - REACT_APP_API_URL=http://{API_URL}:6000
+      - REACT_APP_API_URL=http://${API_URL}:6000
     ports:
       - 10080:3000
     depends_on:
