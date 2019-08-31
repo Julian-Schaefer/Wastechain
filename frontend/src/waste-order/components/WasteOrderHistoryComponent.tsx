@@ -94,7 +94,7 @@ export class WasteOrderHistoryComponent extends React.Component<{ wasteOrder: Wa
                 ) : (
                         <div>
                             {this.state.wasteOrderTransactions ? (
-                                <Table dataSource={this.state.wasteOrderTransactions} columns={columns} style={{ overflowX: "scroll" }} />
+                                <Table dataSource={this.state.wasteOrderTransactions} columns={columns} bodyStyle={{ overflowX: "scroll" }} />
                             ) : (
                                     <Spin tip="Loading..." indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} style={{ margin: "0" }} />
                                 )}
