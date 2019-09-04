@@ -197,6 +197,18 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 WasteOrderJSONObject.Get('unitPrice', ValueJSONToken);
                 "Unit Price" := ValueJSONToken.AsValue().AsDecimal();
 
+                WasteOrderJSONObject.Get('unitOfMeasure', ValueJSONToken);
+                "Unit of Measure" := ValueJSONToken.AsValue().AsText();
+
+                WasteOrderJSONObject.Get('taskDate', ValueJSONToken);
+                "Task Date" := GetDateFromText(ValueJSONToken.AsValue().AsText());
+
+                if WasteOrderJSONObject.Get('startingTime', ValueJSONToken) then
+                    Evaluate("Starting Time", ValueJSONToken.AsValue().AsText());
+
+                if WasteOrderJSONObject.Get('finishingTime', ValueJSONToken) then
+                    Evaluate("Finishing Time", ValueJSONToken.AsValue().AsText());
+
                 if WasteOrderJSONObject.Get('rejectionMessage', ValueJSONToken) then
                     "Rejection Message" := ValueJSONToken.AsValue().AsText();
 

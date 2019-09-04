@@ -37,6 +37,26 @@ page 50102 "Waste Order Tx History WC"
                     ApplicationArea = All;
                 }
 
+                field("Unit of Measure"; "Unit of Measure")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Task Date"; "Task Date")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Starting Time"; "Starting Time")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Finishing Time"; "Finishing Time")
+                {
+                    ApplicationArea = All;
+                }
+
                 field("Rejection Message"; "Rejection Message")
                 {
                     ApplicationArea = All;

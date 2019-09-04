@@ -27,6 +27,7 @@ codeunit 50100 "Wastechain Management"
             WasteMgtLine.Validate("Document No.", WasteMgtHeader."No.");
             WasteMgtLine.Validate("Type", WasteMgtLine.Type::Service);
             WasteMgtLine.Validate("No.", ServiceNo);
+            WasteMgtLine.Validate("Price Fixed", true);
             WasteMgtLine.Validate(Quantity, Quantity);
             WasteMgtLine.Validate("Unit Price", "Unit Price");
             WasteMgtLine.Validate(Description, Description);

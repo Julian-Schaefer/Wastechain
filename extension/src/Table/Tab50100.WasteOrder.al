@@ -112,11 +112,12 @@ table 50100 "Waste Order WC"
             DataClassification = ToBeClassified;
         }
 
-        field(14; "Weighbridge Ticket No."; Code[20])
-        {
-            Caption = 'Weighbridge Ticket No.';
-            DataClassification = ToBeClassified;
-        }
+        // TODO
+        // field(14; "Weighbridge Ticket No."; Code[20])
+        // {
+        //     Caption = 'Weighbridge Ticket No.';
+        //     DataClassification = ToBeClassified;
+        // }
 
         field(15; "Last Changed"; Text[100])
         {
