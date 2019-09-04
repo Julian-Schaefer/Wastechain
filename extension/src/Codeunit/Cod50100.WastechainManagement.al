@@ -27,14 +27,13 @@ codeunit 50100 "Wastechain Management"
             WasteMgtLine.Validate("Document No.", WasteMgtHeader."No.");
             WasteMgtLine.Validate("Type", WasteMgtLine.Type::Service);
             WasteMgtLine.Validate("No.", ServiceNo);
-            WasteMgtLine.Validate("Price Fixed", true);
-            WasteMgtLine.Validate(Quantity, Quantity);
-            WasteMgtLine.Validate("Unit Price", "Unit Price");
-            WasteMgtLine.Validate(Description, Description);
             WasteMgtLine.Validate("Posting Type", WasteMgtLine."Posting Type"::Sales);
             WasteMgtLine.Validate("Post-with No.", BusinessPartnerNo);
             WasteMgtLine.Validate("Invoice-with No.", BusinessPartnerNo);
             WasteMgtLine.Validate("Task-at Code", BusinessPartnerSiteCode);
+            WasteMgtLine.Validate("Price Fixed", true);
+            WasteMgtLine.Validate(Quantity, Quantity);
+            WasteMgtLine.Validate("Unit Price", "Unit Price");
             WasteMgtLine.Validate("Waste Order ID WC", "ID");
             WasteMgtLine.Insert(true);
         end;
