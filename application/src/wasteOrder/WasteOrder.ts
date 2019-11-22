@@ -80,7 +80,7 @@ export interface WasteOrder {
  *                  type: string
  */
 export const WasteOrderSchema = Joi.object().keys({
-    id: ServiceSchema.required(),
+    id: Joi.string().required(),
     status: Joi.number().required(),
     subcontractorMSPID: Joi.string().required(),
     originatorMSPID: Joi.string().required(),
