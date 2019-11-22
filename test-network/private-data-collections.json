@@ -1,0 +1,26 @@
+[
+    {
+         "name": "OrderingOrgMSP-SubcontractorOrgMSP",
+         "policy": "OR('OrderingOrgMSP.member', 'SubcontractorOrgMSP.member')",
+         "requiredPeerCount": 1,
+         "maxPeerCount": 1,
+         "blockToLive": 0,
+         "memberOnlyRead": true
+    },
+    {
+         "name": "OrderingOrgMSP-ThirdPartyOrgMSP",
+         "policy": "OR('OrderingOrgMSP.member', 'ThirdPartyOrgMSP.member')",
+         "requiredPeerCount": 1,
+         "maxPeerCount": 1,
+         "blockToLive": 0,
+         "memberOnlyRead": true
+    },
+    {
+         "name": "SubcontractorOrgMSP-ThirdPartyOrgMSP",
+         "policy": "OR('SubcontractorOrgMSP.member', 'ThirdPartyOrgMSP.member')",
+         "requiredPeerCount": 1,
+         "maxPeerCount": 1,
+         "blockToLive": 0,
+         "memberOnlyRead": true
+    }
+  ]

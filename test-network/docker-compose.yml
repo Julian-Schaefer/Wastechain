@@ -53,7 +53,7 @@ services:
   ## Wastechain-Orderer  
   orderer.wastechain.org:
     container_name: orderer.wastechain.org
-    image: hyperledger/fabric-orderer
+    image: hyperledger/fabric-orderer:1.4.4
     environment:
       - FABRIC_LOGGING_SPEC=info
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
@@ -233,23 +233,3 @@ services:
       - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config
     networks:
       - basic
-
-  ## APIs
-  # api.ordering-organisation.com:
-  #   container_name: api.ordering-organisation.com
-  #   image: wastechain.azurecr.io/wastechain-api:master
-  #   environment:
-  #     - CHANNEL_NAME=wastechain
-  #     - USERNAME=Admin@ordering-organisation.com
-  #     - WALLET_LOCATION=/wallet
-  #     - CONNECTION_FILE=/connection-profiles/network-connection.yaml
-  #     - PORT=3000
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #       - ./wallet/ordering-organisation:/wallet
-  #       - ./connection-profiles:/connection-profiles
-  #   depends_on:
-  #     - peer0.ordering-organisation.com
-  #   networks:
-  #     - basic

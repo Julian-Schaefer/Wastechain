@@ -50,13 +50,13 @@ Application: &ApplicationDefaults
 
 Capabilities:
     Global: &ChannelCapabilities
-        V1_1: true
+        V1_4_2: true
 
     Orderer: &OrdererCapabilities
-        V1_1: true
+        V1_4_2: true
 
     Application: &ApplicationCapabilities
-        V1_1: true
+        V1_4_2: true
 
 Profiles:
     OrdererGenesis:

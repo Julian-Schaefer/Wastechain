@@ -53,3 +53,5 @@ if [ "$?" -ne 0 ]; then
   echo "Failed to generate anchor peer update for ThirdPartyOrg..."
   exit 1
 fi
+
+cp private-data-collections.json config/private-data-collections.json
