@@ -67,7 +67,7 @@ class FabricConnection {
     }
 
     get wasteOrderContract(): Contract {
-        return this.network.getContract('Wastechain', 'WasteOrderContract');
+        return this.network.getContract('Wastechain');
     }
 }
 
