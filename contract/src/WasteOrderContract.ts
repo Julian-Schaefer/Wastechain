@@ -4,15 +4,18 @@ import { WasteOrderPrivate, WasteOrderStatus, WasteOrderPrivateCommissionSchema 
 import { WasteOrderPublic, WasteOrderPublicCommissionSchema } from "./model/WasteOrderPublic";
 import * as Joi from '@hapi/joi';
 import { Guid } from "guid-typescript";
+import winston = require("winston");
 
 export class WasteOrderContract {
 
     private stub: ChaincodeStub;
     private creator: SerializedIdentity;
+    private logger: winston.Logger;
 
-    constructor(stub: ChaincodeStub, creator: SerializedIdentity) {
+    constructor(stub: ChaincodeStub, creator: SerializedIdentity, logger: winston.Logger) {
         this.stub = stub;
         this.creator = creator;
+        this.logger = logger;
     }
 
     public async commissionWasteOrder(orderId: string, wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate): Promise<WasteOrder> {
@@ -46,11 +49,11 @@ export class WasteOrderContract {
             throw new Error('It is not possible to commision a Waste Order to yourself.');
         }
 
-        this.saveWasteOrder(wasteOrderPublic, wasteOrderPrivate);
+        await this.saveWasteOrder(wasteOrderPublic, wasteOrderPrivate);
 
         return {
-            ...wasteOrderPublic,
-            ...wasteOrderPrivate
+            ...wasteOrderPrivate,
+            ...wasteOrderPublic
         };
     }
 
@@ -101,8 +104,8 @@ export class WasteOrderContract {
 
     //     await this.saveWasteOrder(ctx, wasteOrder, newWasteOrderPrivate);
     //     return {
-    //         ...wasteOrder,
-    //         ...newWasteOrderPrivate
+    //         ...newWasteOrderPrivate,
+    //         ...wasteOrder
     //     };
     // }
 
@@ -131,8 +134,8 @@ export class WasteOrderContract {
 
     //     await this.saveWasteOrder(ctx, wasteOrder, newWasteOrderPrivate);
     //     return {
-    //         ...wasteOrder,
-    //         ...newWasteOrderPrivate
+    //         ...newWasteOrderPrivate,
+    //         ...wasteOrder
     //     };
     // }
 
@@ -161,8 +164,8 @@ export class WasteOrderContract {
 
     //     await this.saveWasteOrder(ctx, wasteOrder, newWasteOrderPrivate);
     //     return {
-    //         ...wasteOrder,
-    //         ...newWasteOrderPrivate
+    //         ...newWasteOrderPrivate,
+    //         ...wasteOrder
     //     };
     // }
 
@@ -192,61 +195,59 @@ export class WasteOrderContract {
 
     //     await this.saveWasteOrder(ctx, wasteOrder, newWasteOrderPrivate);
     //     return {
-    //         ...wasteOrder,
-    //         ...newWasteOrderPrivate
+    //         ...newWasteOrderPrivate,
+    //         ...wasteOrder
     //     };
     // }
 
-    // @Transaction(false)
-    // public async getCompleteWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder & WasteOrderPrivate> {
-    //     const exists = await this.checkIfWasteOrderExists(ctx, orderId);
-    //     if (!exists) {
-    //         throw new Error(`The order ${orderId} does not exist`);
-    //     }
+    public async getWasteOrder(orderId: string): Promise<WasteOrder> {
+        const exists = await this.checkIfWasteOrderExists(orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
 
-    //     let wasteOrder = await this.getWasteOrder(ctx, orderId);
-    //     let wasteOrderPrivate = await this.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrder = await this.getWasteOrderPublic(orderId);
+        let wasteOrderPrivate = await this.getWasteOrderPrivate(orderId);
 
-    //     return {
-    //         ...wasteOrder,
-    //         ...wasteOrderPrivate
-    //     };
-    // }
+        return {
+            ...wasteOrderPrivate,
+            ...wasteOrder
+        };
+    }
 
-    // private async getWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
-    //     const exists = await this.checkIfWasteOrderExists(ctx, orderId);
-    //     if (!exists) {
-    //         throw new Error(`The order ${orderId} does not exist`);
-    //     }
-    //     const buffer = await ctx.stub.getState(orderId);
-    //     const wasteOrder = JSON.parse(buffer.toString()) as WasteOrder;
+    private async getWasteOrderPublic(orderId: string): Promise<WasteOrderPublic> {
+        const exists = await this.checkIfWasteOrderExists(orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
+        const buffer = await this.stub.getState(orderId);
+        const wasteOrder = JSON.parse(buffer.toString()) as WasteOrderPublic;
 
-    //     return wasteOrder;
-    // }
+        return wasteOrder;
+    }
 
-    // private async getWasteOrderPrivate(ctx: Context, orderId: string): Promise<WasteOrderPrivate> {
-    //     const exists = await this.checkIfWasteOrderExists(ctx, orderId);
-    //     if (!exists) {
-    //         throw new Error(`The order ${orderId} does not exist`);
-    //     }
+    private async getWasteOrderPrivate(orderId: string): Promise<WasteOrderPrivate> {
+        const exists = await this.checkIfWasteOrderExists(orderId);
+        if (!exists) {
+            throw new Error(`The order ${orderId} does not exist`);
+        }
 
-    //     let wasteOrder = await this.getWasteOrder(ctx, orderId);
+        let wasteOrderPublic: WasteOrderPublic = await this.getWasteOrderPublic(orderId);
 
-    //     let wasteOrderPrivateBuffer: Buffer;
+        let wasteOrderPrivateBuffer: Buffer;
+        // try {
+        wasteOrderPrivateBuffer = await this.stub.getPrivateData("OrderingOrgMSP-SubcontractorOrgMSP", wasteOrderPublic.privateDataId);
+        //} catch {
+        //   wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrder.subcontractorMSPID + '-' + wasteOrder.originatorMSPID, wasteOrder.privateDataId);
+        //}
 
-    //     // try {
-    //     wasteOrderPrivateBuffer = await ctx.stub.getPrivateData("OrderingOrgMSP-SubcontractorOrgMSP", wasteOrder.privateDataId);
-    //     //} catch {
-    //     //   wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrder.subcontractorMSPID + '-' + wasteOrder.originatorMSPID, wasteOrder.privateDataId);
-    //     //}
+        if (!wasteOrderPrivateBuffer) {
+            throw "Private Data not found or not accessible.";
+        }
 
-    //     if (!wasteOrderPrivateBuffer) {
-    //         throw "Private Data not found or not accessible.";
-    //     }
-
-    //     const wasteOrderPrivate = JSON.parse(wasteOrderPrivateBuffer.toString()) as WasteOrderPrivate;
-    //     return wasteOrderPrivate;
-    // }
+        const wasteOrderPrivate = JSON.parse(wasteOrderPrivateBuffer.toString()) as WasteOrderPrivate;
+        return wasteOrderPrivate;
+    }
 
     // // TODO
     // @Transaction(false)
@@ -353,10 +354,6 @@ export class WasteOrderContract {
 
     private async saveWasteOrder(wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate) {
         let wasteOrderPrivateId = wasteOrderPublic.id + '-' + Guid.create().toString();
-        wasteOrderPublic.privateDataId = wasteOrderPrivateId;
-
-        const wasteOrderPublicBuffer = Buffer.from(JSON.stringify(wasteOrderPublic));
-        await this.stub.putState(wasteOrderPublic.id, wasteOrderPublicBuffer);
 
         wasteOrderPrivate.id = wasteOrderPrivateId;
         wasteOrderPrivate.lastChanged = new Date();
@@ -365,6 +362,10 @@ export class WasteOrderContract {
         const wasteOrderPrivateBuffer = Buffer.from(JSON.stringify(wasteOrderPrivate));
 
         await this.stub.putPrivateData("OrderingOrgMSP-SubcontractorOrgMSP", wasteOrderPrivate.id, wasteOrderPrivateBuffer);
+
+        wasteOrderPublic.privateDataId = wasteOrderPrivateId;
+        const wasteOrderPublicBuffer = Buffer.from(JSON.stringify(wasteOrderPublic));
+        await this.stub.putState(wasteOrderPublic.id, wasteOrderPublicBuffer);
     }
 
     private async getWasteOrdersFromIterator(iterator: Iterators.StateQueryIterator): Promise<WasteOrder[]> {

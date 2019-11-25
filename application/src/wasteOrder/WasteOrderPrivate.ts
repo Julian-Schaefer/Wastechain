@@ -64,7 +64,9 @@ export const WasteOrderPrivateCommissionSchema = Joi.object().keys({
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
-    referenceNo: Joi.string().required()
+    referenceNo: Joi.string().required(),
+    lastChanged: Joi.date().required(),
+    lastChangedByMSPID: Joi.string().required()
 });
 
 export const WasteOrderPrivateCorrectionSchema = Joi.object().keys({
@@ -90,26 +92,3 @@ export const WasteOrderPrivateCompleteSchema = Joi.object().keys({
 export const WasteOrderPrivateRejectSchema = Joi.object().keys({
     rejectionMessage: Joi.string().required()
 });
-
-export function getWasteOrderPrivateFromString(wasteOrderPrivateValue: string): WasteOrderPrivate {
-    let wasteOrderPrivate: WasteOrderPrivate = JSON.parse(wasteOrderPrivateValue);
-
-    return {
-        id: wasteOrderPrivate.id,
-        status: wasteOrderPrivate.status,
-        customerName: wasteOrderPrivate.customerName,
-        taskSite: wasteOrderPrivate.taskSite,
-        service: wasteOrderPrivate.service,
-        description: wasteOrderPrivate.description,
-        quantity: wasteOrderPrivate.quantity,
-        unitPrice: wasteOrderPrivate.unitPrice,
-        unitOfMeasure: wasteOrderPrivate.unitOfMeasure,
-        taskDate: wasteOrderPrivate.taskDate,
-        startingTime: wasteOrderPrivate.startingTime,
-        finishingTime: wasteOrderPrivate.finishingTime,
-        referenceNo: wasteOrderPrivate.referenceNo,
-        rejectionMessage: wasteOrderPrivate.rejectionMessage,
-        lastChanged: wasteOrderPrivate.lastChanged,
-        lastChangedByMSPID: wasteOrderPrivate.lastChangedByMSPID
-    };
-}

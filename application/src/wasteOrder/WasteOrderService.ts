@@ -2,6 +2,9 @@ import * as Joi from '@hapi/joi';
 import { getFabricConnection } from "../FabricConnection";
 import { WasteOrderCommissionSchema, WasteOrderCorrectionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
 import { WasteOrderTransaction } from './WasteOrderTransaction';
+import { TransientMap } from 'fabric-network';
+import { WasteOrderPublic } from './WasteOrderPublic';
+import { WasteOrderPrivate } from './WasteOrderPrivate';
 
 async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
     const contract = getFabricConnection().wasteOrderContract;
@@ -24,8 +27,27 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder
         throw validationResult.error;
     }
 
+    const wasteOrderPublic: WasteOrderPublic = {
+        id: "",
+        originatorMSPID: "OrderingOrgMSP",
+        subcontractorMSPID: "SubcontractorOrgMSP",
+        privateDataId: ""
+    };
+    delete (wasteOrderPublic.privateDataId);
+
+    delete (wasteOrder.rejectionMessage);
+    delete (wasteOrder.subcontractorMSPID);
+    delete (wasteOrder.originatorMSPID);
+
     const contract = getFabricConnection().wasteOrderContract;
-    const commissionedWasteOrderBuffer = await contract.submitTransaction('commissionWasteOrder', wasteOrderId, JSON.stringify(wasteOrder));
+
+    let transaction = contract.createTransaction("commissionWasteOrder");
+    const transientData: TransientMap = {
+        order: Buffer.from(JSON.stringify(wasteOrder))
+    };
+    transaction.setTransient(transientData);
+    const commissionedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
+    console.log("Log: " + commissionedWasteOrderBuffer.toString('utf-8'));
     const commissionedWasteOrder: WasteOrder = JSON.parse(commissionedWasteOrderBuffer.toString('utf-8'));
 
     console.log('Commissioned Waste Order with ID: ' + commissionedWasteOrder.id);
