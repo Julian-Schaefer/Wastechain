@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import * as service from './WasteOrderService';
-import { WasteOrder } from './WasteOrder';
+import { WasteOrder, WasteOrderCommissionSchema } from './WasteOrder';
+import { getWasteOrderPrivateFromWasteOrder } from './WasteOrderPrivate';
+import { getWasteOrderPublicFromWasteOrder } from './WasteOrderPublic';
 import { WasteOrderTransaction } from './WasteOrderTransaction';
+import * as Joi from '@hapi/joi';
 
 async function getWasteOrder(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
@@ -29,10 +32,18 @@ async function getWasteOrderHistory(request: Request, response: Response) {
 
 async function commissionWasteOrder(request: Request, response: Response) {
     const wasteOrderId = request.params.id;
-    const wasteOrder = request.body;
+    const wasteOrder: WasteOrder = request.body;
 
     try {
-        const createdWasteOrder: WasteOrder = await service.commissionWasteOrder(wasteOrderId, wasteOrder);
+        const validationResult = Joi.validate(wasteOrder, WasteOrderCommissionSchema);
+        if (validationResult.error !== null) {
+            throw validationResult.error;
+        }
+
+        const wasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
+        const wasteOrderPublic = getWasteOrderPublicFromWasteOrder(wasteOrder);
+
+        const createdWasteOrder: WasteOrder = await service.commissionWasteOrder(wasteOrderId, wasteOrderPublic, wasteOrderPrivate);
         response.send(JSON.stringify(createdWasteOrder));
     } catch (error) {
         console.log('Error submitting Transaction: ' + error);

@@ -23,7 +23,7 @@ export interface WasteOrderPrivate {
     quantity: number;
     unitPrice: number;
     unitOfMeasure: string;
-    taskDate: Date
+    taskDate: Date;
     startingTime: string;
     finishingTime: string;
     referenceNo: string;

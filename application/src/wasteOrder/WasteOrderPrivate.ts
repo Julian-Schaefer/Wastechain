@@ -1,5 +1,6 @@
 import { Service, ServiceSchema } from "./Service";
 import { TaskSite, TaskSiteSchema } from "./TaskSite";
+import { WasteOrder } from "./WasteOrder";
 import * as Joi from '@hapi/joi';
 import * as JoiDate from '@hapi/joi-date';
 
@@ -23,7 +24,7 @@ export interface WasteOrderPrivate {
     quantity: number;
     unitPrice: number;
     unitOfMeasure: string;
-    taskDate: Date
+    taskDate: Date;
     startingTime: string;
     finishingTime: string;
     referenceNo: string;
@@ -92,3 +93,24 @@ export const WasteOrderPrivateCompleteSchema = Joi.object().keys({
 export const WasteOrderPrivateRejectSchema = Joi.object().keys({
     rejectionMessage: Joi.string().required()
 });
+
+export function getWasteOrderPrivateFromWasteOrder(wasteOrder: WasteOrder): WasteOrderPrivate {
+    return {
+        id: wasteOrder.id,
+        status: wasteOrder.status,
+        customerName: wasteOrder.customerName,
+        taskSite: wasteOrder.taskSite,
+        service: wasteOrder.service,
+        description: wasteOrder.description,
+        quantity: wasteOrder.quantity,
+        unitPrice: wasteOrder.unitPrice,
+        unitOfMeasure: wasteOrder.unitOfMeasure,
+        taskDate: wasteOrder.taskDate,
+        startingTime: wasteOrder.startingTime,
+        finishingTime: wasteOrder.finishingTime,
+        referenceNo: wasteOrder.referenceNo,
+        rejectionMessage: wasteOrder.rejectionMessage,
+        lastChanged: wasteOrder.lastChanged,
+        lastChangedByMSPID: wasteOrder.lastChangedByMSPID
+    }
+}

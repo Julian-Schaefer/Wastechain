@@ -21,29 +21,19 @@ async function getWasteOrderHistory(wasteOrderId: string): Promise<WasteOrderTra
     return history;
 }
 
-async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
-    const validationResult = Joi.validate(wasteOrder, WasteOrderCommissionSchema);
-    if (validationResult.error !== null) {
-        throw validationResult.error;
-    }
+async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate): Promise<WasteOrder> {
+    delete (wasteOrderPublic.id);
+    delete (wasteOrderPublic.originatorMSPID);
 
-    const wasteOrderPublic: WasteOrderPublic = {
-        id: "",
-        originatorMSPID: "OrderingOrgMSP",
-        subcontractorMSPID: "SubcontractorOrgMSP",
-        privateDataId: ""
-    };
-    delete (wasteOrderPublic.privateDataId);
-
-    delete (wasteOrder.rejectionMessage);
-    delete (wasteOrder.subcontractorMSPID);
-    delete (wasteOrder.originatorMSPID);
+    delete (wasteOrderPrivate.id);
+    delete (wasteOrderPrivate.status);
+    delete (wasteOrderPrivate.rejectionMessage);
 
     const contract = getFabricConnection().wasteOrderContract;
 
     let transaction = contract.createTransaction("commissionWasteOrder");
     const transientData: TransientMap = {
-        order: Buffer.from(JSON.stringify(wasteOrder))
+        order: Buffer.from(JSON.stringify(wasteOrderPrivate))
     };
     transaction.setTransient(transientData);
     const commissionedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
