@@ -32,20 +32,21 @@ export async function getWasteOrderPublic(ctx: Context, orderId: string): Promis
     return wasteOrder;
 }
 
-export async function getWasteOrderPrivate(ctx: Context, orderId: string): Promise<WasteOrderPrivate> {
+export async function getWasteOrderPrivate(ctx: Context, orderId: string, orderPrivateId?: string): Promise<WasteOrderPrivate> {
     const exists = await checkIfWasteOrderExists(ctx, orderId);
     if (!exists) {
         throw new Error(`The order ${orderId} does not exist`);
     }
 
     let wasteOrderPublic: WasteOrderPublic = await getWasteOrderPublic(ctx, orderId);
+    let wasteOrderPrivateId = orderPrivateId ? orderPrivateId : wasteOrderPublic.privateDataId;
 
     let wasteOrderPrivateBuffer: Buffer;
 
     try {
-        wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.originatorMSPID + '-' + wasteOrderPublic.subcontractorMSPID, wasteOrderPublic.privateDataId);
+        wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.originatorMSPID + '-' + wasteOrderPublic.subcontractorMSPID, wasteOrderPrivateId);
     } catch {
-        wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID, wasteOrderPublic.privateDataId);
+        wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID, wasteOrderPrivateId);
     }
 
     if (!wasteOrderPrivateBuffer) {
