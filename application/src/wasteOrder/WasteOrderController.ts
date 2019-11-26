@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as service from './WasteOrderService';
-import { WasteOrder, WasteOrderCommissionSchema } from './WasteOrder';
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema, WasteOrderUpdateStatusSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema } from './WasteOrder';
 import { getWasteOrderPrivateFromWasteOrder } from './WasteOrderPrivate';
 import { getWasteOrderPublicFromWasteOrder } from './WasteOrderPublic';
 import { WasteOrderTransaction } from './WasteOrderTransaction';
@@ -56,7 +56,51 @@ async function updateWasteOrder(request: Request, response: Response) {
     const updatedWasteOrder: WasteOrder = request.body;
 
     try {
-        let submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, updatedWasteOrder);
+        let validationSchema: Joi.ObjectSchema;
+        let procedure: string;
+        let sendBody = false;
+
+        switch (updatedWasteOrder.status) {
+            case WasteOrderStatus.COMMISSIONED:
+                validationSchema = WasteOrderCorrectionSchema;
+                procedure = 'correctWasteOrder';
+                sendBody = true;
+                break;
+
+            case WasteOrderStatus.ACCEPTED:
+                validationSchema = WasteOrderUpdateStatusSchema;
+                procedure = 'acceptWasteOrder';
+                break;
+
+            case WasteOrderStatus.REJECTED:
+                validationSchema = WasteOrderRejectSchema;
+                procedure = 'rejectWasteOrder';
+                sendBody = true;
+                break;
+
+            case WasteOrderStatus.CANCELLED:
+                validationSchema = WasteOrderUpdateStatusSchema;
+                procedure = 'cancelWasteOrder';
+                break;
+
+            case WasteOrderStatus.COMPLETED:
+                validationSchema = WasteOrderCompleteSchema;
+                procedure = 'completeWasteOrder';
+                sendBody = true;
+                break;
+
+            default:
+                console.log('Error: Unknown Status "' + status + '"');
+                throw ('Error: Unknown Status "' + status + '"');
+        }
+
+        let validationResult = Joi.validate(updatedWasteOrder, validationSchema);
+        if (validationResult.error !== null) {
+            throw validationResult.error;
+        }
+
+        const wasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(updatedWasteOrder);
+        let submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure, wasteOrderPrivate);
         response.send(JSON.stringify(submittedWasteOrder));
     } catch (error) {
         console.log('Error evaluating Transaction: ' + error);

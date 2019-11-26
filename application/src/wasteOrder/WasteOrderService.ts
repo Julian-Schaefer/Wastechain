@@ -37,69 +37,27 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: Wast
     };
     transaction.setTransient(transientData);
     const commissionedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
-    console.log("Log: " + commissionedWasteOrderBuffer.toString('utf-8'));
     const commissionedWasteOrder: WasteOrder = JSON.parse(commissionedWasteOrderBuffer.toString('utf-8'));
 
     console.log('Commissioned Waste Order with ID: ' + commissionedWasteOrder.id);
     return commissionedWasteOrder;
 }
 
-async function updateWasteOrder(wasteOrderId: string, updatedWasteOrder: WasteOrder): Promise<WasteOrder> {
-    let validationSchema: Joi.ObjectSchema;
-    let procedure: string;
-    let sendBody = false;
-
-    switch (updatedWasteOrder.status) {
-        case WasteOrderStatus.COMMISSIONED:
-            validationSchema = WasteOrderCorrectionSchema;
-            procedure = 'correctWasteOrder';
-            sendBody = true;
-            break;
-
-        case WasteOrderStatus.ACCEPTED:
-            validationSchema = WasteOrderUpdateStatusSchema;
-            procedure = 'acceptWasteOrder';
-            break;
-
-        case WasteOrderStatus.REJECTED:
-            validationSchema = WasteOrderRejectSchema;
-            procedure = 'rejectWasteOrder';
-            sendBody = true;
-            break;
-
-        case WasteOrderStatus.CANCELLED:
-            validationSchema = WasteOrderUpdateStatusSchema;
-            procedure = 'cancelWasteOrder';
-            break;
-
-        case WasteOrderStatus.COMPLETED:
-            validationSchema = WasteOrderCompleteSchema;
-            procedure = 'completeWasteOrder';
-            sendBody = true;
-            break;
-
-        default:
-            console.log('Error: Unknown Status "' + status + '"');
-            throw ('Error: Unknown Status "' + status + '"');
-    }
-
-
-    let validationResult = Joi.validate(updatedWasteOrder, validationSchema);
-    if (validationResult.error !== null) {
-        throw validationResult.error;
-    }
-
-    delete updatedWasteOrder.status;
+async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOrderPrivate?: WasteOrderPrivate): Promise<WasteOrder> {
+    delete wasteOrderPrivate.status;
 
     const contract = await getFabricConnection().wasteOrderContract;
-    let submittedWasteOrderBuffer: Buffer;
-    if (sendBody) {
-        submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId, JSON.stringify(updatedWasteOrder));
-    } else {
-        submittedWasteOrderBuffer = await contract.submitTransaction(procedure, wasteOrderId);
+
+    let transaction = contract.createTransaction(procedure);
+    if (wasteOrderPrivate) {
+        const transientData: TransientMap = {
+            order: Buffer.from(JSON.stringify(wasteOrderPrivate))
+        };
+        transaction.setTransient(transientData);
     }
 
-    let submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
+    const submittedWasteOrderBuffer: Buffer = await transaction.submit(wasteOrderId);
+    const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     console.log('Updated Contract with ID: ' + wasteOrderId);
     return submittedWasteOrder;
 }
