@@ -224,7 +224,6 @@ export class WasteOrderContract extends Contract {
 
             if (result.value && result.value.value.toString()) {
                 let wasteOrderPublic: WasteOrderPublic;
-                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic.id);
 
                 try {
                     wasteOrderPublic = JSON.parse(result.value.value.toString('utf8'));
@@ -232,6 +231,8 @@ export class WasteOrderContract extends Contract {
                     console.log(error);
                     throw (error);
                 }
+
+                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic.id);
 
                 let date = new Date(0);
                 date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);
