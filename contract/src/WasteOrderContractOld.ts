@@ -10,7 +10,7 @@ import { WasteOrderTransaction } from './model/WasteOrderTransaction';
 import { Iterators } from 'fabric-shim';
 import { Guid } from 'guid-typescript';
 
-@Info({ title: 'WasteOrderContract', description: 'Contract to commission Waste Orders to Subcontractors' })
+@Info({ title: 'WasteOrderContract2', description: 'Contract to commission Waste Orders to Subcontractors' })
 export class WasteOrderContract extends Contract {
 
     @Transaction()

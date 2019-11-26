@@ -1,6 +1,6 @@
 import * as shim from "fabric-shim";
 import { WasteOrderPrivate } from "./model/WasteOrderPrivate";
-import { WasteOrderContract } from "./WasteOrderContract";
+import { WasteOrderContract } from "./WasteOrderContractUnclean";
 import { WasteOrderPublic } from "./model/WasteOrderPublic";
 import winston = require("winston");
 import { WasteOrder } from "./model/WasteOrder";

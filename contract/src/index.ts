@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { WasteOrderContract } from './WasteOrderContractOld';
-export { WasteOrderContract } from './WasteOrderContractOld';
+import { WasteOrderContract } from './WasteOrderContract';
+export { WasteOrderContract } from './WasteOrderContract';
 
 export const contracts: any[] = [WasteOrderContract];

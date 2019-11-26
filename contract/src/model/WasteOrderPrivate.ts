@@ -52,8 +52,6 @@ export const WasteOrderPrivateSchema = Joi.object().keys({
 });
 
 export const WasteOrderPrivateCommissionSchema = Joi.object().keys({
-    id: Joi.string().required(),
-    status: Joi.number().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
     service: ServiceSchema.required(),
