@@ -23,9 +23,9 @@ export class WasteOrderContract extends Contract {
         let wasteOrderId = ctx.clientIdentity.getMSPID() + '-' + orderId;
 
         let wasteOrderPublic: WasteOrderPublic = JSON.parse(wasteOrderPublicValue);
-        let validationResult = Joi.validate(wasteOrderPublic, WasteOrderPublicCommissionSchema);
-        if (validationResult.error !== null) {
-            throw "Invalid Waste Order Public Schema: " + validationResult.error.message;
+        let publicValidationResult = Joi.validate(wasteOrderPublic, WasteOrderPublicCommissionSchema);
+        if (publicValidationResult.error !== null) {
+            throw "Invalid Waste Order Public Schema: " + publicValidationResult.error.message;
         }
         wasteOrderPublic.id = wasteOrderId;
         wasteOrderPublic.originatorMSPID = ctx.clientIdentity.getMSPID();
@@ -58,7 +58,7 @@ export class WasteOrderContract extends Contract {
     @Transaction()
     public async acceptWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         let wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
@@ -88,7 +88,7 @@ export class WasteOrderContract extends Contract {
         }
 
         let wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
@@ -112,7 +112,7 @@ export class WasteOrderContract extends Contract {
     @Transaction()
     public async cancelWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder & WasteOrderPrivate> {
         let wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED) {
@@ -150,7 +150,7 @@ export class WasteOrderContract extends Contract {
         }
 
         let wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.ACCEPTED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
@@ -172,16 +172,23 @@ export class WasteOrderContract extends Contract {
     }
 
     @Transaction()
-    public async correctWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder & WasteOrderPrivate> {
+    public async correctWasteOrder(ctx: Context, orderId: string, wasteOrderPublicValue: string): Promise<WasteOrder & WasteOrderPrivate> {
+        let updatedWasteOrderPublic = JSON.parse(wasteOrderPublicValue);
+
+        let publicValidationResult = Joi.validate(updatedWasteOrderPublic, WasteOrderPublicCommissionSchema);
+        if (publicValidationResult.error !== null) {
+            throw 'Invalid Schema: ' + publicValidationResult.error.message;
+        }
+
         let updatedWasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
 
-        let validationResult = Joi.validate(updatedWasteOrderPrivate, WasteOrderPrivateCorrectionSchema);
-        if (validationResult.error !== null) {
-            throw 'Invalid Schema: ' + validationResult.error.message;
+        let privateValidationResult = Joi.validate(updatedWasteOrderPrivate, WasteOrderPrivateCorrectionSchema);
+        if (privateValidationResult.error !== null) {
+            throw 'Invalid Schema: ' + privateValidationResult.error.message;
         }
 
         let wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, orderId);
+        let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.clientIdentity.getMSPID();
 
         if (!((wasteOrderPrivate.status === WasteOrderStatus.REJECTED || wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED)
@@ -196,11 +203,16 @@ export class WasteOrderContract extends Contract {
             status: WasteOrderStatus.COMMISSIONED
         }
 
-        await Util.saveWasteOrder(ctx, wasteOrderPublic, newWasteOrderPrivate);
+        const newWasteOrderPublic: WasteOrderPublic = {
+            ...wasteOrderPublic,
+            ...updatedWasteOrderPublic
+        }
+
+        await Util.saveWasteOrder(ctx, newWasteOrderPublic, newWasteOrderPrivate);
 
         return {
             ...newWasteOrderPrivate,
-            ...wasteOrderPublic
+            ...newWasteOrderPublic
         };
     }
 
@@ -232,7 +244,7 @@ export class WasteOrderContract extends Contract {
                     throw (error);
                 }
 
-                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic.id, wasteOrderPublic.privateDataId);
+                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic, wasteOrderPublic.privateDataId);
 
                 let date = new Date(0);
                 date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);

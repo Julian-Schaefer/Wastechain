@@ -12,12 +12,12 @@ export async function getWasteOrder(ctx: Context, orderId: string): Promise<Wast
         throw new Error(`The order ${orderId} does not exist`);
     }
 
-    let wasteOrder = await getWasteOrderPublic(ctx, orderId);
-    let wasteOrderPrivate = await getWasteOrderPrivate(ctx, orderId);
+    let wasteOrderPublic = await getWasteOrderPublic(ctx, orderId);
+    let wasteOrderPrivate = await getWasteOrderPrivate(ctx, wasteOrderPublic);
 
     return {
         ...wasteOrderPrivate,
-        ...wasteOrder
+        ...wasteOrderPublic
     };
 }
 
@@ -32,15 +32,13 @@ export async function getWasteOrderPublic(ctx: Context, orderId: string): Promis
     return wasteOrder;
 }
 
-export async function getWasteOrderPrivate(ctx: Context, orderId: string, orderPrivateId?: string): Promise<WasteOrderPrivate> {
-    const exists = await checkIfWasteOrderExists(ctx, orderId);
+export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: WasteOrderPublic, orderPrivateId?: string): Promise<WasteOrderPrivate> {
+    const exists = await checkIfWasteOrderExists(ctx, wasteOrderPublic.id);
     if (!exists) {
-        throw new Error(`The order ${orderId} does not exist`);
+        throw new Error(`The order ${wasteOrderPublic.id} does not exist`);
     }
 
-    let wasteOrderPublic: WasteOrderPublic = await getWasteOrderPublic(ctx, orderId);
     let wasteOrderPrivateId = orderPrivateId ? orderPrivateId : wasteOrderPublic.privateDataId;
-
     let wasteOrderPrivateBuffer: Buffer;
 
     try {

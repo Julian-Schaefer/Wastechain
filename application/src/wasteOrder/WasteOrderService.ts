@@ -43,20 +43,25 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: Wast
     return commissionedWasteOrder;
 }
 
-async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOrderPrivate?: WasteOrderPrivate): Promise<WasteOrder> {
-    delete wasteOrderPrivate.status;
-
+async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOrderPublic?: WasteOrderPublic, wasteOrderPrivate?: WasteOrderPrivate): Promise<WasteOrder> {
     const contract = await getFabricConnection().wasteOrderContract;
 
     let transaction = contract.createTransaction(procedure);
     if (wasteOrderPrivate) {
+        delete wasteOrderPrivate.status;
         const transientData: TransientMap = {
             order: Buffer.from(JSON.stringify(wasteOrderPrivate))
         };
         transaction.setTransient(transientData);
     }
 
-    const submittedWasteOrderBuffer: Buffer = await transaction.submit(wasteOrderId);
+    let submittedWasteOrderBuffer: Buffer;
+    if (wasteOrderPublic) {
+        submittedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
+    } else {
+        submittedWasteOrderBuffer = await transaction.submit(wasteOrderId);
+    }
+
     const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     console.log('Updated Contract with ID: ' + wasteOrderId);
     return submittedWasteOrder;

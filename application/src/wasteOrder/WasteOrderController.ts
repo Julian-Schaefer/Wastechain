@@ -58,13 +58,13 @@ async function updateWasteOrder(request: Request, response: Response) {
     try {
         let validationSchema: Joi.ObjectSchema;
         let procedure: string;
-        let sendBody = false;
+        let sendWasteOrder = false;
 
         switch (updatedWasteOrder.status) {
             case WasteOrderStatus.COMMISSIONED:
                 validationSchema = WasteOrderCorrectionSchema;
                 procedure = 'correctWasteOrder';
-                sendBody = true;
+                sendWasteOrder = true;
                 break;
 
             case WasteOrderStatus.ACCEPTED:
@@ -75,7 +75,7 @@ async function updateWasteOrder(request: Request, response: Response) {
             case WasteOrderStatus.REJECTED:
                 validationSchema = WasteOrderRejectSchema;
                 procedure = 'rejectWasteOrder';
-                sendBody = true;
+                sendWasteOrder = true;
                 break;
 
             case WasteOrderStatus.CANCELLED:
@@ -86,7 +86,7 @@ async function updateWasteOrder(request: Request, response: Response) {
             case WasteOrderStatus.COMPLETED:
                 validationSchema = WasteOrderCompleteSchema;
                 procedure = 'completeWasteOrder';
-                sendBody = true;
+                sendWasteOrder = true;
                 break;
 
             default:
@@ -100,7 +100,15 @@ async function updateWasteOrder(request: Request, response: Response) {
         }
 
         const wasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(updatedWasteOrder);
-        let submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure, wasteOrderPrivate);
+        const wasteOrderPublic = getWasteOrderPublicFromWasteOrder(updatedWasteOrder);
+
+        let submittedWasteOrder: WasteOrder;
+        if (sendWasteOrder) {
+            submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure, wasteOrderPublic, wasteOrderPrivate);
+        } else {
+            submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure);
+        }
+
         response.send(JSON.stringify(submittedWasteOrder));
     } catch (error) {
         console.log('Error evaluating Transaction: ' + error);
