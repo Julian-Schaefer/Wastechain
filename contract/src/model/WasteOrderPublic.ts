@@ -4,14 +4,14 @@ export interface WasteOrderPublic {
     id: string;
     subcontractorMSPID: string;
     originatorMSPID: string;
-    privateDataId: string;
+    wasteOrderPrivateId: string;
 }
 
 export const WasteOrderPublicSchema = Joi.object().keys({
     id: Joi.string().required(),
     subcontractorMSPID: Joi.string().required(),
     originatorMSPID: Joi.string().required(),
-    privateDataId: Joi.string().required()
+    wasteOrderPrivateId: Joi.string().required()
 });
 
 

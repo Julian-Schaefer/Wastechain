@@ -244,7 +244,7 @@ export class WasteOrderContract extends Contract {
                     throw (error);
                 }
 
-                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic, wasteOrderPublic.privateDataId);
+                let wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic, wasteOrderPublic.wasteOrderPrivateId);
 
                 let date = new Date(0);
                 date.setSeconds(result.value.timestamp.getSeconds(), result.value.timestamp.getNanos() / 1000000);

@@ -38,7 +38,7 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
         throw new Error(`The order ${wasteOrderPublic.id} does not exist`);
     }
 
-    let wasteOrderPrivateId = orderPrivateId ? orderPrivateId : wasteOrderPublic.privateDataId;
+    let wasteOrderPrivateId = orderPrivateId ? orderPrivateId : wasteOrderPublic.wasteOrderPrivateId;
     let wasteOrderPrivateBuffer: Buffer;
 
     try {
@@ -62,7 +62,7 @@ export async function checkIfWasteOrderExists(ctx: Context, orderId: string): Pr
 
 export async function saveWasteOrder(ctx: Context, wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate) {
     let wasteOrderPrivateId = wasteOrderPublic.id + '-' + Guid.create().toString();
-    wasteOrderPublic.privateDataId = wasteOrderPrivateId;
+    wasteOrderPublic.wasteOrderPrivateId = wasteOrderPrivateId;
 
     let validationResult = Joi.validate(wasteOrderPublic, WasteOrderPublicSchema);
     if (validationResult.error !== null) {
