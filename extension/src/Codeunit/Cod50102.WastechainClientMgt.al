@@ -1,6 +1,6 @@
 codeunit 50102 "Wastechain Client Mgt. WC"
 {
-    procedure PostWasteOrder(WasteLine: Record "Waste Management Line")
+    procedure PostWasteOrder(WasteMgtLine: Record "Waste Management Line WMR")
     var
         Response: HttpResponseMessage;
         Content: HttpContent;
@@ -9,18 +9,18 @@ codeunit 50102 "Wastechain Client Mgt. WC"
         WasteOrderCommissionJSON: JsonObject;
         WasteOrderCommissionJSONText: Text;
     begin
-        WasteOrderCommissionJSON := WastechainJSONMgt.CreateWasteOrderCommissionSchemaJSON(WasteLine);
+        WasteOrderCommissionJSON := WastechainJSONMgt.CreateWasteOrderCommissionSchemaJSON(WasteMgtLine);
         WasteOrderCommissionJSON.WriteTo(WasteOrderCommissionJSONText);
         Content.WriteFrom(WasteOrderCommissionJSONText);
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
-        Post('/order/' + WastechainJSONMgt.GetWasteOrderID(WasteLine), Content, Response);
+        Post('/order/' + WastechainJSONMgt.GetWasteOrderID(WasteMgtLine), Content, Response);
 
         Response.Content.ReadAs(ResponseText);
         if Response.IsSuccessStatusCode then begin
-            WasteLine."Waste Order ID WC" := WastechainJSONMgt.GetWasteOrderIDFromJSONText(ResponseText);
-            WasteLine.Modify();
+            WasteMgtLine."Waste Order ID WC" := WastechainJSONMgt.GetWasteOrderIDFromJSONText(ResponseText);
+            WasteMgtLine.Modify();
             Message('Successfully commissioned Waste Order to Wastechain.');
         end else
             Error(ResponseText);

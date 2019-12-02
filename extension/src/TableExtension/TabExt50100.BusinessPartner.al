@@ -1,4 +1,4 @@
-tableextension 50100 "Business Partner Ext WC" extends "Business Partner"
+tableextension 50100 "Business Partner Ext WC" extends "Business Partner WMR"
 {
     fields
     {
@@ -9,7 +9,7 @@ tableextension 50100 "Business Partner Ext WC" extends "Business Partner"
 
             trigger OnValidate()
             var
-                BusinessPartner: Record "Business Partner";
+                BusinessPartner: Record "Business Partner WMR";
                 MSPIDAlreadyDefinedErr: Label 'This MSP ID has already been specified for %1 %2';
             begin
                 if BusinessPartner.Get("Wastechain MSP ID") then

@@ -1,7 +1,7 @@
 codeunit 50100 "Wastechain Management"
 {
 
-    procedure CommissionWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    procedure CommissionWasteOrder(WasteMgtLine: Record "Waste Management Line WMR")
     begin
         if WasteMgtLine."Waste Order ID WC" <> '' then
             Error('Waste Order %1 has already been commissioned.', WasteMgtLine."Waste Order ID WC");
@@ -10,10 +10,10 @@ codeunit 50100 "Wastechain Management"
         WastechainClientMgt.PostWasteOrder(WasteMgtLine);
     end;
 
-    procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; BusinessPartnerSiteCode: Code[10]; ServiceNo: Code[20])
+    procedure AcceptWasteOrder(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]; TaskSiteNo: Code[20]; ServiceNo: Code[20])
     var
-        WasteMgtHeader: Record "Waste Management Header";
-        WasteMgtLine: Record "Waste Management Line";
+        WasteMgtHeader: Record "Waste Management Header WMR";
+        WasteMgtLine: Record "Waste Management Line WMR";
         WasteOrderUpdateJSON: JsonObject;
     begin
         WasteMgtHeader.Init();
@@ -30,7 +30,7 @@ codeunit 50100 "Wastechain Management"
             WasteMgtLine.Validate("Posting Type", WasteMgtLine."Posting Type"::Sales);
             WasteMgtLine.Validate("Post-with No.", BusinessPartnerNo);
             WasteMgtLine.Validate("Invoice-with No.", BusinessPartnerNo);
-            WasteMgtLine.Validate("Task-at Code", BusinessPartnerSiteCode);
+            WasteMgtLine.Validate("Task Site No.", TaskSiteNo);
             WasteMgtLine.Validate("Price Fixed", true);
             WasteMgtLine.Validate(Quantity, Quantity);
             WasteMgtLine.Validate("Unit Price", "Unit Price");
@@ -58,7 +58,7 @@ codeunit 50100 "Wastechain Management"
         UpdateWasteOrder(WasteOrder."ID", WasteOrderUpdateJSON);
     end;
 
-    procedure CompleteWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    procedure CompleteWasteOrder(WasteMgtLine: Record "Waste Management Line WMR")
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
@@ -68,7 +68,7 @@ codeunit 50100 "Wastechain Management"
         UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 
-    procedure CorrectWasteOrder(WasteMgtLine: Record "Waste Management Line")
+    procedure CorrectWasteOrder(WasteMgtLine: Record "Waste Management Line WMR")
     var
         WasteOrderUpdateJSON: JsonObject;
     begin
@@ -78,9 +78,9 @@ codeunit 50100 "Wastechain Management"
         UpdateWasteOrder(WasteMgtLine."Waste Order ID WC", WasteOrderUpdateJSON);
     end;
 
-    local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line"; Purchase: Boolean)
+    local procedure CheckWasteMgtLine(WasteMgtLine: Record "Waste Management Line WMR"; Purchase: Boolean)
     var
-        BusinessPartner: Record "Business Partner";
+        BusinessPartner: Record "Business Partner WMR";
     begin
 
         WasteMgtLine.TestField("Unit Price");
@@ -94,7 +94,7 @@ codeunit 50100 "Wastechain Management"
 
         if Purchase then begin
             WasteMgtLine.TestField("Bal. Acc. Post-with No.");
-            WasteMgtLine.TestField("Bal. Acc. Task-at Code");
+            WasteMgtLine.TestField("Bal. Acc. Task Site No.");
         end;
     end;
 
@@ -106,35 +106,31 @@ codeunit 50100 "Wastechain Management"
         WastechainClientMgt.UpdateWasteOrder(WasteOrderID, WasteOrderUpdateJSON);
     end;
 
-    procedure FindOrCreateBusinessPartnerSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[10]
+    procedure FindOrCreateTaskSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[20]
     var
-        BusinessPartnerSite: Record "Business Partner Site";
+        TaskSite: Record "Task Site WMR";
     begin
         with WasteOrder do begin
-            BusinessPartnerSite.SetRange("Business Partner No.", BusinessPartnerNo);
-            BusinessPartnerSite.SetRange(Address, "Task Site Address");
-            BusinessPartnerSite.SetRange("Address 2", "Task Site Address 2");
-            BusinessPartnerSite.SetRange("Post Code", "Task Site Post Code");
-            BusinessPartnerSite.SetRange(City, "Task Site City");
-            BusinessPartnerSite.SetRange("Country/Region Code", "Task Site Country Code");
-            BusinessPartnerSite.SetRange("Area Code", "Task Site Area Code");
-            if BusinessPartnerSite.FindFirst() then begin
-                exit(BusinessPartnerSite.Code);
+            TaskSite.SetRange(Address, "Task Site Address");
+            TaskSite.SetRange("Address 2", "Task Site Address 2");
+            TaskSite.SetRange("Post Code", "Task Site Post Code");
+            TaskSite.SetRange(City, "Task Site City");
+            TaskSite.SetRange("Country/Region Code", "Task Site Country Code");
+            TaskSite.SetRange("Area Code", "Task Site Area Code");
+            if TaskSite.FindFirst() then begin
+                exit(TaskSite."No.");
             end else begin
-                BusinessPartnerSite.Init();
-                BusinessPartnerSite.Validate("Business Partner No.", BusinessPartnerNo);
-                BusinessPartnerSite.Insert(true);
+                TaskSite.Init();
+                TaskSite.Validate(Address, "Task Site Address");
+                TaskSite.Validate("Address 2", "Task Site Address 2");
+                TaskSite.Validate("Area Code", "Task Site Area Code");
+                TaskSite.Validate(City, "Task Site City");
+                TaskSite.Validate("Country/Region Code", "Task Site Country Code");
+                TaskSite.Validate("Post Code", "Task Site Post Code");
+                TaskSite.Validate("Name 2", 'Auto generated from Wastechain');
+                TaskSite.Insert(true);
 
-                BusinessPartnerSite.Validate(Address, "Task Site Address");
-                BusinessPartnerSite.Validate("Address 2", "Task Site Address 2");
-                BusinessPartnerSite.Validate("Area Code", "Task Site Area Code");
-                BusinessPartnerSite.Validate(City, "Task Site City");
-                BusinessPartnerSite.Validate("Country/Region Code", "Task Site Country Code");
-                BusinessPartnerSite.Validate("Post Code", "Task Site Post Code");
-                BusinessPartnerSite.Validate("Name 2", 'Auto generated from Wastechain');
-                BusinessPartnerSite.Modify();
-
-                exit(BusinessPartnerSite.Code);
+                exit(TaskSite."No.");
             end;
         end;
     end;

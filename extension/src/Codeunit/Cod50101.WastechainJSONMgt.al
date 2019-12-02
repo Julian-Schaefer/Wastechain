@@ -1,8 +1,8 @@
 codeunit 50101 "Wastechain JSON Mgt. WC"
 {
-    procedure CreateWasteOrderCommissionSchemaJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    procedure CreateWasteOrderCommissionSchemaJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
-        BusinessPartner: Record "Business Partner";
+        BusinessPartner: Record "Business Partner WMR";
         WasteOrderJSON: JsonObject;
     begin
         with WasteMgtLine do begin
@@ -33,9 +33,9 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(WasteOrderJSON);
     end;
 
-    procedure CreateWasteOrderCorrectionSchemaJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    procedure CreateWasteOrderCorrectionSchemaJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
-        BusinessPartner: Record "Business Partner";
+        BusinessPartner: Record "Business Partner WMR";
         WasteOrderJSON: JsonObject;
     begin
         with WasteMgtLine do begin
@@ -67,7 +67,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(WasteOrderJSON);
     end;
 
-    procedure CreateWasteOrderCompleteSchemaJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    procedure CreateWasteOrderCompleteSchemaJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
         WasteOrderJSON: JsonObject;
     begin
@@ -103,36 +103,36 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         exit(WasteOrderJSON);
     end;
 
-    local procedure CreateTaskSiteJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    local procedure CreateTaskSiteJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
-        BusinessPartnerSite: Record "Business Partner Site";
+        TaskSite: Record "Task Site WMR";
         TaskSiteJSON: JsonObject;
     begin
         with WasteMgtLine do begin
             if WasteMgtLine."Posting Type" = WasteMgtLine."Posting Type"::Sales then
-                BusinessPartnerSite.Get("Post-with No.", "Task-at Code")
+                TaskSite.Get("Task Site No.")
             else
                 if WasteMgtLine."Posting Type" = WasteMgtLine."Posting Type"::Purchase then
-                    BusinessPartnerSite.Get("Bal. Acc. Post-with No.", "Bal. Acc. Task-at Code");
-            TaskSiteJSON.Add('name', BusinessPartnerSite.Name);
-            TaskSiteJSON.Add('name2', BusinessPartnerSite."Name 2");
-            TaskSiteJSON.Add('address', BusinessPartnerSite.Address);
-            TaskSiteJSON.Add('address2', BusinessPartnerSite."Address 2");
-            TaskSiteJSON.Add('postCode', BusinessPartnerSite."Post Code");
-            TaskSiteJSON.Add('city', BusinessPartnerSite.City);
-            TaskSiteJSON.Add('countryCode', BusinessPartnerSite."Country/Region Code");
-            TaskSiteJSON.Add('areaCode', BusinessPartnerSite."Area Code");
+                    TaskSite.Get("Bal. Acc. Post-with No.", "Bal. Acc. Task Site No.");
+            TaskSiteJSON.Add('name', TaskSite.Name);
+            TaskSiteJSON.Add('name2', TaskSite."Name 2");
+            TaskSiteJSON.Add('address', TaskSite.Address);
+            TaskSiteJSON.Add('address2', TaskSite."Address 2");
+            TaskSiteJSON.Add('postCode', TaskSite."Post Code");
+            TaskSiteJSON.Add('city', TaskSite.City);
+            TaskSiteJSON.Add('countryCode', TaskSite."Country/Region Code");
+            TaskSiteJSON.Add('areaCode', TaskSite."Area Code");
 
             exit(TaskSiteJSON);
         end;
     end;
 
-    local procedure CreateServiceJSON(WasteMgtLine: Record "Waste Management Line"): JsonObject
+    local procedure CreateServiceJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
-        Service: Record Service;
+        Service: Record "Service WMR";
         Item: Record Item;
-        IntMaterialCatalog: Record "Global Int. Material Catalog";
-        Equipment: Record Equipment;
+        IntMaterialCatalog: Record "Global Int. Mat. Catalog WMR";
+        Equipment: Record "Equipment WMR";
         ServiceJSON: JsonObject;
     begin
         with WasteMgtLine do begin
@@ -345,7 +345,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
         end;
     end;
 
-    procedure GetWasteOrderID(WasteMgtLine: Record "Waste Management Line"): Text
+    procedure GetWasteOrderID(WasteMgtLine: Record "Waste Management Line WMR"): Text
     begin
         exit(WasteMgtLine."Document No." + '-' + Format(WasteMgtLine."Line No."));
     end;

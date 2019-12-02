@@ -29,5 +29,11 @@ New-NavContainer -containerName Subcontractor -accept_eula -auth UserPassword -a
 # Optional: Import License File
 #Import-NavContainerLicense -containerName RC -licenseFile "PATH TO .flf"
 
-New-NavContainer -containerName OrderingOrg -accept_eula -imageName "mcr.microsoft.com/businesscentral/onprem:14.1.32615.0" -useBestContainerOS -bakFile "C:\Users\JSchaefer\Documents\Backup\BC140-Wastechain.bak" -updateHosts
+New-NavContainer -containerName OrderingOrg `
+    -accept_eula `
+    -imageName "mcr.microsoft.com/businesscentral/onprem:14.4.35602.0-w1" `
+    -useBestContainerOS `
+    -bakFile "C:\Users\JSchaefer\Documents\Backup\BC140-Wastechain.bak" `
+    -updateHosts `
+    -shortcuts "None"
 

@@ -1,4 +1,4 @@
-pageextension 50102 "Completed Order Subform Ext WC" extends "Completed Orders Subform"
+pageextension 50102 "Completed Order Subform Ext WC" extends "Completed Orders Subform WMR"
 {
 
     actions

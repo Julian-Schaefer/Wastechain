@@ -1,4 +1,4 @@
-tableextension 50103 "Waste Mgt. Line Archive Ext WC" extends "Waste Mgt. Line Archive"
+tableextension 50103 "Waste Mgt. Line Archive Ext WC" extends "Waste Mgt. Line Archive WMR"
 {
     fields
     {

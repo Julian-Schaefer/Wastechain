@@ -199,8 +199,8 @@ page 50105 "Outgoing Waste Orders WC"
 
                 trigger OnAction()
                 var
-                    WasteMgtLine: Record "Waste Management Line";
-                    WasteMgtHeader: Record "Waste Management Header";
+                    WasteMgtLine: Record "Waste Management Line WMR";
+                    WasteMgtHeader: Record "Waste Management Header WMR";
                     MultipleWasteOrdersFoundErr: Label 'Multiple Waste Management Orders have been found.';
                     NoWasteOrderFoundErr: Label 'No corresponding Waste Management Order has been found.';
                 begin
@@ -229,7 +229,7 @@ page 50105 "Outgoing Waste Orders WC"
 
     var
         WastechainMgt: Codeunit "Wastechain Management";
-        WasteLine: Record "Waste Management Line";
+        WasteLine: Record "Waste Management Line WMR";
         StatusFilter: enum "Waste Order Status WC";
 
     local procedure RefreshPage()
@@ -238,7 +238,7 @@ page 50105 "Outgoing Waste Orders WC"
         WastechainMgt.GetOutgoingWasteOrdersWithStatus(Rec, StatusFilter);
     end;
 
-    procedure SetWasteLine(WasteLine2: Record "Waste Management Line")
+    procedure SetWasteLine(WasteLine2: Record "Waste Management Line WMR")
     begin
         WasteLine := WasteLine2;
     end;

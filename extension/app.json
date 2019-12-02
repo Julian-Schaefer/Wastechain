@@ -13,8 +13,8 @@
   "dependencies": [
     {
       "appId": "05f7e1ef-ed7c-42bc-8a09-6d146ed92f6f",
-      "name": "RC365 Core",
-      "version": "1.0.0.0",
+      "name": "enwis.Core",
+      "version": "14.0.1.0",
       "publisher": "tegos Group"
     }
   ],

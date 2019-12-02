@@ -1,4 +1,4 @@
-pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt Order Subform"
+pageextension 50100 "Waste Mgt Order Subform Ext WC" extends "Waste Mgt. Order Subform WMR"
 {
     actions
     {

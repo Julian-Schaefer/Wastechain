@@ -1,9 +1,9 @@
 codeunit 50103 "Waste Mgt. Order Subscriber WC"
 {
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::ReleaseManagement, 'OnBeforeOrderReleased', '', true, true)]
-    local procedure OnBeforeOrderReleasedCheckWastechain(WasteHeader: Record "Waste Management Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"ReleaseManagement WMR", 'OnBeforeOrderReleased', '', true, true)]
+    local procedure OnBeforeOrderReleasedCheckWastechain(WasteHeader: Record "Waste Management Header WMR")
     var
-        WasteMgtLine: Record "Waste Management Line";
+        WasteMgtLine: Record "Waste Management Line WMR";
         WasteOrder: Record "Waste Order WC";
     begin
         with WasteMgtLine do begin
@@ -31,10 +31,10 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::ReleaseManagement, 'OnAfterOrderReleased', '', true, true)]
-    local procedure OnAfterOrderReleasedCheckWastechain(OriginalWasteHeader: Record "Waste Management Header"; var ReleasedWasteHeader: Record "Waste Management Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"ReleaseManagement WMR", 'OnAfterOrderReleased', '', true, true)]
+    local procedure OnAfterOrderReleasedCheckWastechain(OriginalWasteHeader: Record "Waste Management Header WMR"; var ReleasedWasteHeader: Record "Waste Management Header WMR")
     var
-        WasteMgtLine: Record "Waste Management Line";
+        WasteMgtLine: Record "Waste Management Line WMR";
     begin
         with WasteMgtLine do begin
             SetRange("Document Type", ReleasedWasteHeader."Document Type");

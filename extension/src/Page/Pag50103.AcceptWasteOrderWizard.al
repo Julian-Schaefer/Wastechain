@@ -15,12 +15,12 @@ page 50103 "Accept Waste Order Wizard WC"
                 field("Business Partner No."; BusinessPartnerNo)
                 {
                     Caption = 'Business Partner No.';
-                    TableRelation = "Business Partner";
+                    TableRelation = "Business Partner WMR";
                     ApplicationArea = All;
 
                     trigger OnValidate()
                     var
-                        BusinessPartner: Record "Business Partner";
+                        BusinessPartner: Record "Business Partner WMR";
                         MSPIDNotMatchingErr: Label 'The Wastechain MSP ID of the selected Business Partner does not match the MSP ID of the Originator';
                     begin
                         BusinessPartner.Get(BusinessPartnerNo);
@@ -40,7 +40,7 @@ page 50103 "Accept Waste Order Wizard WC"
                 field("Service No."; ServiceNo)
                 {
                     Caption = 'Service No.';
-                    TableRelation = Service;
+                    TableRelation = "Service WMR";
                     ApplicationArea = All;
 
                     trigger OnValidate()
@@ -59,45 +59,45 @@ page 50103 "Accept Waste Order Wizard WC"
                 field("Business Partner No Overview"; BusinessPartnerNo)
                 {
                     Caption = 'Business Partner No.';
-                    TableRelation = "Business Partner";
+                    TableRelation = "Business Partner WMR";
                     ApplicationArea = All;
 
                     trigger OnDrillDown()
                     var
-                        BusinessPartner: Record "Business Partner";
+                        BusinessPartner: Record "Business Partner WMR";
                     begin
                         BusinessPartner.Get(BusinessPartnerNo);
-                        Page.RunModal(Page::"Business Partner Card", BusinessPartner);
+                        Page.RunModal(Page::"Business Partner Card WMR", BusinessPartner);
                     end;
                 }
 
-                field("Business Partner Site Code Overview"; BusinessPartnerSiteCode)
+                field("Task Site No."; TaskSiteNo)
                 {
-                    Caption = 'Business Parner Site Code';
-                    TableRelation = "Business Partner Site";
+                    Caption = 'Task Site No.';
+                    TableRelation = "Task Site WMR";
                     ApplicationArea = All;
 
                     trigger OnDrillDown()
                     var
-                        BusinessPartnerSite: Record "Business Partner Site";
+                        TaskSite: Record "Task Site WMR";
                     begin
-                        BusinessPartnerSite.Get(BusinessPartnerNo, BusinessPartnerSiteCode);
-                        Page.RunModal(Page::"Business Partner Site", BusinessPartnerSite);
+                        TaskSite.Get(BusinessPartnerNo, TaskSiteNo);
+                        Page.RunModal(Page::"Task Site Card WMR", TaskSite);
                     end;
                 }
 
                 field("Service No Overview"; ServiceNo)
                 {
                     Caption = 'Service No.';
-                    TableRelation = Service;
+                    TableRelation = "Service WMR";
                     ApplicationArea = All;
 
                     trigger OnDrillDown()
                     var
-                        Service: Record Service;
+                        Service: Record "Service WMR";
                     begin
                         Service.Get(ServiceNo);
-                        Page.RunModal(Page::"Service Card", Service);
+                        Page.RunModal(Page::"Service Card WMR", Service);
                     end;
                 }
             }
@@ -147,7 +147,7 @@ page 50103 "Accept Waste Order Wizard WC"
                 var
                     WastechainMgt: Codeunit "Wastechain Management";
                 begin
-                    WastechainMgt.AcceptWasteOrder(WasteOrder, BusinessPartnerNo, BusinessPartnerSiteCode, ServiceNo);
+                    WastechainMgt.AcceptWasteOrder(WasteOrder, BusinessPartnerNo, TaskSiteNo, ServiceNo);
                     CurrPage.Close();
                 end;
             }
@@ -161,7 +161,7 @@ page 50103 "Accept Waste Order Wizard WC"
 
     trigger OnOpenPage()
     var
-        BusinessPartner: Record "Business Partner";
+        BusinessPartner: Record "Business Partner WMR";
     begin
         BusinessPartner.SetRange("Wastechain MSP ID", WasteOrder."Originator MSP ID");
         if BusinessPartner.FindFirst() then begin
@@ -179,7 +179,7 @@ page 50103 "Accept Waste Order Wizard WC"
         AcceptEnabled: Boolean;
         WasteOrder: Record "Waste Order WC";
         BusinessPartnerNo: Code[20];
-        BusinessPartnerSiteCode: Code[10];
+        TaskSiteNo: Code[20];
         ServiceNo: Code[20];
 
     local procedure EnableControls()
@@ -209,7 +209,7 @@ page 50103 "Accept Waste Order Wizard WC"
     var
         WastechainMgt: Codeunit "Wastechain Management";
     begin
-        BusinessPartnerSiteCode := WastechainMgt.FindOrCreateBusinessPartnerSite(WasteOrder, BusinessPartnerNo);
+        TaskSiteNo := WastechainMgt.FindOrCreateTaskSite(WasteOrder, BusinessPartnerNo);
 
         if ServiceNo <> '' then
             NextEnabled := true;
@@ -219,7 +219,7 @@ page 50103 "Accept Waste Order Wizard WC"
 
     local procedure ShowThirdStep()
     begin
-        if (ServiceNo <> '') and (BusinessPartnerNo <> '') and (BusinessPartnerSiteCode <> '') then
+        if (ServiceNo <> '') and (BusinessPartnerNo <> '') and (TaskSiteNo <> '') then
             AcceptEnabled := true;
 
         BackEnabled := true;

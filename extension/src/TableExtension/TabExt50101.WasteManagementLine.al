@@ -1,4 +1,4 @@
-tableextension 50101 "Waste Management Line Ext WC" extends "Waste Management Line"
+tableextension 50101 "Waste Management Line Ext WC" extends "Waste Management Line WMR"
 {
     fields
     {
