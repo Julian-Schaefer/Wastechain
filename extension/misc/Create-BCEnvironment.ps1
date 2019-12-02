@@ -29,8 +29,14 @@ New-NavContainer -containerName Subcontractor -accept_eula -auth UserPassword -a
 # Optional: Import License File
 #Import-NavContainerLicense -containerName RC -licenseFile "PATH TO .flf"
 
+$secpasswd = ConvertTo-SecureString "Testpassword123" -AsPlainText -Force
+$credentials = New-Object System.Management.Automation.PSCredential ("testuser", $secpasswd)
+
 New-NavContainer -containerName OrderingOrg `
     -accept_eula `
+    -accept_outdated `
+    -auth "NavUserPassword" `
+    -credential $credentials `
     -imageName "mcr.microsoft.com/businesscentral/onprem:14.4.35602.0-w1" `
     -useBestContainerOS `
     -bakFile "https://csbe7aa018c6d87x490dxb26.file.core.windows.net/tegos/BC140W1CU4.bak?st=2019-12-02T20%3A19%3A19Z&se=2020-04-01T20%3A19%3A00Z&sp=rl&sv=2018-03-28&sr=f&sig=w1q%2B%2FKI5xeiTEBOWq7ih5xSeURDL1O1NgaLmho7TDvE%3D" `
