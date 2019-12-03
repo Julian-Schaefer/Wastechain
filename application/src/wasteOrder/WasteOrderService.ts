@@ -47,7 +47,7 @@ async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOr
     const contract = await getFabricConnection().wasteOrderContract;
 
     let transaction = contract.createTransaction(procedure);
-    if (wasteOrderPrivate) {
+    if (wasteOrderPrivate !== undefined) {
         delete wasteOrderPrivate.status;
         const transientData: TransientMap = {
             order: Buffer.from(JSON.stringify(wasteOrderPrivate))
@@ -56,7 +56,7 @@ async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOr
     }
 
     let submittedWasteOrderBuffer: Buffer;
-    if (wasteOrderPublic) {
+    if (wasteOrderPublic !== undefined) {
         submittedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
     } else {
         submittedWasteOrderBuffer = await transaction.submit(wasteOrderId);

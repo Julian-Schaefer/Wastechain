@@ -58,13 +58,15 @@ async function updateWasteOrder(request: Request, response: Response) {
     try {
         let validationSchema: Joi.ObjectSchema;
         let procedure: string;
-        let sendWasteOrder = false;
+        let sendWasteOrderPublic = false;
+        let sendWasteOrderPrivate = false;
 
         switch (updatedWasteOrder.status) {
             case WasteOrderStatus.COMMISSIONED:
                 validationSchema = WasteOrderCorrectionSchema;
                 procedure = 'correctWasteOrder';
-                sendWasteOrder = true;
+                sendWasteOrderPublic = true;
+                sendWasteOrderPrivate = true;
                 break;
 
             case WasteOrderStatus.ACCEPTED:
@@ -75,7 +77,7 @@ async function updateWasteOrder(request: Request, response: Response) {
             case WasteOrderStatus.REJECTED:
                 validationSchema = WasteOrderRejectSchema;
                 procedure = 'rejectWasteOrder';
-                sendWasteOrder = true;
+                sendWasteOrderPrivate = true;
                 break;
 
             case WasteOrderStatus.CANCELLED:
@@ -86,7 +88,7 @@ async function updateWasteOrder(request: Request, response: Response) {
             case WasteOrderStatus.COMPLETED:
                 validationSchema = WasteOrderCompleteSchema;
                 procedure = 'completeWasteOrder';
-                sendWasteOrder = true;
+                sendWasteOrderPrivate = true;
                 break;
 
             default:
@@ -99,15 +101,10 @@ async function updateWasteOrder(request: Request, response: Response) {
             throw validationResult.error;
         }
 
-        const wasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(updatedWasteOrder);
-        const wasteOrderPublic = getWasteOrderPublicFromWasteOrder(updatedWasteOrder);
+        const wasteOrderPrivate = sendWasteOrderPrivate ? getWasteOrderPrivateFromWasteOrder(updatedWasteOrder) : undefined;
+        const wasteOrderPublic = sendWasteOrderPublic ? getWasteOrderPublicFromWasteOrder(updatedWasteOrder) : undefined;
 
-        let submittedWasteOrder: WasteOrder;
-        if (sendWasteOrder) {
-            submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure, wasteOrderPublic, wasteOrderPrivate);
-        } else {
-            submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure);
-        }
+        const submittedWasteOrder = await service.updateWasteOrder(wasteOrderId, procedure, wasteOrderPublic, wasteOrderPrivate);
 
         response.send(JSON.stringify(submittedWasteOrder));
     } catch (error) {
