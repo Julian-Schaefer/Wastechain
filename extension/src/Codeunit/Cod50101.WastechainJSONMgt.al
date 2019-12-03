@@ -113,7 +113,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 TaskSite.Get("Task Site No.")
             else
                 if WasteMgtLine."Posting Type" = WasteMgtLine."Posting Type"::Purchase then
-                    TaskSite.Get("Bal. Acc. Post-with No.", "Bal. Acc. Task Site No.");
+                    TaskSite.Get("Bal. Acc. Task Site No.");
             TaskSiteJSON.Add('name', TaskSite.Name);
             TaskSiteJSON.Add('name2', TaskSite."Name 2");
             TaskSiteJSON.Add('address', TaskSite.Address);

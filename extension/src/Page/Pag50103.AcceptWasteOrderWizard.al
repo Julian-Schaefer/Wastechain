@@ -81,7 +81,7 @@ page 50103 "Accept Waste Order Wizard WC"
                     var
                         TaskSite: Record "Task Site WMR";
                     begin
-                        TaskSite.Get(BusinessPartnerNo, TaskSiteNo);
+                        TaskSite.Get(TaskSiteNo);
                         Page.RunModal(Page::"Task Site Card WMR", TaskSite);
                     end;
                 }
