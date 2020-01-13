@@ -26,5 +26,13 @@
 			"path": "mobile"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"mocha.files.glob": "**/test/**/*.ts",
+		"mocha.requires": [
+			"ts-node/register"
+		]
+	},
+	"extensions": {
+		"recommendations": []
+	}
 }
