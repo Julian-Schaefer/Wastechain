@@ -1,7 +1,7 @@
-import { Service, ServiceSchema } from "./Service";
-import { TaskSite, TaskSiteSchema } from "./TaskSite";
 import * as Joi from '@hapi/joi';
 import * as JoiDate from '@hapi/joi-date';
+import { Service, ServiceSchema } from './Service';
+import { TaskSite, TaskSiteSchema } from './TaskSite';
 
 const JoiExtended: any = Joi.extend(JoiDate);
 
@@ -10,7 +10,7 @@ export enum WasteOrderStatus {
     ACCEPTED,
     REJECTED,
     CANCELLED,
-    COMPLETED
+    COMPLETED,
 }
 
 export interface WasteOrderPrivate {
@@ -48,7 +48,7 @@ export const WasteOrderPrivateSchema = Joi.object().keys({
     referenceNo: Joi.string().required(),
     rejectionMessage: Joi.string(),
     lastChanged: Joi.date().required(),
-    lastChangedByMSPID: Joi.string().required()
+    lastChangedByMSPID: Joi.string().required(),
 });
 
 export const WasteOrderPrivateCommissionSchema = Joi.object().keys({
@@ -62,7 +62,7 @@ export const WasteOrderPrivateCommissionSchema = Joi.object().keys({
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
     finishingTime: Joi.string(),
-    referenceNo: Joi.string().required()
+    referenceNo: Joi.string().required(),
 });
 
 export const WasteOrderPrivateCorrectionSchema = Joi.object().keys({
@@ -75,22 +75,22 @@ export const WasteOrderPrivateCorrectionSchema = Joi.object().keys({
     unitOfMeasure: Joi.string().required(),
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
-    finishingTime: Joi.string()
+    finishingTime: Joi.string(),
 });
 
 export const WasteOrderPrivateCompleteSchema = Joi.object().keys({
     quantity: Joi.number().required(),
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
-    finishingTime: Joi.string()
+    finishingTime: Joi.string(),
 });
 
 export const WasteOrderPrivateRejectSchema = Joi.object().keys({
-    rejectionMessage: Joi.string().required()
+    rejectionMessage: Joi.string().required(),
 });
 
 export function getWasteOrderPrivateFromString(wasteOrderPrivateValue: string): WasteOrderPrivate {
-    let wasteOrderPrivate: WasteOrderPrivate = JSON.parse(wasteOrderPrivateValue);
+    const wasteOrderPrivate: WasteOrderPrivate = JSON.parse(wasteOrderPrivateValue);
 
     return {
         id: wasteOrderPrivate.id,
@@ -108,6 +108,6 @@ export function getWasteOrderPrivateFromString(wasteOrderPrivateValue: string): 
         referenceNo: wasteOrderPrivate.referenceNo,
         rejectionMessage: wasteOrderPrivate.rejectionMessage,
         lastChanged: wasteOrderPrivate.lastChanged,
-        lastChangedByMSPID: wasteOrderPrivate.lastChangedByMSPID
+        lastChangedByMSPID: wasteOrderPrivate.lastChangedByMSPID,
     };
 }

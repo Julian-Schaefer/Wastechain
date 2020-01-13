@@ -11,10 +11,9 @@ export const WasteOrderPublicSchema = Joi.object().keys({
     id: Joi.string().required(),
     subcontractorMSPID: Joi.string().required(),
     originatorMSPID: Joi.string().required(),
-    wasteOrderPrivateId: Joi.string().required()
+    wasteOrderPrivateId: Joi.string().required(),
 });
 
-
 export const WasteOrderPublicCommissionSchema = Joi.object().keys({
-    subcontractorMSPID: Joi.string().required()
+    subcontractorMSPID: Joi.string().required(),
 });

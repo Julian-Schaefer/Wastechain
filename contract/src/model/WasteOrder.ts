@@ -1,4 +1,4 @@
-import { WasteOrderPublic } from "./WasteOrderPublic";
-import { WasteOrderPrivate } from "./WasteOrderPrivate";
+import { WasteOrderPrivate } from './WasteOrderPrivate';
+import { WasteOrderPublic } from './WasteOrderPublic';
 
 export type WasteOrder = WasteOrderPublic & WasteOrderPrivate;

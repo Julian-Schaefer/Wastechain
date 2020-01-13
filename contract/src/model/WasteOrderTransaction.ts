@@ -1,5 +1,5 @@
-import { WasteOrderPublic } from './WasteOrderPublic';
 import { WasteOrder } from './WasteOrder';
+import { WasteOrderPublic } from './WasteOrderPublic';
 
 export interface WasteOrderTransaction {
     txId: string;

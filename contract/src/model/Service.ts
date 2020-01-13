@@ -4,7 +4,7 @@ export enum EquipmentType {
     SUBMISSION,
     PICK_UP,
     EXCHANGE,
-    CLEARANCE
+    CLEARANCE,
 }
 
 export interface Service {
@@ -19,6 +19,6 @@ export const ServiceSchema = Joi.object().keys({
     description: Joi.string().required(),
     description2: Joi.string().required(),
     materialDescription: Joi.string().required(),
+    equipmentDescription: Joi.string().required(),
     equipmentType: Joi.number().required(),
-    equipmentDescription: Joi.string().required()
 });

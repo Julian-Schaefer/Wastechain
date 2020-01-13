@@ -19,5 +19,5 @@ export const TaskSiteSchema = Joi.object().keys({
     postCode: Joi.string().required(),
     city: Joi.string().required(),
     countryCode: Joi.string().required(),
-    areaCode: Joi.string().required()
+    areaCode: Joi.string().required(),
 });
