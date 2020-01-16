@@ -12,7 +12,7 @@ services:
 
   ## Certificate Authorities
   ca.ordering-organisation.com:
-    image: hyperledger/fabric-ca
+    image: hyperledger/fabric-ca:1.4.2
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
     ports:
@@ -25,7 +25,7 @@ services:
       - basic
 
   ca.subcontractor-organisation.com:
-    image: hyperledger/fabric-ca
+    image: hyperledger/fabric-ca:1.4.2
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
     ports:
@@ -38,7 +38,7 @@ services:
       - basic
 
   ca.third-party-organisation.com:
-    image: hyperledger/fabric-ca
+    image: hyperledger/fabric-ca:1.4.2
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
     ports:
@@ -74,7 +74,7 @@ services:
   ## Peers
   peer0.ordering-organisation.com:
     container_name: peer0.ordering-organisation.com
-    image: hyperledger/fabric-peer
+    image: hyperledger/fabric-peer:1.4.2
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.ordering-organisation.com
@@ -109,7 +109,7 @@ services:
 
   peer0.subcontractor-organisation.com:
     container_name: peer0.subcontractor-organisation.com
-    image: hyperledger/fabric-peer
+    image: hyperledger/fabric-peer:1.4.2
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.subcontractor-organisation.com
@@ -144,7 +144,7 @@ services:
 
   peer0.third-party-organisation.com:
     container_name: peer0.third-party-organisation.com
-    image: hyperledger/fabric-peer
+    image: hyperledger/fabric-peer:1.4.2
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.third-party-organisation.com
