@@ -70,6 +70,16 @@ Organizations:
                 Type: Signature
                 Rule: "OR('ThirdPartyOrgMSP.admin')"
 
+Capabilities:
+    Global: &ChannelCapabilities
+        V1_4_2: true
+
+    Orderer: &OrdererCapabilities
+        V1_4_2: true
+
+    Application: &ApplicationCapabilities
+        V1_4_2: true
+
 Orderer: &OrdererDefaults
     OrdererType: solo
     Addresses:
@@ -119,17 +129,6 @@ Application: &ApplicationDefaults
 
     Capabilities:
         <<: *ApplicationCapabilities
-
-Capabilities:
-    Global: &ChannelCapabilities
-        V1_4_2: true
-
-    Orderer: &OrdererCapabilities
-        V1_4_2: true
-
-    Application: &ApplicationCapabilities
-        V1_4_2: true
-
 
 Channel: &ChannelDefaults
     # Policies defines the set of policies at this level of the config tree
