@@ -214,22 +214,21 @@ services:
   ## CLI
   cli:
     container_name: cli
-    image: hyperledger/fabric-tools
+    image: hyperledger/fabric-tools:1.4.2
     tty: true
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer0.ordering-organisation.com:7051
       - CORE_PEER_LOCALMSPID=OrderingOrgMSP
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ordering-organisation.com/users/Admin@ordering-organisation.com/msp
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/crypto-config/peerOrganizations/ordering-organisation.com/users/Admin@ordering-organisation.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash -c 'sleep 1000'
     volumes:
       - /var/run:/host/var/run/
-      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
-      - ./../contract:/opt/gopath/src/github.com/contract
-      - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config
+      - ./../contract:/opt/gopath/src/github.com/contract/
+      - .:/etc/hyperledger/
     networks:
       - basic
