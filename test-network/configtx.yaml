@@ -4,7 +4,17 @@ Organizations:
     - &OrdererOrg
         Name: OrdererOrg
         ID: OrdererMSP
-        MSPDir: crypto-config/ordererOrganizations/wastechain.org/msp
+        MSPDir: crypto-config/ordererOrganizations/wastechain.org/msp        
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
 
     - &OrderingOrg
         Name: OrderingOrgMSP
@@ -13,6 +23,16 @@ Organizations:
         AnchorPeers:
             - Host: peer0.ordering-organisation.com
               Port: 7051
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin', 'OrderingOrgMSP.peer', 'OrderingOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin', 'OrderingOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrderingOrgMSP.admin')"
 
     - &SubcontractorOrg
         Name: SubcontractorOrgMSP
@@ -21,6 +41,16 @@ Organizations:
         AnchorPeers:
             - Host: peer0.subcontractor-organisation.com
               Port: 7051
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin', 'SubcontractorOrgMSP.peer', 'SubcontractorOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin', 'SubcontractorOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('SubcontractorOrgMSP.admin')"
 
     - &ThirdPartyOrg
         Name: ThirdPartyOrgMSP
@@ -29,6 +59,16 @@ Organizations:
         AnchorPeers:
             - Host: peer0.third-party-organisation.com
               Port: 7051
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin', 'ThirdPartyOrgMSP.peer', 'ThirdPartyOrgMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin', 'ThirdPartyOrgMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('ThirdPartyOrgMSP.admin')"
 
 Orderer: &OrdererDefaults
     OrdererType: solo
@@ -44,9 +84,41 @@ Orderer: &OrdererDefaults
         Brokers:
             - 127.0.0.1:9092
     Organizations:
+ 
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        # BlockValidation specifies what signatures must be included in the block
+        # from the orderer for the peer to validate it.
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
 
 Application: &ApplicationDefaults
     Organizations:
+    # Policies defines the set of policies at this level of the config tree
+    # For Application policies, their canonical path is
+    #   /Channel/Application/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
 
 Capabilities:
     Global: &ChannelCapabilities
@@ -57,6 +129,31 @@ Capabilities:
 
     Application: &ApplicationCapabilities
         V1_4_2: true
+
+
+Channel: &ChannelDefaults
+    # Policies defines the set of policies at this level of the config tree
+    # For Channel policies, their canonical path is
+    #   /Channel/<PolicyName>
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    # Capabilities describes the channel level capabilities, see the
+    # dedicated Capabilities section elsewhere in this file for a full
+    # description
+    Capabilities:
+        <<: *ChannelCapabilities
 
 Profiles:
     OrdererGenesis:
