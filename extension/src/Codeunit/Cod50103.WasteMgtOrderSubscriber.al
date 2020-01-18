@@ -18,7 +18,7 @@ codeunit 50103 "Waste Mgt. Order Subscriber WC"
                             "Posting Type"::Purchase:
                                 begin
                                     if WasteOrder.Status <> WasteOrder.Status::Completed then
-                                        Error('Line %1 has a commissioned Waste Order which has not yet been completed by the Contrator.', "Line No.");
+                                        Error('Line %1 has a commissioned Waste Order which has not yet been completed by the Subcontractor.', "Line No.");
                                 end;
                             "Posting Type"::Sales:
                                 begin

@@ -147,7 +147,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 ServiceJSON.Add('materialDescription', IntMaterialCatalog.Description);
             end;
             ServiceJSON.Add('equipmentType', Format(Service."Equipment Type", 0, 2));
-            Equipment.Get(Service."Equipment No.");
+            Equipment.Get(WasteMgtLine."Equipment No.");
             ServiceJSON.Add('equipmentDescription', Equipment.Description);
 
             exit(ServiceJSON);
