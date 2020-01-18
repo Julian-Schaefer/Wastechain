@@ -11,7 +11,7 @@
     "scripts": {
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "pretest": "npm run lint",
-        "test": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+        "test": "nyc mocha -r ts-node/register src/test/**/*.Test.ts",
         "start": "fabric-chaincode-node start",
         "build": "tsc",
         "build:watch": "tsc -w",
@@ -24,8 +24,8 @@
         "@hapi/joi": "^15.1.0",
         "@hapi/joi-date": "^1.3.0",
         "@types/hapi__joi": "^15.0.2",
-        "fabric-contract-api": "1.4.1",
-        "fabric-shim": "^1.4.4",
+        "fabric-contract-api": "1.4.2",
+        "fabric-shim": "1.4.2",
         "guid-typescript": "^1.0.9"
     },
     "devDependencies": {

@@ -10,6 +10,8 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
+import { WasteOrderPrivate } from '../model/WasteOrderPrivate';
+import { getWasteOrderPrivateFromTransient } from '../WasteOrderUtil';
 const winston = require('winston');
 
 chai.should();
@@ -19,6 +21,7 @@ chai.use(sinonChai);
 class TestingContext implements Context {
     public stub: sinon.SinonStubbedInstance<ChaincodeStub> = sinon.createStubInstance(ChaincodeStub);
     public clientIdentity: sinon.SinonStubbedInstance<ClientIdentity> = sinon.createStubInstance(ClientIdentity);
+
     public logging = {
         getLogger: sinon.stub().returns(sinon.createStubInstance(winston.createLogger().constructor)),
         setLevel: sinon.stub(),
@@ -41,7 +44,26 @@ describe('WasteOrderContract', () => {
     describe('#commissionWasteOrder', () => {
 
         it('should return true for a order', async () => {
-            ctx.stub.getTransient.returns({ asd: 123 });
+            const wasteOrderPrivate = {
+                description: 'asd'
+            };
+
+            /*const transientData = new Map<string, Buffer>();
+            transientData.set("order", Buffer.from(JSON.stringify(wasteOrderPrivate)));
+            ctx.stub.getTransient.returns({
+                size: 1,
+                map: {
+                    order: {
+                        value: Buffer.from(JSON.stringify(wasteOrderPrivate))
+                    }
+                }
+            });*/
+
+            let transientMap = {
+                order: Buffer.from(JSON.stringify(wasteOrderPrivate))
+            };
+
+            ctx.stub.getTransient.returns(new Map(Object.entries(transientMap)));
 
             const wasteOrderPublic = {
                 subcontractorMSPID: 'SubcontractorOrgMSP',
