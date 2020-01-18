@@ -27,7 +27,7 @@ peers:
     chaincodeQuery: true
     ledgerQuery: true
     eventSource: true
-    url: grpc://${FABRIC_NETWORK_URL}:8051
+    url: grpc://${FABRIC_NETWORK_URL}:9051
 orderers:
   orderer.wastechain.org:
     url: grpc://${FABRIC_NETWORK_URL}:7050
