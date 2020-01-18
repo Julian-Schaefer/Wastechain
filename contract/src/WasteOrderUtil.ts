@@ -44,11 +44,12 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
     try {
         wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.originatorMSPID + '-' + wasteOrderPublic.subcontractorMSPID, wasteOrderPrivateId);
     } catch {
-        wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID, wasteOrderPrivateId);
-    }
-
-    if (!wasteOrderPrivateBuffer) {
-        throw new Error('Private Data not found or not accessible.');
+        try {
+            wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID, wasteOrderPrivateId);
+        } catch {
+            throw new Error('Private Data Collection between ' + wasteOrderPublic.originatorMSPID + ' and ' +
+                wasteOrderPublic.subcontractorMSPID + ' could not be found or is not accessible.');
+        }
     }
 
     const wasteOrderPrivate = JSON.parse(wasteOrderPrivateBuffer.toString()) as WasteOrderPrivate;
@@ -84,8 +85,13 @@ export async function saveWasteOrder(ctx: Context, wasteOrderPublic: WasteOrderP
         await ctx.stub.putPrivateData(wasteOrderPublic.originatorMSPID + '-' + wasteOrderPublic.subcontractorMSPID,
             wasteOrderPrivate.id, wasteOrderPrivateBuffer);
     } catch {
-        await ctx.stub.putPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID,
-            wasteOrderPrivate.id, wasteOrderPrivateBuffer);
+        try {
+            await ctx.stub.putPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID,
+                wasteOrderPrivate.id, wasteOrderPrivateBuffer);
+        } catch {
+            throw new Error('Private Data Collection between ' + wasteOrderPublic.originatorMSPID + ' and ' +
+                wasteOrderPublic.subcontractorMSPID + ' could not be found or is not accessible.');
+        }
     }
 
     const wasteOrderPublicBuffer = Buffer.from(JSON.stringify(wasteOrderPublic));
