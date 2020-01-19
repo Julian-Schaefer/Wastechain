@@ -23,9 +23,6 @@ if ($module) {
     Write-Host "NavContainerHelper $VersionStr installed"
 }
 
-New-NavContainer -containerName Orderer -accept_eula -auth UserPassword -additionalParameters @("-p 80:80", "-p 7049:7049")
-New-NavContainer -containerName Subcontractor -accept_eula -auth UserPassword -additionalParameters @("-p 14080:80", "-p 14049:7049")
-
 # Optional: Import License File
 #Import-NavContainerLicense -containerName RC -licenseFile "PATH TO .flf"
 
@@ -37,9 +34,19 @@ New-NavContainer -containerName OrderingOrg `
     -accept_outdated `
     -auth "NavUserPassword" `
     -credential $credentials `
-    -imageName "mcr.microsoft.com/businesscentral/onprem:14.4.35602.0-w1" `
-    -useBestContainerOS `
-    -bakFile "https://csbe7aa018c6d87x490dxb26.file.core.windows.net/tegos/BC140W1CU4.bak?st=2019-12-02T20%3A19%3A19Z&se=2020-04-01T20%3A19%3A00Z&sp=rl&sv=2018-03-28&sr=f&sig=w1q%2B%2FKI5xeiTEBOWq7ih5xSeURDL1O1NgaLmho7TDvE%3D" `
+    -imageName "mcr.microsoft.com/businesscentral/onprem:1910" `
+    -bakFile "https://csbe7aa018c6d87x490dxb26.file.core.windows.net/tegos/OrderingOrg_BC.bak?st=2020-01-19T12%3A29%3A55Z&se=2020-11-20T12%3A29%3A00Z&sp=r&sv=2018-03-28&sr=f&sig=xuoqz1V7%2BmPkEcykYC1YLtojqZJguCuraIT6Tg%2B0GD8%3D" `
+    -updateHosts `
+    -shortcuts "None"
+
+
+New-NavContainer -containerName SubcontractorOrg `
+    -accept_eula `
+    -accept_outdated `
+    -auth "NavUserPassword" `
+    -credential $credentials `
+    -imageName "mcr.microsoft.com/businesscentral/onprem:1910" `
+    -bakFile "https://csbe7aa018c6d87x490dxb26.file.core.windows.net/tegos/SubcontractorOrg_BC.bak?st=2020-01-19T12%3A31%3A04Z&se=2020-10-20T12%3A31%3A00Z&sp=rl&sv=2018-03-28&sr=f&sig=Sl2DiAoLHwft7FRmPeg7Qwrwj2Uq6V9CuO%2BC77IUD7I%3D" `
     -updateHosts `
     -shortcuts "None"
 

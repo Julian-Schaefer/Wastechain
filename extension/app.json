@@ -12,20 +12,26 @@
   "logo": "",
   "dependencies": [
     {
+      "appId": "437dbf0e-84ff-417a-965d-ed2bb9650972",
+      "publisher": "Microsoft",
+      "name": "Base Application",
+      "version": "15.1.0.0"
+    },
+    {
       "appId": "05f7e1ef-ed7c-42bc-8a09-6d146ed92f6f",
       "name": "enwis.Core",
-      "version": "14.0.1.0",
+      "version": "15.0.0.0",
       "publisher": "tegos Group"
     }
   ],
   "screenshots": [],
-  "platform": "14.0.0.0",
-  "application": "14.0.0.0",
-  "idRange": 
+  "platform": "15.0.0.0",
+  "idRanges": [
     {
       "from": 50100,
       "to": 50149
-    },
+    }
+  ],
   "showMyCode": false,
-  "runtime": "2.4"
+  "runtime": "4.0"
 }
