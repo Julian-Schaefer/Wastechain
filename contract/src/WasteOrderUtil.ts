@@ -100,7 +100,7 @@ export async function checkIfWasteOrderExists(ctx: Context, orderId: string): Pr
 }
 
 export async function saveWasteOrder(ctx: Context, wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate) {
-    const wasteOrderPrivateId = wasteOrderPublic.id + '-' + Guid.create().toString();
+    const wasteOrderPrivateId = wasteOrderPublic.id + '-' + ctx.stub.getTxID();
     wasteOrderPublic.wasteOrderPrivateId = wasteOrderPrivateId;
 
     const validationResult = Joi.validate(wasteOrderPublic, WasteOrderPublicSchema);
@@ -108,9 +108,12 @@ export async function saveWasteOrder(ctx: Context, wasteOrderPublic: WasteOrderP
         throw new Error('Invalid Waste Order Public Schema: ' + validationResult.error.message);
     }
 
+
     wasteOrderPrivate.id = wasteOrderPrivateId;
-    wasteOrderPrivate.lastChanged = new Date();
-    wasteOrderPrivate.lastChangedByMSPID = ctx.clientIdentity.getMSPID();
+    const date = new Date(0);
+    date.setSeconds(ctx.stub.getTxTimestamp().getSeconds(), ctx.stub.getTxTimestamp().getNanos() / 1000000);
+    wasteOrderPrivate.lastChanged = date;
+    wasteOrderPrivate.lastChangedByMSPID = ctx.stub.getCreator().getMspid();
 
     const privateValidationResult = Joi.validate(wasteOrderPrivate, WasteOrderPrivateSchema);
     if (privateValidationResult.error !== null) {

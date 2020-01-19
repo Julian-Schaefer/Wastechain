@@ -20,7 +20,7 @@ export class WasteOrderContract extends Contract {
 
     @Transaction()
     public async commissionWasteOrder(ctx: Context, orderId: string, wasteOrderPublicValue: string): Promise<WasteOrder & WasteOrderPrivate> {
-        const wasteOrderId = ctx.clientIdentity.getMSPID() + '-' + orderId;
+        const wasteOrderId = ctx.stub.getCreator().getMspid() + '-' + orderId;
 
         const wasteOrderPublic: WasteOrderPublic = JSON.parse(wasteOrderPublicValue);
         const publicValidationResult = Joi.validate(wasteOrderPublic, WasteOrderPublicCommissionSchema);
@@ -28,7 +28,7 @@ export class WasteOrderContract extends Contract {
             throw new Error('Invalid Waste Order Public Schema: ' + publicValidationResult.error.message);
         }
         wasteOrderPublic.id = wasteOrderId;
-        wasteOrderPublic.originatorMSPID = ctx.clientIdentity.getMSPID();
+        wasteOrderPublic.originatorMSPID = ctx.stub.getCreator().getMspid();
 
         const wasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
         const privateValidationResult = Joi.validate(wasteOrderPrivate, WasteOrderPrivateCommissionSchema);
@@ -43,7 +43,7 @@ export class WasteOrderContract extends Contract {
             throw new Error(`The order ${wasteOrderPublic.id} already exists`);
         }
 
-        if (wasteOrderPublic.subcontractorMSPID === ctx.clientIdentity.getMSPID()) {
+        if (wasteOrderPublic.subcontractorMSPID === ctx.stub.getCreator().getMspid()) {
             throw new Error('It is not possible to commision a Waste Order to yourself.');
         }
 
@@ -59,7 +59,7 @@ export class WasteOrderContract extends Contract {
     public async acceptWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
-        const MSPID = ctx.clientIdentity.getMSPID();
+        const MSPID = ctx.stub.getCreator().getMspid();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be accepted by the Subcontractor and needs to have the Status "Commissioned".');
@@ -89,7 +89,7 @@ export class WasteOrderContract extends Contract {
 
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
-        const MSPID = ctx.clientIdentity.getMSPID();
+        const MSPID = ctx.stub.getCreator().getMspid();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be rejected by the Subcontractor and needs to have the Status "Commissioned".');
@@ -113,7 +113,7 @@ export class WasteOrderContract extends Contract {
     public async cancelWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder & WasteOrderPrivate> {
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
-        const MSPID = ctx.clientIdentity.getMSPID();
+        const MSPID = ctx.stub.getCreator().getMspid();
 
         if (wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED) {
             if (!(wasteOrderPublic.originatorMSPID === MSPID)) {
@@ -151,7 +151,7 @@ export class WasteOrderContract extends Contract {
 
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
-        const MSPID = ctx.clientIdentity.getMSPID();
+        const MSPID = ctx.stub.getCreator().getMspid();
 
         if (!(wasteOrderPrivate.status === WasteOrderStatus.ACCEPTED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be completed by the Subcontractor and needs to have the Status "Accepted".');
@@ -189,7 +189,7 @@ export class WasteOrderContract extends Contract {
 
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
-        const MSPID = ctx.clientIdentity.getMSPID();
+        const MSPID = ctx.stub.getCreator().getMspid();
 
         if (!((wasteOrderPrivate.status === WasteOrderStatus.REJECTED || wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED)
             && wasteOrderPublic.originatorMSPID === MSPID)) {

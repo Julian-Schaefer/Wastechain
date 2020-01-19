@@ -78,6 +78,8 @@ services:
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.ordering-organisation.com
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
+      - CORE_PEER_PROFILE_ENABLED=true
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
       - CORE_PEER_LOCALMSPID=OrderingOrgMSP
@@ -86,7 +88,6 @@ services:
       - CORE_PEER_LISTENADDRESS=peer0.ordering-organisation.com:7051
       - CORE_PEER_GOSSIP_ENDPOINT=peer0.ordering-organisation.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ordering-organisation.com:7051
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.ordering-organisation.com:5984
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
@@ -113,6 +114,8 @@ services:
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.subcontractor-organisation.com
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
+      - CORE_PEER_PROFILE_ENABLED=true
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
       - CORE_PEER_LOCALMSPID=SubcontractorOrgMSP
@@ -121,7 +124,6 @@ services:
       - CORE_PEER_LISTENADDRESS=peer0.subcontractor-organisation.com:7051
       - CORE_PEER_GOSSIP_ENDPOINT=peer0.subcontractor-organisation.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.subcontractor-organisation.com:7051
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.subcontractor-organisation.com:5984
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
@@ -148,6 +150,8 @@ services:
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.third-party-organisation.com
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
+      - CORE_PEER_PROFILE_ENABLED=true
       - FABRIC_LOGGING_SPEC=info
       - CORE_CHAINCODE_LOGGING_LEVEL=info
       - CORE_PEER_LOCALMSPID=ThirdPartyOrgMSP
@@ -156,7 +160,6 @@ services:
       - CORE_PEER_LISTENADDRESS=peer0.third-party-organisation.com:7051
       - CORE_PEER_GOSSIP_ENDPOINT=peer0.third-party-organisation.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.third-party-organisation.com:7051
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_basic
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.third-party-organisation.com:5984
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
@@ -221,9 +224,6 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli
-      - CORE_PEER_ADDRESS=peer0.ordering-organisation.com:7051
-      - CORE_PEER_LOCALMSPID=OrderingOrgMSP
-      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/crypto-config/peerOrganizations/ordering-organisation.com/users/Admin@ordering-organisation.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash -c 'sleep 1000'
     volumes:
