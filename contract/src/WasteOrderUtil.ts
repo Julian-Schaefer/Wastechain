@@ -32,7 +32,7 @@ export async function getWasteOrderPublic(ctx: Context, orderId: string): Promis
     return wasteOrder;
 }
 
-export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: WasteOrderPublic, orderPrivateId?: string): Promise<WasteOrderPrivate> {
+export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: WasteOrderPublic, throws: boolean = true, orderPrivateId?: string): Promise<WasteOrderPrivate> {
     const exists = await checkIfWasteOrderExists(ctx, wasteOrderPublic.id);
     if (!exists) {
         throw new Error(`The order ${wasteOrderPublic.id} does not exist`);
@@ -47,14 +47,52 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
         try {
             wasteOrderPrivateBuffer = await ctx.stub.getPrivateData(wasteOrderPublic.subcontractorMSPID + '-' + wasteOrderPublic.originatorMSPID, wasteOrderPrivateId);
         } catch {
-            throw new Error('Private Data Collection between ' + wasteOrderPublic.originatorMSPID + ' and ' +
-                wasteOrderPublic.subcontractorMSPID + ' could not be found or is not accessible.');
+            if (throws) {
+                throw new Error('Private Data Collection between ' + wasteOrderPublic.originatorMSPID + ' and ' +
+                    wasteOrderPublic.subcontractorMSPID + ' could not be found or is not accessible.');
+            } else {
+                return {
+                    id: "",
+                    customerName: "",
+                    status: 0,
+                    description: "",
+                    taskSite: {
+                        address: "",
+                        address2: "",
+                        areaCode: "",
+                        city: "",
+                        countryCode: "",
+                        name: "",
+                        name2: "",
+                        postCode: ""
+                    },
+                    service: {
+                        description: "",
+                        description2: "",
+                        equipmentDescription: "",
+                        equipmentType: 0,
+                        materialDescription: ""
+                    },
+                    quantity: -1,
+                    unitPrice: -1,
+                    unitOfMeasure: "",
+                    taskDate: new Date(0),
+                    startingTime: "",
+                    finishingTime: "",
+                    referenceNo: "",
+                    rejectionMessage: "",
+                    lastChanged: new Date(0),
+                    lastChangedByMSPID: "",
+                };
+            }
         }
     }
 
     const wasteOrderPrivate = JSON.parse(wasteOrderPrivateBuffer.toString()) as WasteOrderPrivate;
     return wasteOrderPrivate;
 }
+
+
 
 export async function checkIfWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
     const buffer = await ctx.stub.getState(orderId);
