@@ -1,7 +1,6 @@
 import * as Joi from '@hapi/joi';
 import { Context } from 'fabric-contract-api';
 import { Iterators } from 'fabric-shim';
-import { Guid } from 'guid-typescript';
 import { WasteOrder } from './model/WasteOrder';
 import { WasteOrderPrivate, WasteOrderPrivateSchema } from './model/WasteOrderPrivate';
 import { WasteOrderPublic, WasteOrderPublicSchema } from './model/WasteOrderPublic';
@@ -54,7 +53,6 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
                 return {
                     id: "",
                     customerName: "",
-                    status: 0,
                     description: "",
                     taskSite: {
                         address: "",

@@ -1,4 +1,4 @@
-import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCorrectionSchema, WasteOrderCompleteSchema } from "./WasteOrder";
+import { WasteOrder, WasteOrderCommissionSchema, WasteOrderStatus, WasteOrderCompleteSchema } from "./WasteOrder";
 import { WasteOrderTransaction } from "./WasteOrderTransaction";
 import { get, post, put } from "../HttpClient";
 import { WasteOrderFilterType } from "./components/WasteOrderFilterComponent";
@@ -24,7 +24,7 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder
 }
 
 async function correctWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): Promise<WasteOrder> {
-    let correctedWasteOrder: WasteOrderCorrectionSchema = {
+    let correctedWasteOrder: WasteOrderCommissionSchema = {
         customerName: wasteOrder.customerName,
         subcontractorMSPID: wasteOrder.subcontractorMSPID,
         description: wasteOrder.description,
@@ -35,8 +35,9 @@ async function correctWasteOrder(wasteOrderId: string, wasteOrder: WasteOrder): 
         unitOfMeasure: wasteOrder.unitOfMeasure,
         taskDate: wasteOrder.taskDate,
         startingTime: wasteOrder.startingTime,
-        finishingTime: wasteOrder.finishingTime
-    }
+        finishingTime: wasteOrder.finishingTime,
+        referenceNo: wasteOrder.referenceNo
+    };
 
     let updatedWasteOrder = await put('/order/' + wasteOrderId, { status: WasteOrderStatus.COMMISSIONED, ...correctedWasteOrder });
     console.log(updatedWasteOrder);

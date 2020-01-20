@@ -195,7 +195,8 @@ export const WasteOrderCorrectionSchema = Joi.object().keys({
     unitOfMeasure: Joi.string().required(),
     taskDate: JoiExtended.date().format('DD/MM/YYYY').required(),
     startingTime: Joi.string(),
-    finishingTime: Joi.string()
+    finishingTime: Joi.string(),
+    referenceNo: Joi.string().required()
 });
 
 /**

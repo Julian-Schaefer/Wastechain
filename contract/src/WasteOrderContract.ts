@@ -5,8 +5,8 @@
 import * as Joi from '@hapi/joi';
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import { WasteOrder } from './model/WasteOrder';
-import { WasteOrderPrivate, WasteOrderPrivateCommissionSchema, WasteOrderPrivateCompleteSchema, WasteOrderPrivateCorrectionSchema, WasteOrderPrivateRejectSchema, WasteOrderStatus } from './model/WasteOrderPrivate';
-import { WasteOrderPublic, WasteOrderPublicCommissionSchema } from './model/WasteOrderPublic';
+import { WasteOrderPrivate, WasteOrderPrivateCommissionSchema, WasteOrderPrivateCompleteSchema, WasteOrderPrivateRejectSchema } from './model/WasteOrderPrivate';
+import { WasteOrderPublic, WasteOrderPublicCommissionSchema, WasteOrderStatus } from './model/WasteOrderPublic';
 import { WasteOrderTransaction } from './model/WasteOrderTransaction';
 import * as Util from './WasteOrderUtil';
 
@@ -28,6 +28,7 @@ export class WasteOrderContract extends Contract {
             throw new Error('Invalid Waste Order Public Schema: ' + publicValidationResult.error.message);
         }
         wasteOrderPublic.id = wasteOrderId;
+        wasteOrderPublic.status = WasteOrderStatus.COMMISSIONED;
         wasteOrderPublic.originatorMSPID = ctx.stub.getCreator().getMspid();
 
         const wasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
@@ -35,8 +36,6 @@ export class WasteOrderContract extends Contract {
         if (privateValidationResult.error !== null) {
             throw new Error('Invalid Waste Order Private Schema: ' + privateValidationResult.error.message);
         }
-        wasteOrderPrivate.id = wasteOrderId;
-        wasteOrderPrivate.status = WasteOrderStatus.COMMISSIONED;
 
         const exists = await Util.checkIfWasteOrderExists(ctx, wasteOrderPublic.id);
         if (exists) {
@@ -61,19 +60,16 @@ export class WasteOrderContract extends Contract {
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.stub.getCreator().getMspid();
 
-        if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
+        if (!(wasteOrderPublic.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be accepted by the Subcontractor and needs to have the Status "Commissioned".');
         }
 
-        const newWasteOrderPrivate: WasteOrderPrivate = {
-            ...wasteOrderPrivate,
-            status: WasteOrderStatus.ACCEPTED,
-        };
+        wasteOrderPublic.status = WasteOrderStatus.ACCEPTED;
 
-        await Util.saveWasteOrder(ctx, wasteOrderPublic, newWasteOrderPrivate);
+        await Util.saveWasteOrder(ctx, wasteOrderPublic, wasteOrderPrivate);
 
         return {
-            ...newWasteOrderPrivate,
+            ...wasteOrderPrivate,
             ...wasteOrderPublic,
         };
     }
@@ -91,15 +87,16 @@ export class WasteOrderContract extends Contract {
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.stub.getCreator().getMspid();
 
-        if (!(wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
+        if (!(wasteOrderPublic.status === WasteOrderStatus.COMMISSIONED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be rejected by the Subcontractor and needs to have the Status "Commissioned".');
         }
 
         const newWasteOrderPrivate: WasteOrderPrivate = {
             ...wasteOrderPrivate,
             ...updatedWasteOrderPrivate,
-            status: WasteOrderStatus.REJECTED,
         };
+
+        wasteOrderPublic.status = WasteOrderStatus.REJECTED;
 
         await Util.saveWasteOrder(ctx, wasteOrderPublic, newWasteOrderPrivate);
 
@@ -115,11 +112,11 @@ export class WasteOrderContract extends Contract {
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.stub.getCreator().getMspid();
 
-        if (wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED) {
+        if (wasteOrderPublic.status === WasteOrderStatus.COMMISSIONED) {
             if (!(wasteOrderPublic.originatorMSPID === MSPID)) {
                 throw new Error('Waste Orders with Status "Commissioned" can only be cancelled by the Originator.');
             }
-        } else if (wasteOrderPrivate.status === WasteOrderStatus.ACCEPTED) {
+        } else if (wasteOrderPublic.status === WasteOrderStatus.ACCEPTED) {
             if (!(wasteOrderPublic.originatorMSPID === MSPID || wasteOrderPublic.subcontractorMSPID === MSPID)) {
                 throw new Error('Waste Orders with Status "Accepted" can only be cancelled by the Subcontractor or the Originator.');
             }
@@ -127,15 +124,12 @@ export class WasteOrderContract extends Contract {
             throw new Error('Only Waste Orders with Status "Commissioned" or "Accepted" can be cancelled.');
         }
 
-        const newWasteOrderPrivate: WasteOrderPrivate = {
-            ...wasteOrderPrivate,
-            status: WasteOrderStatus.CANCELLED,
-        };
+        wasteOrderPublic.status = WasteOrderStatus.CANCELLED;
 
-        await Util.saveWasteOrder(ctx, wasteOrderPublic, newWasteOrderPrivate);
+        await Util.saveWasteOrder(ctx, wasteOrderPublic, wasteOrderPrivate);
 
         return {
-            ...newWasteOrderPrivate,
+            ...wasteOrderPrivate,
             ...wasteOrderPublic,
         };
     }
@@ -153,15 +147,16 @@ export class WasteOrderContract extends Contract {
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.stub.getCreator().getMspid();
 
-        if (!(wasteOrderPrivate.status === WasteOrderStatus.ACCEPTED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
+        if (!(wasteOrderPublic.status === WasteOrderStatus.ACCEPTED && wasteOrderPublic.subcontractorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be completed by the Subcontractor and needs to have the Status "Accepted".');
         }
 
         const newWasteOrderPrivate: WasteOrderPrivate = {
             ...wasteOrderPrivate,
             ...updatedWasteOrderPrivate,
-            status: WasteOrderStatus.COMPLETED,
         };
+
+        wasteOrderPublic.status = WasteOrderStatus.COMPLETED;
 
         await Util.saveWasteOrder(ctx, wasteOrderPublic, newWasteOrderPrivate);
 
@@ -182,30 +177,28 @@ export class WasteOrderContract extends Contract {
 
         const updatedWasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
 
-        const privateValidationResult = Joi.validate(updatedWasteOrderPrivate, WasteOrderPrivateCorrectionSchema);
+        const privateValidationResult = Joi.validate(updatedWasteOrderPrivate, WasteOrderPrivateCommissionSchema);
         if (privateValidationResult.error !== null) {
             throw new Error('Invalid Schema: ' + privateValidationResult.error.message);
         }
 
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
-        const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
         const MSPID = ctx.stub.getCreator().getMspid();
 
-        if (!((wasteOrderPrivate.status === WasteOrderStatus.REJECTED || wasteOrderPrivate.status === WasteOrderStatus.COMMISSIONED)
+        if (!((wasteOrderPublic.status === WasteOrderStatus.REJECTED || wasteOrderPublic.status === WasteOrderStatus.COMMISSIONED)
             && wasteOrderPublic.originatorMSPID === MSPID)) {
             throw new Error('The Waste Order can only be corrected by the Originator and needs to have the Status "Rejected" or "Commissioned".');
         }
 
         const newWasteOrderPrivate: WasteOrderPrivate = {
-            ...wasteOrderPrivate,
             ...updatedWasteOrderPrivate,
             rejectionMessage: undefined,
-            status: WasteOrderStatus.COMMISSIONED,
         };
 
         const newWasteOrderPublic: WasteOrderPublic = {
             ...wasteOrderPublic,
             ...updatedWasteOrderPublic,
+            status: WasteOrderStatus.COMMISSIONED,
         };
 
         await Util.saveWasteOrder(ctx, newWasteOrderPublic, newWasteOrderPrivate);

@@ -1,6 +1,6 @@
 import * as Joi from '@hapi/joi';
 import { getFabricConnection } from "../FabricConnection";
-import { WasteOrderCommissionSchema, WasteOrderCorrectionSchema, WasteOrderRejectSchema, WasteOrderCompleteSchema, WasteOrder, WasteOrderStatus, WasteOrderUpdateStatusSchema } from './WasteOrder';
+import { WasteOrder } from './WasteOrder';
 import { WasteOrderTransaction } from './WasteOrderTransaction';
 import { TransientMap } from 'fabric-network';
 import { WasteOrderPublic } from './WasteOrderPublic';
@@ -24,10 +24,10 @@ async function getWasteOrderHistory(wasteOrderId: string): Promise<WasteOrderTra
 
 async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: WasteOrderPublic, wasteOrderPrivate: WasteOrderPrivate): Promise<WasteOrder> {
     delete (wasteOrderPublic.id);
+    delete (wasteOrderPublic.status);
     delete (wasteOrderPublic.originatorMSPID);
 
     delete (wasteOrderPrivate.id);
-    delete (wasteOrderPrivate.status);
     delete (wasteOrderPrivate.rejectionMessage);
 
     const commissionedWasteOrderBuffer = await submitWasteOrderTransaction("commissionWasteOrder", wasteOrderId, wasteOrderPublic, wasteOrderPrivate);
@@ -38,23 +38,17 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: Wast
 }
 
 async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOrderPublic?: WasteOrderPublic, wasteOrderPrivate?: WasteOrderPrivate): Promise<WasteOrder> {
-    const contract = await getFabricConnection().wasteOrderContract;
-
-    let transaction = contract.createTransaction(procedure);
-    if (wasteOrderPrivate !== undefined) {
-        delete wasteOrderPrivate.status;
-        const transientData: TransientMap = {
-            order: Buffer.from(JSON.stringify(wasteOrderPrivate))
-        };
-        transaction.setTransient(transientData);
-    }
-
-    let submittedWasteOrderBuffer: Buffer;
     if (wasteOrderPublic !== undefined) {
-        submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic);
-    } else {
-        submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId);
+        delete wasteOrderPublic.status;
     }
+
+    let submittedWasteOrderBuffer: Buffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic, wasteOrderPrivate);
+
+    //if (wasteOrderPublic !== undefined) {
+    //    submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic);
+    //} else {
+    //    submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId);
+    //}
 
     const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     console.log('Updated Contract with ID: ' + wasteOrderId);
@@ -79,7 +73,8 @@ async function getWasteOrdersForOriginatorWithStatus(status: string): Promise<Bu
     return wasteOrdersBuffer;
 }
 
-async function submitWasteOrderTransaction(fcn: string, wasteOrderId: string, wasteOrderPublic?: WasteOrderPublic, wasteOrderPrivate?: WasteOrderPrivate): Promise<Buffer> {
+async function submitWasteOrderTransaction(fcn: string, wasteOrderId: string, wasteOrderPublic?: WasteOrderPublic,
+    wasteOrderPrivate?: WasteOrderPrivate): Promise<Buffer> {
     let originatorMSPID: string;
     let subcontractorMSPID: string;
 

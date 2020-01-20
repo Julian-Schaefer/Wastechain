@@ -6,17 +6,8 @@ import * as JoiDate from '@hapi/joi-date';
 
 const JoiExtended: any = Joi.extend(JoiDate);
 
-export enum WasteOrderStatus {
-    COMMISSIONED,
-    ACCEPTED,
-    REJECTED,
-    CANCELLED,
-    COMPLETED
-}
-
 export interface WasteOrderPrivate {
     id: string;
-    status: WasteOrderStatus;
     customerName: string;
     taskSite: TaskSite;
     service: Service;
@@ -35,7 +26,6 @@ export interface WasteOrderPrivate {
 
 export const WasteOrderPrivateSchema = Joi.object().keys({
     id: Joi.string().required(),
-    status: Joi.number().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
     service: ServiceSchema.required(),
@@ -54,7 +44,6 @@ export const WasteOrderPrivateSchema = Joi.object().keys({
 
 export const WasteOrderPrivateCommissionSchema = Joi.object().keys({
     id: Joi.string().required(),
-    status: Joi.number().required(),
     customerName: Joi.string().required(),
     taskSite: TaskSiteSchema.required(),
     service: ServiceSchema.required(),
@@ -97,7 +86,6 @@ export const WasteOrderPrivateRejectSchema = Joi.object().keys({
 export function getWasteOrderPrivateFromWasteOrder(wasteOrder: WasteOrder): WasteOrderPrivate {
     return {
         id: wasteOrder.id,
-        status: wasteOrder.status,
         customerName: wasteOrder.customerName,
         taskSite: wasteOrder.taskSite,
         service: wasteOrder.service,
