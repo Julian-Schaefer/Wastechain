@@ -45,20 +45,6 @@ export interface WasteOrderCommissionSchema {
     referenceNo?: string;
 }
 
-export interface WasteOrderCorrectionSchema {
-    subcontractorMSPID: string;
-    customerName: string;
-    taskSite: TaskSite;
-    service: Service;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    unitOfMeasure: string;
-    taskDate: string;
-    startingTime: string;
-    finishingTime: string;
-}
-
 export interface WasteOrderCompleteSchema {
     quantity: number;
     taskDate: string;
