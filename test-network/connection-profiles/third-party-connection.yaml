@@ -11,17 +11,47 @@ channels:
         orderers:
         - orderer.wastechain.org
         peers:
+          peer0.ordering-organisation.com:
+            endorsingPeer: true
+            chaincodeQuery: true
+            ledgerQuery: true
+            eventSource: true
+          peer0.subcontractor-organisation.com:
+            endorsingPeer: true
+            chaincodeQuery: true
+            ledgerQuery: true
+            eventSource: true
           peer0.third-party-organisation.com:
             endorsingPeer: true
             chaincodeQuery: true
             ledgerQuery: true
             eventSource: true
 organizations:
+  OrderingOrg:
+    mspid: OrderingOrgMSP
+    peers:
+    - peer0.ordering-organisation.com
+  SubcontractorOrg:
+    mspid: SubcontractorOrgMSP
+    peers:
+    - peer0.subcontractor-organisation.com
   ThirdPartyOrg:
     mspid: ThirdPartyOrgMSP
     peers:
     - peer0.third-party-organisation.com
 peers:
+  peer0.ordering-organisation.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+    url: grpc://${FABRIC_NETWORK_URL}:7051
+  peer0.subcontractor-organisation.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+    url: grpc://${FABRIC_NETWORK_URL}:8051
   peer0.third-party-organisation.com:
     endorsingPeer: true
     chaincodeQuery: true

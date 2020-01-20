@@ -5,6 +5,7 @@ import { WasteOrderTransaction } from './WasteOrderTransaction';
 import { TransientMap } from 'fabric-network';
 import { WasteOrderPublic } from './WasteOrderPublic';
 import { WasteOrderPrivate } from './WasteOrderPrivate';
+import * as FabricClient from 'fabric-client';
 
 async function getWasteOrder(wasteOrderId: string): Promise<WasteOrder> {
     const contract = getFabricConnection().wasteOrderContract;
@@ -29,14 +30,7 @@ async function commissionWasteOrder(wasteOrderId: string, wasteOrderPublic: Wast
     delete (wasteOrderPrivate.status);
     delete (wasteOrderPrivate.rejectionMessage);
 
-    const contract = getFabricConnection().wasteOrderContract;
-
-    let transaction = contract.createTransaction("commissionWasteOrder");
-    const transientData: TransientMap = {
-        order: Buffer.from(JSON.stringify(wasteOrderPrivate))
-    };
-    transaction.setTransient(transientData);
-    const commissionedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
+    const commissionedWasteOrderBuffer = await submitWasteOrderTransaction("commissionWasteOrder", wasteOrderId, wasteOrderPublic, wasteOrderPrivate);
     const commissionedWasteOrder: WasteOrder = JSON.parse(commissionedWasteOrderBuffer.toString('utf-8'));
 
     console.log('Commissioned Waste Order with ID: ' + commissionedWasteOrder.id);
@@ -57,9 +51,9 @@ async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOr
 
     let submittedWasteOrderBuffer: Buffer;
     if (wasteOrderPublic !== undefined) {
-        submittedWasteOrderBuffer = await transaction.submit(wasteOrderId, JSON.stringify(wasteOrderPublic));
+        submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic);
     } else {
-        submittedWasteOrderBuffer = await transaction.submit(wasteOrderId);
+        submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId);
     }
 
     const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
@@ -83,6 +77,59 @@ async function getWasteOrdersForOriginatorWithStatus(status: string): Promise<Bu
 
     console.log('Retrieved Waste Orders with status ' + status + ' for Originator: ' + MSPID);
     return wasteOrdersBuffer;
+}
+
+async function submitWasteOrderTransaction(fcn: string, wasteOrderId: string, wasteOrderPublic?: WasteOrderPublic, wasteOrderPrivate?: WasteOrderPrivate): Promise<Buffer> {
+    let originatorMSPID: string;
+    let subcontractorMSPID: string;
+
+    if (wasteOrderPublic) {
+        originatorMSPID = wasteOrderPublic.originatorMSPID;
+        subcontractorMSPID = wasteOrderPublic.subcontractorMSPID;
+    } else {
+        const wasteOrder = await getWasteOrder(wasteOrderId);
+        originatorMSPID = wasteOrder.originatorMSPID;
+        subcontractorMSPID = wasteOrder.subcontractorMSPID;
+    }
+
+    const channel = getFabricConnection().channel;
+    const clientMSPID = getFabricConnection().client.getMspid();
+
+    let targetPeers: FabricClient.Peer[] = [];
+    targetPeers = getPeersFromChannelPeers(channel.getPeersForOrg(clientMSPID));
+
+    if (originatorMSPID && originatorMSPID !== clientMSPID) {
+        targetPeers = targetPeers.concat(getPeersFromChannelPeers(channel.getPeersForOrg(originatorMSPID)));
+    }
+
+    if (subcontractorMSPID && subcontractorMSPID !== clientMSPID) {
+        targetPeers = targetPeers.concat(getPeersFromChannelPeers(channel.getPeersForOrg(subcontractorMSPID)));
+    }
+
+    let args: string[];
+    if (wasteOrderPublic) {
+        args = [wasteOrderId, JSON.stringify(wasteOrderPublic)];
+    } else {
+        args = [wasteOrderId];
+    }
+
+    let transientData: TransientMap;
+    if (wasteOrderPrivate) {
+        transientData = {
+            order: Buffer.from(JSON.stringify(wasteOrderPrivate))
+        };
+    }
+
+    return getFabricConnection().submitTransaction(fcn, args, targetPeers, transientData);
+}
+
+function getPeersFromChannelPeers(channelPeers: FabricClient.ChannelPeer[]): FabricClient.Peer[] {
+    let peers: FabricClient.Peer[] = [];
+    for (let channelPeer of channelPeers) {
+        peers.push(channelPeer.getPeer());
+    }
+
+    return peers;
 }
 
 export {
