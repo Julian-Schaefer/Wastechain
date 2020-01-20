@@ -3,7 +3,9 @@ version: '2'
 services:
   api.ordering-organisation.com:
     container_name: api.ordering-organisation.com
-    image: wastechain.azurecr.io/wastechain-api:master
+    build:
+      dockerfile: Dockerfile
+      context: ../application
     environment:
       - CHANNEL_NAME=wastechain
       - USERNAME=Admin@ordering-organisation.com
@@ -20,7 +22,9 @@ services:
 
   api.subcontractor-organisation.com:
     container_name: api.subcontractor-organisation.com
-    image: wastechain.azurecr.io/wastechain-api:master
+    build:
+      dockerfile: Dockerfile
+      context: ../application
     environment:
       - CHANNEL_NAME=wastechain
       - USERNAME=Admin@subcontractor-organisation.com
@@ -37,7 +41,9 @@ services:
 
   api.third-party-organisation.com:
     container_name: api.third-party-organisation.com
-    image: wastechain.azurecr.io/wastechain-api:master
+    build:
+      dockerfile: Dockerfile
+      context: ../application
     environment:
       - CHANNEL_NAME=wastechain
       - USERNAME=Admin@third-party-organisation.com
@@ -56,9 +62,11 @@ services:
 
   frontend.ordering-organisation.com:
     container_name: frontend.ordering-organisation.com
-    image: wastechain.azurecr.io/wastechain-frontend:master
-    environment:
-      - REACT_APP_API_URL=http://${API_URL}:10000
+    build:
+      dockerfile: Dockerfile
+      context: ../frontend
+      args:
+        - REACT_APP_API_URL=http://${API_URL}:10000
     ports:
       - 8080:3000
     depends_on:
@@ -66,9 +74,11 @@ services:
 
   frontend.subcontractor-organisation.com:
     container_name: frontend.subcontractor-organisation.com
-    image: wastechain.azurecr.io/wastechain-frontend:master
-    environment:
-      - REACT_APP_API_URL=http://${API_URL}:30000
+    build:
+      dockerfile: Dockerfile
+      context: ../frontend
+      args:
+        - REACT_APP_API_URL=http://${API_URL}:30000
     ports:
       - 10080:3000
     depends_on:
@@ -76,9 +86,11 @@ services:
 
   frontend.third-party-organisation.com:
     container_name: frontend.third-party-organisation.com
-    image: wastechain.azurecr.io/wastechain-frontend:master
-    environment:
-      - REACT_APP_API_URL=http://${API_URL}:50000
+    build:
+      dockerfile: Dockerfile
+      context: ../frontend
+      args:
+        - REACT_APP_API_URL=http://${API_URL}:50000
     ports:
       - 12080:3000
     depends_on:
