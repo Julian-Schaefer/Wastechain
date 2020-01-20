@@ -56,6 +56,7 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
                 WasteOrderJSON.Add('startingTime', Format("Starting Time"));
             if "Finishing Time" <> 0T then
                 WasteOrderJSON.Add('finishingTime', Format("Finishing Time"));
+            WasteOrderJSON.Add('referenceNo', "Document No.");
 
             // Task Site
             WasteOrderJSON.Add('taskSite', CreateTaskSiteJSON(WasteMgtLine));
