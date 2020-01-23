@@ -109,21 +109,30 @@ codeunit 50100 "Wastechain Management"
     procedure FindOrCreateTaskSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[20]
     var
         TaskSite: Record "Task Site WMR";
+        AreaRecord: Record "Area";
     begin
+        AreaRecord.SetRange("Text", WasteOrder."Task Site Area Code");
+        if not AreaRecord.FindFirst() then begin
+            AreaRecord.Init();
+            AreaRecord."Code" := CopyStr(WasteOrder."Task Site Area Code", 1, 10);
+            AreaRecord."Text" := WasteOrder."Task Site Area Code";
+            AreaRecord.Insert();
+        end;
+
         with WasteOrder do begin
             TaskSite.SetRange(Address, "Task Site Address");
             TaskSite.SetRange("Address 2", "Task Site Address 2");
             TaskSite.SetRange("Post Code", "Task Site Post Code");
             TaskSite.SetRange(City, "Task Site City");
             TaskSite.SetRange("Country/Region Code", "Task Site Country Code");
-            TaskSite.SetRange("Area Code", "Task Site Area Code");
+            TaskSite.SetRange("Area Code", AreaRecord."Code");
             if TaskSite.FindFirst() then begin
                 exit(TaskSite."No.");
             end else begin
                 TaskSite.Init();
                 TaskSite.Validate(Address, "Task Site Address");
                 TaskSite.Validate("Address 2", "Task Site Address 2");
-                TaskSite.Validate("Area Code", "Task Site Area Code");
+                TaskSite.Validate("Area Code", AreaRecord."Code");
                 TaskSite.Validate(City, "Task Site City");
                 TaskSite.Validate("Country/Region Code", "Task Site Country Code");
                 TaskSite.Validate("Post Code", "Task Site Post Code");

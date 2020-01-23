@@ -11,24 +11,39 @@ page 50103 "Accept Waste Order Wizard WC"
             {
                 Visible = Step = 1;
                 ShowCaption = false;
+                InstructionalText = 'Please select the corresponding Business Partner for the MSP ID of the Originator.';
 
-                field("Business Partner No."; BusinessPartnerNo)
+                Caption = 'MSP';
+
+                field("Originator MSP ID"; WasteOrder."Originator MSP ID")
                 {
-                    Caption = 'Business Partner No.';
-                    TableRelation = "Business Partner WMR";
+                    Caption = 'Originator MSP ID';
+                    Editable = false;
                     ApplicationArea = All;
+                }
 
-                    trigger OnValidate()
-                    var
-                        BusinessPartner: Record "Business Partner WMR";
-                        MSPIDNotMatchingErr: Label 'The Wastechain MSP ID of the selected Business Partner does not match the MSP ID of the Originator';
-                    begin
-                        BusinessPartner.Get(BusinessPartnerNo);
-                        if BusinessPartner."Wastechain MSP ID" <> WasteOrder."Originator MSP ID" then
-                            Error(MSPIDNotMatchingErr);
+                group("MSP ID")
+                {
+                    Caption = 'Select Business Partner';
 
-                        EnableControls();
-                    end;
+                    field("Business Partner No."; BusinessPartnerNo)
+                    {
+                        Caption = 'Business Partner No.';
+                        TableRelation = "Business Partner WMR";
+                        ApplicationArea = All;
+
+                        trigger OnValidate()
+                        var
+                            BusinessPartner: Record "Business Partner WMR";
+                            MSPIDNotMatchingErr: Label 'The Wastechain MSP ID of the selected Business Partner does not match the MSP ID of the Originator.';
+                        begin
+                            BusinessPartner.Get(BusinessPartnerNo);
+                            if BusinessPartner."Wastechain MSP ID" <> WasteOrder."Originator MSP ID" then
+                                Error(MSPIDNotMatchingErr);
+
+                            EnableControls();
+                        end;
+                    }
                 }
             }
 
@@ -36,17 +51,66 @@ page 50103 "Accept Waste Order Wizard WC"
             {
                 Visible = Step = 2;
                 ShowCaption = false;
+                InstructionalText = 'Please select the corresponding Service for the following Values.';
 
-                field("Service No."; ServiceNo)
+                field("Service Description"; WasteOrder."Service Description")
                 {
-                    Caption = 'Service No.';
-                    TableRelation = "Service WMR";
+                    Caption = 'Description';
+                    Editable = false;
                     ApplicationArea = All;
+                }
 
-                    trigger OnValidate()
-                    begin
-                        EnableControls();
-                    end;
+                field("Service Description 2"; WasteOrder."Service Description 2")
+                {
+                    Caption = 'Description 2';
+                    Editable = false;
+                    ApplicationArea = All;
+                }
+
+                field("Service Equipment Description"; WasteOrder."Service Equipment Description")
+                {
+                    Caption = 'Equipment Description';
+                    Editable = false;
+                    ApplicationArea = All;
+                }
+
+                field("Service Equipment Type"; WasteOrder."Service Equipment Type")
+                {
+                    Caption = 'Equipment Type';
+                    OptionCaption = ' ,Submission,Pick-up,Exchange,Clearance,Purchase (Stock),Sales (Stock)';
+                    Editable = false;
+                    ApplicationArea = All;
+                }
+
+                field("Service Material Description"; WasteOrder."Service Material Description")
+                {
+                    Caption = 'Material Description';
+                    Editable = false;
+                    ApplicationArea = All;
+                }
+
+                field("Unit of Measure"; WasteOrder."Unit of Measure")
+                {
+                    Caption = 'Unit of Measure';
+                    Editable = false;
+                    ApplicationArea = All;
+                }
+
+                group("Select Service")
+                {
+                    Caption = 'Select Service';
+
+                    field("Service No."; ServiceNo)
+                    {
+                        Caption = 'Service No.';
+                        TableRelation = "Service WMR";
+                        ApplicationArea = All;
+
+                        trigger OnValidate()
+                        begin
+                            EnableControls();
+                        end;
+                    }
                 }
             }
 
