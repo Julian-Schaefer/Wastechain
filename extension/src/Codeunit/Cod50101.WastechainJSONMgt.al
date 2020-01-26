@@ -107,6 +107,8 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
     local procedure CreateTaskSiteJSON(WasteMgtLine: Record "Waste Management Line WMR"): JsonObject
     var
         TaskSite: Record "Task Site WMR";
+        CountryRegion: Record "Country/Region";
+        AreaCode: Record "Area";
         TaskSiteJSON: JsonObject;
     begin
         with WasteMgtLine do begin
@@ -121,8 +123,10 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             TaskSiteJSON.Add('address2', TaskSite."Address 2");
             TaskSiteJSON.Add('postCode', TaskSite."Post Code");
             TaskSiteJSON.Add('city', TaskSite.City);
-            TaskSiteJSON.Add('countryCode', TaskSite."Country/Region Code");
-            TaskSiteJSON.Add('areaCode', TaskSite."Area Code");
+            CountryRegion.Get(TaskSite."Country/Region Code");
+            TaskSiteJSON.Add('countryCode', CountryRegion.Name);
+            AreaCode.Get(TaskSite."Area Code");
+            TaskSiteJSON.Add('areaCode', AreaCode."Text");
 
             exit(TaskSiteJSON);
         end;
@@ -314,13 +318,13 @@ codeunit 50101 "Wastechain JSON Mgt. WC"
             "Task Site Address 2" := ValueJSONToken.AsValue().AsText();
 
             TaskSiteJSONObject.Get('areaCode', ValueJSONToken);
-            "Task Site Area Code" := ValueJSONToken.AsValue().AsText();
+            "Task Site Area" := ValueJSONToken.AsValue().AsText();
 
             TaskSiteJSONObject.Get('city', ValueJSONToken);
             "Task Site City" := ValueJSONToken.AsValue().AsText();
 
             TaskSiteJSONObject.Get('countryCode', ValueJSONToken);
-            "Task Site Country Code" := ValueJSONToken.AsValue().AsText();
+            "Task Site Country" := ValueJSONToken.AsValue().AsText();
 
             TaskSiteJSONObject.Get('postCode', ValueJSONToken);
             "Task Site Post Code" := ValueJSONToken.AsValue().AsText();

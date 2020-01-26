@@ -199,15 +199,15 @@ table 50100 "Waste Order WC"
             DataClassification = ToBeClassified;
         }
 
-        field(36; "Task Site Country Code"; Text[20])
+        field(36; "Task Site Country"; Text[50])
         {
-            Caption = 'Task Site Country Code';
+            Caption = 'Task Site Country';
             DataClassification = ToBeClassified;
         }
 
-        field(37; "Task Site Area Code"; Text[50])
+        field(37; "Task Site Area"; Text[50])
         {
-            Caption = 'Task Site Area Code';
+            Caption = 'Task Site Area';
             DataClassification = ToBeClassified;
         }
     }

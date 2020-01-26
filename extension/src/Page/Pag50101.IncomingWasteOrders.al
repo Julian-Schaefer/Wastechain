@@ -122,12 +122,12 @@ page 50101 "Incoming Waste Orders WC"
                     ApplicationArea = All;
                 }
 
-                field("Task Site Country Code"; "Task Site Country Code")
+                field("Task Site Country"; "Task Site Country")
                 {
                     ApplicationArea = All;
                 }
 
-                field("Task Site Area Code"; "Task Site Area Code")
+                field("Task Site Area"; "Task Site Area")
                 {
                     ApplicationArea = All;
                 }

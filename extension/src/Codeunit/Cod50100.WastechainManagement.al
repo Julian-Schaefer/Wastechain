@@ -109,14 +109,23 @@ codeunit 50100 "Wastechain Management"
     procedure FindOrCreateTaskSite(WasteOrder: Record "Waste Order WC"; BusinessPartnerNo: Code[20]): Code[20]
     var
         TaskSite: Record "Task Site WMR";
+        CountryRegion: Record "Country/Region";
         AreaRecord: Record "Area";
     begin
-        AreaRecord.SetRange("Text", WasteOrder."Task Site Area Code");
+        AreaRecord.SetRange("Text", WasteOrder."Task Site Area");
         if not AreaRecord.FindFirst() then begin
             AreaRecord.Init();
-            AreaRecord."Code" := CopyStr(WasteOrder."Task Site Area Code", 1, 10);
-            AreaRecord."Text" := WasteOrder."Task Site Area Code";
+            AreaRecord."Code" := CopyStr(WasteOrder."Task Site Area", 1, 10);
+            AreaRecord."Text" := WasteOrder."Task Site Area";
             AreaRecord.Insert();
+        end;
+
+        CountryRegion.SetRange(Name, WasteOrder."Task Site Country");
+        if not CountryRegion.FindFirst() then begin
+            CountryRegion.Init();
+            CountryRegion."Code" := CopyStr(WasteOrder."Task Site Country", 1, 10);
+            CountryRegion."Name" := WasteOrder."Task Site Country";
+            CountryRegion.Insert();
         end;
 
         with WasteOrder do begin
@@ -124,7 +133,7 @@ codeunit 50100 "Wastechain Management"
             TaskSite.SetRange("Address 2", "Task Site Address 2");
             TaskSite.SetRange("Post Code", "Task Site Post Code");
             TaskSite.SetRange(City, "Task Site City");
-            TaskSite.SetRange("Country/Region Code", "Task Site Country Code");
+            TaskSite.SetRange("Country/Region Code", CountryRegion."Code");
             TaskSite.SetRange("Area Code", AreaRecord."Code");
             if TaskSite.FindFirst() then begin
                 exit(TaskSite."No.");
@@ -134,7 +143,7 @@ codeunit 50100 "Wastechain Management"
                 TaskSite.Validate("Address 2", "Task Site Address 2");
                 TaskSite.Validate("Area Code", AreaRecord."Code");
                 TaskSite.Validate(City, "Task Site City");
-                TaskSite.Validate("Country/Region Code", "Task Site Country Code");
+                TaskSite.Validate("Country/Region Code", CountryRegion."Code");
                 TaskSite.Validate("Post Code", "Task Site Post Code");
                 TaskSite.Validate("Name 2", 'Auto generated from Wastechain');
                 TaskSite.Insert(true);
