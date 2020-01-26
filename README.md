@@ -1,20 +1,30 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+This is Wastechain, a Blockchain-based, decentralized Operating System for the Waste industry using Hyperledger Fabric. 
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+# How to run the Test-Network
+(Note: The system only runs on Linux or Mac)
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/)
+2. Download and install npm (https://www.npmjs.com/get-npm)
+3. Navigate into the "contract" directoy and execute the command "npm install" (using a shell)
+4. Navigate into the "application" directoy and execute "npm install"
+5. Navigate into the "test-network" directory
+6. If using a Mac, execute "./recreate_complete.sh"
+7. If using a Linux-based OS, execute "sudo ./recreate_complete.sh"
+8. Wait for the command to finish
+6. If using a Mac, execute "./start_api.sh"
+7. If using a Linux-based OS, execute "sudo ./start_api.sh"
+8. Wait for the command to finish and continue to wait for a minute after that, in order for the API and Web-Frontend to start up.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+# Access API
+When everything is up and running, the API for the different Organisations are available at:
+- Ordering Org: http://localhost:10000
+- Subcontractor Org: http://localhost:30000
+- Third Party Org: http://localhost:50000
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+# Access Web-Frontend
+When everything is up and running, the Web-Frontend for the different Organisations are available at:
+- Ordering Org: http://localhost:8080
+- Subcontractor Org: http://localhost:10800
+- Third Party Org: http://localhost:12080
+
