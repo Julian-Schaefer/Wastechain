@@ -17,18 +17,24 @@ async function main() {
     const organisationURL = args[1];
     const organisationMSP = args[2];
     const username = args[3];
+    let networkFolder;
+
+    if (args[4]) {
+        networkFolder = args[4];
+    } else {
+        networkFolder = await new Promise((resolve) => {
+            rl.question('Please enter the Path of the Network Folder: ', (response) => {
+                networkFolder = response;
+                rl.close();
+                resolve(networkFolder)
+            });
+        }).then((value) => {
+            return value;
+        });
+    }
 
     let wallet = new FileSystemWallet(walletLocation);
 
-    let networkFolder = await new Promise((resolve) => {
-        rl.question('Please enter the Path of the Network Folder: ', (response) => {
-            networkFolder = response;
-            rl.close();
-            resolve(networkFolder)
-        });
-    }).then((value) => {
-        return value;
-    });
     try {
         // Identity to credentials to be stored in the wallet
         const credPath = path.join(networkFolder, '/crypto-config/peerOrganizations/' + organisationURL + '/users/' + username);
@@ -53,6 +59,7 @@ async function main() {
 
 main().then(() => {
     console.log('done');
+    process.exit(0);
 }).catch((e) => {
     console.log(e);
     console.log(e.stack);
