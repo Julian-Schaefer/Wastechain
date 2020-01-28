@@ -8,6 +8,7 @@ import { WasteOrderContract } from '..';
 
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import { Guid } from 'guid-typescript';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as winston from 'winston';
@@ -40,22 +41,20 @@ describe('WasteOrderContract', () => {
     let contract: WasteOrderContract;
     let ctx: TestingContext;
 
-    beforeEach(() => {
-        contract = new WasteOrderContract();
-        ctx = new TestingContext();
-        ctx.stub.getState.withArgs('1001').resolves(Buffer.from('{"value":"order 1001 value"}'));
-        ctx.stub.getState.withArgs('1002').resolves(Buffer.from('{"value":"order 1002 value"}'));
-        ctx.stub.getTxID.returns('TX1');
-        ctx.stub.getTxTimestamp.returns({
-            getSeconds() { return new Date().getSeconds(); },
-            getNanos() { return new Date().getMilliseconds(); },
-        });
-        ctx.clientIdentity.getMSPID.returns('OrderingOrgMSP');
-    });
-
     describe('#commissionWasteOrder', () => {
 
-        it('should return true for a order', async () => {
+        beforeEach(() => {
+            contract = new WasteOrderContract();
+            ctx = new TestingContext();
+            ctx.stub.getTxID.returns(Guid.create());
+            ctx.stub.getTxTimestamp.returns({
+                getSeconds() { return new Date().getSeconds(); },
+                getNanos() { return new Date().getMilliseconds(); },
+            });
+            ctx.clientIdentity.getMSPID.returns('OrderingOrgMSP');
+        });
+
+        it('Should return the correct WasteOrder when commissioning a new Waste Order', async () => {
             const wasteOrder = getTestWasteOrder();
 
             const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
@@ -84,8 +83,108 @@ describe('WasteOrderContract', () => {
             await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.deep.equal(expectedWasteOrder);
         });
 
-        it('should return false for a order that does not exist', async () => {
-            // await contract.checkWasteOrderExists(ctx, '1003').should.eventually.be.false;
+        it('Should throw an error when Waste Order Public Schema is violated', async () => {
+            const wasteOrder = getTestWasteOrder();
+
+            const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
+
+            delete wasteOrderPrivate.id;
+            delete wasteOrderPrivate.lastChanged;
+            delete wasteOrderPrivate.lastChangedByMSPID;
+            delete wasteOrderPrivate.rejectionMessage;
+
+            ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
+
+            const wasteOrderPublic = {
+                id: wasteOrder.id,
+                subcontractorMSPID: wasteOrder.subcontractorMSPID,
+            };
+
+            const expectedWasteOrder = { ...wasteOrder };
+            expectedWasteOrder.id = ctx.stub.getCreator().getMspid() + '-' + wasteOrder.id;
+            expectedWasteOrder.originatorMSPID = ctx.stub.getCreator().getMspid();
+            const date = new Date(0);
+            date.setSeconds(ctx.stub.getTxTimestamp().getSeconds(), ctx.stub.getTxTimestamp().getNanos() / 1000000);
+            expectedWasteOrder.lastChanged = date;
+            expectedWasteOrder.lastChangedByMSPID = ctx.stub.getCreator().getMspid();
+            expectedWasteOrder.wasteOrderPrivateId = expectedWasteOrder.id + '-' + ctx.stub.getTxID();
+            delete expectedWasteOrder.rejectionMessage;
+
+            await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.rejectedWith(/is not allowed/);
+        });
+
+        it('Should throw an error when Waste Order Public Schema is violated', async () => {
+            const wasteOrder = getTestWasteOrder();
+
+            const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
+
+            delete wasteOrderPrivate.id;
+            delete wasteOrderPrivate.lastChanged;
+            delete wasteOrderPrivate.lastChangedByMSPID;
+            delete wasteOrderPrivate.rejectionMessage;
+            delete wasteOrderPrivate.customerName;
+
+            ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
+
+            const wasteOrderPublic = {
+                id: wasteOrder.id,
+            };
+
+            const expectedWasteOrder = { ...wasteOrder };
+            expectedWasteOrder.id = ctx.stub.getCreator().getMspid() + '-' + wasteOrder.id;
+            expectedWasteOrder.originatorMSPID = ctx.stub.getCreator().getMspid();
+            const date = new Date(0);
+            date.setSeconds(ctx.stub.getTxTimestamp().getSeconds(), ctx.stub.getTxTimestamp().getNanos() / 1000000);
+            expectedWasteOrder.lastChanged = date;
+            expectedWasteOrder.lastChangedByMSPID = ctx.stub.getCreator().getMspid();
+            expectedWasteOrder.wasteOrderPrivateId = expectedWasteOrder.id + '-' + ctx.stub.getTxID();
+            delete expectedWasteOrder.rejectionMessage;
+
+            await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.rejectedWith(/is required/);
+        });
+
+        it('Should throw an error when commissioning Waste Order to yourself', async () => {
+            const wasteOrder = getTestWasteOrder();
+            wasteOrder.subcontractorMSPID = ctx.stub.getCreator().getMspid();
+
+            const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
+
+            delete wasteOrderPrivate.id;
+            delete wasteOrderPrivate.lastChanged;
+            delete wasteOrderPrivate.lastChangedByMSPID;
+            delete wasteOrderPrivate.rejectionMessage;
+
+            ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
+
+            const wasteOrderPublic = {
+                subcontractorMSPID: wasteOrder.subcontractorMSPID,
+            };
+
+            await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.be.rejectedWith('It is not possible to commision a Waste Order to yourself.');
+        });
+
+        it('Should throw an error if Waste Order already exists', async () => {
+            const wasteOrder = getTestWasteOrder();
+
+            const expectedWasteOrder = { ...wasteOrder };
+            expectedWasteOrder.id = ctx.stub.getCreator().getMspid() + '-' + wasteOrder.id;
+
+            ctx.stub.getState.withArgs(expectedWasteOrder.id).resolves(Buffer.from(JSON.stringify(expectedWasteOrder)));
+
+            const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
+
+            delete wasteOrderPrivate.id;
+            delete wasteOrderPrivate.lastChanged;
+            delete wasteOrderPrivate.lastChangedByMSPID;
+            delete wasteOrderPrivate.rejectionMessage;
+
+            ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
+
+            const wasteOrderPublic = {
+                subcontractorMSPID: wasteOrder.subcontractorMSPID,
+            };
+
+            await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.be.rejectedWith(`The order ${expectedWasteOrder.id} already exists`);
         });
 
     });
