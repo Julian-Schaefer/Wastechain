@@ -127,7 +127,7 @@ describe('WasteOrderContract', () => {
             ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
 
             const wasteOrderPublic = {
-                id: wasteOrder.id,
+                subcontractorMSPID: wasteOrder.subcontractorMSPID,
             };
 
             const expectedWasteOrder = { ...wasteOrder };
