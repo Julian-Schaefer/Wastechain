@@ -51,36 +51,36 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
                     wasteOrderPublic.subcontractorMSPID + ' could not be found or is not accessible.');
             } else {
                 return {
-                    id: "",
-                    customerName: "",
-                    description: "",
+                    id: '',
+                    customerName: '',
+                    description: '',
                     taskSite: {
-                        address: "",
-                        address2: "",
-                        areaCode: "",
-                        city: "",
-                        countryCode: "",
-                        name: "",
-                        name2: "",
-                        postCode: ""
+                        address: '',
+                        address2: '',
+                        areaCode: '',
+                        city: '',
+                        countryCode: '',
+                        name: '',
+                        name2: '',
+                        postCode: '',
                     },
                     service: {
-                        description: "",
-                        description2: "",
-                        equipmentDescription: "",
+                        description: '',
+                        description2: '',
+                        equipmentDescription: '',
                         equipmentType: 0,
-                        materialDescription: ""
+                        materialDescription: '',
                     },
                     quantity: -1,
                     unitPrice: -1,
-                    unitOfMeasure: "",
+                    unitOfMeasure: '',
                     taskDate: new Date(0),
-                    startingTime: "",
-                    finishingTime: "",
-                    referenceNo: "",
-                    rejectionMessage: "",
+                    startingTime: '',
+                    finishingTime: '',
+                    referenceNo: '',
+                    rejectionMessage: '',
                     lastChanged: new Date(0),
-                    lastChangedByMSPID: "",
+                    lastChangedByMSPID: '',
                 };
             }
         }
@@ -89,8 +89,6 @@ export async function getWasteOrderPrivate(ctx: Context, wasteOrderPublic: Waste
     const wasteOrderPrivate = JSON.parse(wasteOrderPrivateBuffer.toString()) as WasteOrderPrivate;
     return wasteOrderPrivate;
 }
-
-
 
 export async function checkIfWasteOrderExists(ctx: Context, orderId: string): Promise<boolean> {
     const buffer = await ctx.stub.getState(orderId);
@@ -105,7 +103,6 @@ export async function saveWasteOrder(ctx: Context, wasteOrderPublic: WasteOrderP
     if (validationResult.error !== null) {
         throw new Error('Invalid Waste Order Public Schema: ' + validationResult.error.message);
     }
-
 
     wasteOrderPrivate.id = wasteOrderPrivateId;
     const date = new Date(0);

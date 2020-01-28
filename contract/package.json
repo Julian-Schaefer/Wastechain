@@ -9,7 +9,7 @@
         "npm": ">=5"
     },
     "scripts": {
-        "lint": "tslint -c tslint.json 'src/**/*.ts'",
+        "lint": "tslint -c tslint.json 'src/**/*.ts' --fix",
         "pretest": "npm run lint",
         "test": "nyc mocha -r ts-node/register src/test/**/*.Test.ts",
         "start": "fabric-chaincode-node start",

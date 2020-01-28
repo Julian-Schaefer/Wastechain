@@ -44,12 +44,6 @@ async function updateWasteOrder(wasteOrderId: string, procedure: string, wasteOr
 
     let submittedWasteOrderBuffer: Buffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic, wasteOrderPrivate);
 
-    //if (wasteOrderPublic !== undefined) {
-    //    submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId, wasteOrderPublic);
-    //} else {
-    //    submittedWasteOrderBuffer = await submitWasteOrderTransaction(procedure, wasteOrderId);
-    //}
-
     const submittedWasteOrder: WasteOrder = JSON.parse(submittedWasteOrderBuffer.toString('utf-8'));
     console.log('Updated Contract with ID: ' + wasteOrderId);
     return submittedWasteOrder;
