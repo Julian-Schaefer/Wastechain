@@ -3,7 +3,7 @@
  */
 
 import { Context } from 'fabric-contract-api';
-import { ChaincodeStub, ClientIdentity, SerializedIdentity } from 'fabric-shim';
+import { ChaincodeStub, ClientIdentity } from 'fabric-shim';
 import { WasteOrderContract } from '..';
 
 import * as chai from 'chai';
@@ -11,9 +11,9 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as winston from 'winston';
-import { EquipmentType } from '../model/Service';
-import { WasteOrderPrivate } from '../model/WasteOrderPrivate';
-import { getTransientMapFromWasteOrderPrivate } from './TestUtil';
+import { getWasteOrderPrivateFromWasteOrder, WasteOrderPrivate } from '../model/WasteOrderPrivate';
+import { WasteOrderPublic } from '../model/WasteOrderPublic';
+import { getTestWasteOrder, getTransientMapFromWasteOrderPrivate } from './TestUtil';
 
 chai.should();
 chai.use(chaiAsPromised);
@@ -56,38 +56,9 @@ describe('WasteOrderContract', () => {
     describe('#commissionWasteOrder', () => {
 
         it('should return true for a order', async () => {
-            const wasteOrderPrivate: WasteOrderPrivate = {
-                id: '',
-                description: 'asd',
-                customerName: 'afasd',
-                service: {
-                    description: 'test',
-                    description2: '2',
-                    equipmentDescription: 'equip',
-                    equipmentType: EquipmentType.CLEARANCE,
-                    materialDescription: 'mat',
-                },
-                taskSite: {
-                    address: 'asd',
-                    address2: 'asd2',
-                    areaCode: 'NRW',
-                    city: 'Bochum',
-                    countryCode: 'DE',
-                    name: 'asd',
-                    name2: 'name2',
-                    postCode: '44787',
-                },
-                quantity: 2,
-                unitPrice: 33,
-                unitOfMeasure: 'MG',
-                taskDate: '12/12/2020' as unknown as Date,
-                startingTime: '13',
-                finishingTime: '12',
-                referenceNo: 'ASD123',
-                rejectionMessage: '',
-                lastChanged: new Date(),
-                lastChangedByMSPID: '',
-            };
+            const wasteOrder = getTestWasteOrder();
+
+            const wasteOrderPrivate: WasteOrderPrivate = getWasteOrderPrivateFromWasteOrder(wasteOrder);
 
             delete wasteOrderPrivate.id;
             delete wasteOrderPrivate.lastChanged;
@@ -97,10 +68,20 @@ describe('WasteOrderContract', () => {
             ctx.stub.getTransient.returns(getTransientMapFromWasteOrderPrivate(wasteOrderPrivate as WasteOrderPrivate));
 
             const wasteOrderPublic = {
-                subcontractorMSPID: 'SubcontractorOrgMSP',
+                subcontractorMSPID: wasteOrder.subcontractorMSPID,
             };
 
-            await contract.commissionWasteOrder(ctx, 'ORDER001', JSON.stringify(wasteOrderPublic)).should.eventually.exist;
+            const expectedWasteOrder = { ...wasteOrder };
+            expectedWasteOrder.id = ctx.stub.getCreator().getMspid() + '-' + wasteOrder.id;
+            expectedWasteOrder.originatorMSPID = ctx.stub.getCreator().getMspid();
+            const date = new Date(0);
+            date.setSeconds(ctx.stub.getTxTimestamp().getSeconds(), ctx.stub.getTxTimestamp().getNanos() / 1000000);
+            expectedWasteOrder.lastChanged = date;
+            expectedWasteOrder.lastChangedByMSPID = ctx.stub.getCreator().getMspid();
+            expectedWasteOrder.wasteOrderPrivateId = expectedWasteOrder.id + '-' + ctx.stub.getTxID();
+            delete expectedWasteOrder.rejectionMessage;
+
+            await contract.commissionWasteOrder(ctx, wasteOrder.id, JSON.stringify(wasteOrderPublic as WasteOrderPublic)).should.eventually.deep.equal(expectedWasteOrder);
         });
 
         it('should return false for a order that does not exist', async () => {

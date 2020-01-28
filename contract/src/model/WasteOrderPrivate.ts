@@ -2,6 +2,7 @@ import * as Joi from '@hapi/joi';
 import * as JoiDate from '@hapi/joi-date';
 import { Service, ServiceSchema } from './Service';
 import { TaskSite, TaskSiteSchema } from './TaskSite';
+import { WasteOrder } from './WasteOrder';
 
 const JoiExtended: any = Joi.extend(JoiDate);
 
@@ -66,24 +67,22 @@ export const WasteOrderPrivateRejectSchema = Joi.object().keys({
     rejectionMessage: Joi.string().required(),
 });
 
-export function getWasteOrderPrivateFromString(wasteOrderPrivateValue: string): WasteOrderPrivate {
-    const wasteOrderPrivate: WasteOrderPrivate = JSON.parse(wasteOrderPrivateValue);
-
+export function getWasteOrderPrivateFromWasteOrder(wasteOrder: WasteOrder): WasteOrderPrivate {
     return {
-        id: wasteOrderPrivate.id,
-        customerName: wasteOrderPrivate.customerName,
-        taskSite: wasteOrderPrivate.taskSite,
-        service: wasteOrderPrivate.service,
-        description: wasteOrderPrivate.description,
-        quantity: wasteOrderPrivate.quantity,
-        unitPrice: wasteOrderPrivate.unitPrice,
-        unitOfMeasure: wasteOrderPrivate.unitOfMeasure,
-        taskDate: wasteOrderPrivate.taskDate,
-        startingTime: wasteOrderPrivate.startingTime,
-        finishingTime: wasteOrderPrivate.finishingTime,
-        referenceNo: wasteOrderPrivate.referenceNo,
-        rejectionMessage: wasteOrderPrivate.rejectionMessage,
-        lastChanged: wasteOrderPrivate.lastChanged,
-        lastChangedByMSPID: wasteOrderPrivate.lastChangedByMSPID,
+        id: wasteOrder.id,
+        customerName: wasteOrder.customerName,
+        taskSite: wasteOrder.taskSite,
+        service: wasteOrder.service,
+        description: wasteOrder.description,
+        quantity: wasteOrder.quantity,
+        unitPrice: wasteOrder.unitPrice,
+        unitOfMeasure: wasteOrder.unitOfMeasure,
+        taskDate: wasteOrder.taskDate,
+        startingTime: wasteOrder.startingTime,
+        finishingTime: wasteOrder.finishingTime,
+        referenceNo: wasteOrder.referenceNo,
+        rejectionMessage: wasteOrder.rejectionMessage,
+        lastChanged: wasteOrder.lastChanged,
+        lastChangedByMSPID: wasteOrder.lastChangedByMSPID,
     };
 }

@@ -1,4 +1,5 @@
 import * as Joi from '@hapi/joi';
+import { WasteOrder } from './WasteOrder';
 
 export enum WasteOrderStatus {
     COMMISSIONED,
@@ -27,3 +28,13 @@ export const WasteOrderPublicSchema = Joi.object().keys({
 export const WasteOrderPublicCommissionSchema = Joi.object().keys({
     subcontractorMSPID: Joi.string().required(),
 });
+
+export function getWasteOrderPublicFromWasteOrder(wasteOrder: WasteOrder): WasteOrderPublic {
+    return {
+        id: wasteOrder.id,
+        status: wasteOrder.status,
+        subcontractorMSPID: wasteOrder.subcontractorMSPID,
+        originatorMSPID: wasteOrder.originatorMSPID,
+        wasteOrderPrivateId: wasteOrder.wasteOrderPrivateId,
+    };
+}
