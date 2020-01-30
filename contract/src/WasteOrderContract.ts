@@ -268,10 +268,11 @@ export class WasteOrderContract extends Contract {
         const query = {
             selector: {
                 subcontractorMSPID: MSPID,
+                status: Number(status),
             },
         };
 
-        const wasteOrderResults = await Util.getWasteOrdersFromQuery(ctx, query, status);
+        const wasteOrderResults = await Util.getWasteOrdersFromQuery(ctx, query);
         return wasteOrderResults;
     }
 
@@ -280,10 +281,11 @@ export class WasteOrderContract extends Contract {
         const query = {
             selector: {
                 originatorMSPID: MSPID,
+                status: Number(status),
             },
         };
 
-        const wasteOrderResults = await Util.getWasteOrdersFromQuery(ctx, query, status);
+        const wasteOrderResults = await Util.getWasteOrdersFromQuery(ctx, query);
         return wasteOrderResults;
     }
 }

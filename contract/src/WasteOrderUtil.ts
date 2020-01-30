@@ -147,7 +147,7 @@ export function getWasteOrderPrivateFromTransient(ctx: Context): WasteOrderPriva
     }
 }
 
-export async function getWasteOrdersFromQuery(ctx: Context, query: any, status: string): Promise<WasteOrder[]> {
+export async function getWasteOrdersFromQuery(ctx: Context, query: any): Promise<WasteOrder[]> {
     const wasteOrderResults: WasteOrder[] = [];
 
     const iterator: Iterators.StateQueryIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
@@ -155,9 +155,7 @@ export async function getWasteOrdersFromQuery(ctx: Context, query: any, status: 
 
     for (const wasteOrderPublic of wasteOrdersPublic) {
         const wasteOrder = await getWasteOrder(ctx, wasteOrderPublic.id);
-        if (wasteOrder.status === Number(status)) {
-            wasteOrderResults.push(wasteOrder);
-        }
+        wasteOrderResults.push(wasteOrder);
     }
 
     return wasteOrderResults;
