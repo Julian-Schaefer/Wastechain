@@ -1,0 +1,375 @@
+openapi: 3.0.0
+info:
+  title: Wastechain API
+  version: 1.0.0
+  description: API to interact with the Wastechain
+tags:
+- name: Waste Order
+  description: Operations regarding Waste Orders
+paths:
+  /order/{id}:
+    get:
+      tags:
+      - Waste Order
+      description: Retrieve a Waste Order by ID
+      parameters:
+      - name: id
+        in: path
+        description: Waste Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Waste Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteOrder'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+    put:
+      tags:
+      - Waste Order
+      description: Update a Waste Order by ID
+      parameters:
+      - name: id
+        in: path
+        description: Waste Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Waste Order to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+        required: true
+      responses:
+        "200":
+          description: Waste Order that has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteOrder'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+    post:
+      tags:
+      - Waste Order
+      description: Commission a new Waste Order
+      parameters:
+      - name: id
+        in: path
+        description: Waste Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Waste Order to be commissioned
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WasteOrderCommission'
+        required: true
+      responses:
+        "200":
+          description: Waste Order that has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteOrder'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /order/{id}/history:
+    get:
+      tags:
+      - Waste Order
+      description: Retrieve Transaction History of a Waste Order
+      parameters:
+      - name: id
+        in: path
+        description: Waste Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: List of Transactions for the Waste Order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WasteOrderTransaction'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /order/incoming/status/{status}:
+    get:
+      tags:
+      - Waste Order
+      description: Retrieve a list of Waste Orders for the Subcontractor with a specific
+        status
+      parameters:
+      - name: status
+        in: path
+        description: Waste Order Status
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: List of Waste Orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WasteOrder'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /order/outgoing/status/{status}:
+    get:
+      tags:
+      - Waste Order
+      description: Retrieve a list of Waste Orders for the Originator with a specific
+        status
+      parameters:
+      - name: status
+        in: path
+        description: Waste Order Status
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: List of Waste Orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WasteOrder'
+        "500":
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    Service:
+      required:
+      - description
+      - description2
+      - equipmentDescription
+      - equipmentType
+      - materialDescription
+      type: object
+      properties:
+        description:
+          type: string
+        description2:
+          type: string
+        materialDescription:
+          type: string
+        equipmentType:
+          type: integer
+        equipmentDescription:
+          type: string
+    TaskSite:
+      required:
+      - address
+      - address2
+      - areaCode
+      - city
+      - countryCode
+      - name
+      - name2
+      - postCode
+      type: object
+      properties:
+        name:
+          type: string
+        name2:
+          type: string
+        address:
+          type: string
+        address2:
+          type: string
+        postCode:
+          type: string
+        city:
+          type: string
+        countryCode:
+          type: string
+        areaCode:
+          type: string
+    WasteOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: integer
+        subcontractorMSPID:
+          type: string
+        originatorMSPID:
+          type: string
+        customerName:
+          type: string
+        taskSite:
+          $ref: '#/components/schemas/TaskSite'
+        service:
+          $ref: '#/components/schemas/Service'
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        unitOfMeasure:
+          type: string
+        taskDate:
+          type: string
+        startingTime:
+          type: string
+        finishingTime:
+          type: string
+        referenceNo:
+          type: string
+        rejectionMessage:
+          type: string
+        lastChanged:
+          type: string
+        lastChangedByMSPID:
+          type: string
+    WasteOrderCommission:
+      type: object
+      properties:
+        subcontractorMSPID:
+          type: string
+        customerName:
+          type: string
+        taskSite:
+          $ref: '#/components/schemas/TaskSite'
+        service:
+          $ref: '#/components/schemas/Service'
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        unitOfMeasure:
+          type: string
+        taskDate:
+          type: string
+        startingTime:
+          type: string
+        finishingTime:
+          type: string
+        referenceNo:
+          type: string
+    WasteOrderCorrection:
+      type: object
+      properties:
+        status:
+          type: integer
+        subcontractorMSPID:
+          type: string
+        customerName:
+          type: string
+        taskSite:
+          $ref: '#/components/schemas/TaskSite'
+        service:
+          $ref: '#/components/schemas/Service'
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        unitOfMeasure:
+          type: string
+        taskDate:
+          type: string
+        startingTime:
+          type: string
+        finishingTime:
+          type: string
+    WasteOrderCompletion:
+      type: object
+      properties:
+        status:
+          type: integer
+        quantity:
+          type: number
+        taskDate:
+          type: string
+        startingTime:
+          type: string
+        finishingTime:
+          type: string
+    WasteOrderRejection:
+      type: object
+      properties:
+        status:
+          type: integer
+        rejectionMessage:
+          type: string
+    WasteOrderStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: integer
+    WasteOrderTransaction:
+      type: object
+      properties:
+        txId:
+          type: string
+        timestamp:
+          type: string
+        isDelete:
+          type: string
+        value:
+          $ref: '#/components/schemas/WasteOrder'
+    body:
+      oneOf:
+      - $ref: '#/components/schemas/WasteOrderCorrection'
+      - $ref: '#/components/schemas/WasteOrderStatusUpdate'
+      - $ref: '#/components/schemas/WasteOrderRejection'
+      - $ref: '#/components/schemas/WasteOrderCompletion'
