@@ -18,7 +18,7 @@ export class WasteOrderContract extends Contract {
         ctx.logging.getLogger().info('Initialized Wastechain successfully!');
     }
 
-    @Transaction()
+    @Transaction(true)
     public async commissionWasteOrder(ctx: Context, orderId: string, wasteOrderPublicValue: string): Promise<WasteOrder> {
         const wasteOrderId = ctx.stub.getCreator().getMspid() + '-' + orderId;
 
@@ -55,7 +55,7 @@ export class WasteOrderContract extends Contract {
         };
     }
 
-    @Transaction()
+    @Transaction(true)
     public async acceptWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
@@ -75,7 +75,7 @@ export class WasteOrderContract extends Contract {
         };
     }
 
-    @Transaction()
+    @Transaction(true)
     public async rejectWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const updatedWasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
 
@@ -107,7 +107,7 @@ export class WasteOrderContract extends Contract {
         };
     }
 
-    @Transaction()
+    @Transaction(true)
     public async cancelWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const wasteOrderPublic = await Util.getWasteOrderPublic(ctx, orderId);
         const wasteOrderPrivate = await Util.getWasteOrderPrivate(ctx, wasteOrderPublic);
@@ -135,7 +135,7 @@ export class WasteOrderContract extends Contract {
         };
     }
 
-    @Transaction()
+    @Transaction(true)
     public async completeWasteOrder(ctx: Context, orderId: string): Promise<WasteOrder> {
         const updatedWasteOrderPrivate = Util.getWasteOrderPrivateFromTransient(ctx);
 
@@ -167,7 +167,7 @@ export class WasteOrderContract extends Contract {
         };
     }
 
-    @Transaction()
+    @Transaction(true)
     public async correctWasteOrder(ctx: Context, orderId: string, wasteOrderPublicValue: string): Promise<WasteOrder> {
         const updatedWasteOrderPublic = JSON.parse(wasteOrderPublicValue);
 
