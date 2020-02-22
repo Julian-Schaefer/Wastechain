@@ -5,7 +5,7 @@ This is Wastechain, a Blockchain-based, decentralized Operating System for the W
 (Note: The system only runs on Linux or Mac)
 
 1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/)
-2. Download and install npm (https://www.npmjs.com/get-npm)
+2. Download and install npm (https://www.npmjs.com/get-npm) --> Version 5.x.x or higher!
 3. Navigate into the "contract" directoy and execute the command "npm install" (using a shell)
 4. Navigate into the "application" directoy and execute "npm install"
 5. Navigate into the "test-network" directory
