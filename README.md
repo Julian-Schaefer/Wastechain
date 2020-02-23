@@ -4,7 +4,7 @@ This is Wastechain, a Blockchain-based, decentralized Operating System for the W
 # How to run the Test-Network
 (Note: The system only runs on Linux or Mac)
 
-1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/)
+1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/) --> Version 8.x.x!
 2. Download and install npm (https://www.npmjs.com/get-npm) --> Version 5.x.x or higher!
 
 (see Prerequisites of Hyperledger Fabric for more Information: https://hyperledger-fabric.readthedocs.io/en/release-1.4/prereqs.html)
