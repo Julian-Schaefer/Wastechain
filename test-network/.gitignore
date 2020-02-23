@@ -1,4 +1,4 @@
 crypto-config/**
 config/**
 wallet/**
-.vagrant/**
+**/.vagrant/**
