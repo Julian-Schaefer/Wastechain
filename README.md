@@ -2,7 +2,7 @@
 This is Wastechain, a Blockchain-based, decentralized Operating System for the Waste industry using Hyperledger Fabric. 
 
 # How to run the Test-Network
-(Note: The system only runs on Linux or Mac)
+Note: The system only runs on Linux (only tested on Debian 9 and Ubuntu 16+) or Mac!
 
 1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/) --> Version 8.x.x!
 2. Download and install npm (https://www.npmjs.com/get-npm) --> Version 5.x.x or higher!
