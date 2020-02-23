@@ -6,6 +6,9 @@ This is Wastechain, a Blockchain-based, decentralized Operating System for the W
 
 1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/)
 2. Download and install npm (https://www.npmjs.com/get-npm) --> Version 5.x.x or higher!
+
+(see Prerequisites of Hyperledger Fabric for more Information: https://hyperledger-fabric.readthedocs.io/en/release-1.4/prereqs.html)
+
 3. Navigate into the "contract" directoy and execute the command "npm install" (using a shell)
 4. Navigate into the "application" directoy and execute "npm install"
 5. Navigate into the "test-network" directory
