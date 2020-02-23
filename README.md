@@ -6,6 +6,7 @@ Note: The system only runs on Linux (only tested on Debian 9 and Ubuntu 16+) or 
 
 1. Download and install docker (https://docs.docker.com/install/) and docker-compose (https://docs.docker.com/compose/install/) --> Version 8.x.x!
 2. Download and install npm (https://www.npmjs.com/get-npm) --> Version 5.x.x or higher!
+(2a. On Linux install build-essential: sudo apt install build-essential) 
 
 (see Prerequisites of Hyperledger Fabric for more Information: https://hyperledger-fabric.readthedocs.io/en/release-1.4/prereqs.html)
 
@@ -15,9 +16,10 @@ Note: The system only runs on Linux (only tested on Debian 9 and Ubuntu 16+) or 
 6. If using a Mac, execute "./recreate_complete.sh"
 7. If using a Linux-based OS, execute "sudo ./recreate_complete.sh"
 8. Wait for the command to finish
-6. If using a Mac, execute "./start_api.sh"
-7. If using a Linux-based OS, execute "sudo ./start_api.sh"
-8. Wait for the command to finish and continue to wait for a minute after that, in order for the API and Web-Frontend to start up.
+8. (If using a Mac, replace "127.0.0.1" with "localhost" in ".env" file of "test-network" folder)
+9. If using a Mac, execute "./start_api.sh"
+10. If using a Linux-based OS, execute "sudo ./start_api.sh"
+11. Wait for the command to finish and continue to wait for a minute after that, in order for the API and Web-Frontend to start up.
 
 # Access API
 When everything is up and running, the API for the different Organisations are available at:
