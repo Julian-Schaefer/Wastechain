@@ -19,5 +19,12 @@ Vagrant.configure('2') do |config|
     vb.maxmemory = 8192
   end
 
-  config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime", run: "always"
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y build-essential
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    apt-get install -y nodejs
+    snap install docker
+    sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+  SHELL
 end
