@@ -1,6 +1,6 @@
 Vagrant.require_version ">= 1.7.4"
 Vagrant.configure('2') do |config|
-  config.vm.box = "generic/debian9"
+  config.vm.box = "generic/ubuntu1804"
 
   config.vm.network :forwarded_port, guest: 7050, host: 7050, id: "orderer", host_ip: "localhost", auto_correct: true # fabric orderer service
   config.vm.network :forwarded_port, guest: 7051, host: 7051, id: "peer", host_ip: "localhost", auto_correct: true # fabric peer service
